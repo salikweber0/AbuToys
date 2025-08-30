@@ -147,9 +147,9 @@ async function requestMobileLocation() {
     // Check if geolocation is supported
     if (!navigator.geolocation) {
         showMobileLocationPopup(
-            '❌ आपका device/browser location support नहीं करता।\n\nकृपया modern browser use करें या manual contact करें।',
+            '⚠ Your device/browser does not support location.\n\nPlease use a modern browser or contact manually.',
             [
-                { text: 'WhatsApp करें', action: 'manualWhatsApp()', color: '#25D366' },
+                { text: 'WhatsApp', action: 'manualWhatsApp()', color: '#25D366' },
                 { text: 'Close', action: 'hideMobileLocationPopup()' }
             ]
         );
@@ -166,10 +166,10 @@ async function requestMobileLocation() {
     
     if (!isSecure) {
         showMobileLocationPopup(
-            '🔒 Location केवल secure (HTTPS) websites पर काम करती है।\n\nGitHub Pages या अन्य HTTPS hosting use करें।',
+            '🔒 Location only works on secure (HTTPS) websites.\n\nUse GitHub Pages or other HTTPS hosting.',
             [
                 { text: 'Manual Contact', action: 'manualWhatsApp()', color: '#25D366' },
-                { text: 'समझ गया', action: 'hideMobileLocationPopup()' }
+                { text: 'Understood', action: 'hideMobileLocationPopup()' }
             ]
         );
         return;
@@ -180,7 +180,7 @@ async function requestMobileLocation() {
     
     if (permissionStatus === 'denied') {
         showMobileLocationPopup(
-            '⚠️ Location permission पहले deny कर दी गई है!\n\nMobile में enable करने के लिए:\n\n📱 Browser settings में जाकर इस site के लिए location "Allow" करें\n\n🔄 या page refresh करके फिर try करें',
+            '⚠️ Location permission was denied earlier!\n\nTo enable on mobile:\n\n📱 Go to browser settings and allow location for this site\n\n🔄 Or refresh the page and try again',
             [
                 { text: 'Page Refresh', action: 'location.reload()', color: '#4ECDC4' },
                 { text: 'Manual Contact', action: 'manualWhatsApp()', color: '#25D366' },
@@ -191,21 +191,21 @@ async function requestMobileLocation() {
     }
 
     // Show loading with better mobile UX
-    showMobileLocationPopup(`🔍 Location detect कर रहे हैं...\n\n${isMobileDevice() ? '📱 Mobile detected' : '💻 Desktop detected'}\n\nकृपया "Allow" दबाएं जब browser पूछे।`);
+    showMobileLocationPopup(`📍 Detecting location...\n\n${isMobileDevice() ? '📱 Mobile detected' : '💻 Desktop detected'}\n\nPlease click "Allow" when browser asks.`);
 
     // Enhanced location options for mobile
     const locationOptions = {
-        enableHighAccuracy: isMobileDevice() ? false : true, // Mobile पर battery save करने के लिए
-        timeout: isMobileDevice() ? 20000 : 15000, // Mobile पर ज्यादा time दें
+        enableHighAccuracy: isMobileDevice() ? false : true, // Save battery on mobile
+        timeout: isMobileDevice() ? 20000 : 15000, // Give more time on mobile
         maximumAge: 300000 // 5 minutes cache
     };
 
     // Add timeout handling
     const timeoutId = setTimeout(() => {
         showMobileLocationPopup(
-            '⏰ Location detect में बहुत time लग रहा है!\n\nकुछ tips:\n• GPS on करें\n• Open area में जाएं\n• WiFi/Data strong हो',
+            '⏰ Location detection is taking too long!\n\nSome tips:\n• Turn on GPS\n• Go to open area\n• Ensure strong WiFi/Data',
             [
-                { text: 'फिर Try करें', action: 'requestMobileLocation()', color: '#FF6B6B' },
+                { text: 'Try Again', action: 'requestMobileLocation()', color: '#FF6B6B' },
                 { text: 'Manual Contact', action: 'manualWhatsApp()', color: '#25D366' }
             ]
         );
@@ -237,7 +237,7 @@ async function requestMobileLocation() {
                 
                 isAhmedabadUser = true;
                 showMobileLocationPopup(
-                    '✅ Perfect! आप अहमदाबाद में हैं।\n\n🎯 Location verified successfully!\n\nअब आप सभी features use कर सकते हैं।',
+                    '✅ Perfect! You are in Ahmedabad.\n\n🎯 Location verified successfully!\n\nNow you can use all features.',
                     [{ text: '🎉 Great!', action: 'hideMobileLocationPopup()', color: '#4CAF50' }]
                 );
                 
@@ -252,9 +252,9 @@ async function requestMobileLocation() {
                 const distance = calculateDistance(lat, lon, ahmedabadCenter.lat, ahmedabadCenter.lon);
                 
                 showMobileLocationPopup(
-                    `📍 आपकी location: ${distance.toFixed(1)} km away from Ahmedabad\n\n😔 माफ करें! हम सिर्फ अहमदाबाद में ही delivery करते हैं।\n\nFuture में अन्य cities भी add करेंगे!`,
+                    `📍 Your location: ${distance.toFixed(1)} km away from Ahmedabad\n\n😔 Sorry! We only deliver in Ahmedabad city.\n\n📜 We will add other cities soon!`,
                     [
-                        { text: 'समझ गया', action: 'hideMobileLocationPopup()' },
+                        { text: 'Understood', action: 'hideMobileLocationPopup()' },
                         { text: 'Still Contact', action: 'manualWhatsApp()', color: '#25D366' }
                     ]
                 );
@@ -272,28 +272,28 @@ async function requestMobileLocation() {
             
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMsg = `🚫 Location permission deny कर दी गई!\n\n📱 Mobile में enable करने के steps:\n\n1️⃣ Browser के menu (⋮) में जाएं\n2️⃣ "Site settings" या "Permissions" खोलें\n3️⃣ "Location" को "Allow" करें\n4️⃣ Page refresh करें\n\n🔄 या phone की main settings में भी location on करें।`;
+                    errorMsg = `🚫 Location permission denied!\n\n📱 Steps to enable on mobile:\n\n1️⃣ Go to browser menu (⋮)\n2️⃣ Open "Site settings" or "Permissions"\n3️⃣ Set "Location" to "Allow"\n4️⃣ Refresh page\n\n🔄 Or turn on location in your phone's main settings.`;
                     buttons = [
                         { text: '🔄 Page Refresh', action: 'location.reload()', color: '#4ECDC4' },
                         { text: '📱 Manual Contact', action: 'manualWhatsApp()', color: '#25D366' },
-                        { text: 'बाद में', action: 'hideMobileLocationPopup()', color: '#6c757d' }
+                        { text: 'Later', action: 'hideMobileLocationPopup()', color: '#6c757d' }
                     ];
                     break;
                     
                 case error.POSITION_UNAVAILABLE:
-                    errorMsg = `📡 GPS signal नहीं मिल रही!\n\n${isMobileDevice() ? '📱 Mobile tips:' : '💻 Desktop tips:'}\n\n• GPS/Location services on करें\n• Open area में जाएं (building से बाहर)\n• Network connection strong हो\n• कुछ seconds wait करें`;
+                    errorMsg = `📡 GPS signal not found!\n\n${isMobileDevice() ? '📱 Mobile tips:' : '💻 Desktop tips:'}\n\n• Turn on GPS/Location services\n• Go to open area (outside building)\n• Ensure strong network connection\n• Wait a few seconds`;
                     buttons = [
-                        { text: '🔄 फिर Try करें', action: 'requestMobileLocation()', color: '#FF6B6B' },
+                        { text: '🔄 Try Again', action: 'requestMobileLocation()', color: '#FF6B6B' },
                         { text: '📞 Manual Contact', action: 'manualWhatsApp()', color: '#25D366' }
                     ];
                     break;
                     
                 case error.TIMEOUT:
-                    errorMsg = `⏰ Location detect में बहुत time लग रहा!\n\n${isMobileDevice() ? '📱 Mobile solutions:' : '💻 Desktop solutions:'}\n\n• Internet connection check करें\n• GPS signal strong हो\n• कुछ seconds wait करके फिर try करें`;
+                    errorMsg = `⏰ Location detection taking too long!\n\n${isMobileDevice() ? '📱 Mobile solutions:' : '💻 Desktop solutions:'}\n\n• Check internet connection\n• Ensure strong GPS signal\n• Wait a few seconds and try again`;
                     
                     if (locationAttempts < MAX_LOCATION_ATTEMPTS) {
                         buttons = [
-                            { text: '🔄 फिर Try करें', action: 'requestMobileLocation()', color: '#FF6B6B' },
+                            { text: '🔄 Try Again', action: 'requestMobileLocation()', color: '#FF6B6B' },
                             { text: '📱 Manual Contact', action: 'manualWhatsApp()', color: '#25D366' }
                         ];
                     } else {
@@ -305,7 +305,7 @@ async function requestMobileLocation() {
                     break;
                     
                 default:
-                    errorMsg = `❌ Location में technical problem है।\n\n${isMobileDevice() ? '📱 Mobile device detected' : '💻 Desktop detected'}\n\n• Browser को update करें\n• या manual contact करें`;
+                    errorMsg = `⚠ Technical problem with location.\n\n${isMobileDevice() ? '📱 Mobile device detected' : '💻 Desktop detected'}\n\n• Update your browser\n• Or contact manually`;
                     buttons = [
                         { text: '📱 Manual Contact', action: 'manualWhatsApp()', color: '#25D366' },
                         { text: 'Close', action: 'hideMobileLocationPopup()' }
@@ -335,9 +335,9 @@ function executeAction(actionType, productName = '') {
     // Check if location was attempted
     if (!locationCheckAttempted) {
         showMobileLocationPopup(
-            '📍 Location Verification Required\n\nपहले location permission दें ताकि हम verify कर सकें कि आप अहमदाबाद में हैं।\n\n🔒 यह आपकी privacy के लिए safe है।',
+            '📍 Location Verification Required\n\nFirst give location permission so we can verify that you are in Ahmedabad.\n\n🔒 This is safe for your privacy.',
             [
-                { text: '✅ Location Allow करें', action: 'requestMobileLocation()', color: '#4ECDC4' },
+                { text: '✅ Allow Location', action: 'requestMobileLocation()', color: '#4ECDC4' },
                 { text: '❌ Cancel', action: 'hideMobileLocationPopup()', color: '#6c757d' }
             ]
         );
@@ -346,11 +346,11 @@ function executeAction(actionType, productName = '') {
     
     if (!isLocationAllowed) {
         showMobileLocationPopup(
-            `⚠️ Location permission नहीं मिली!\n\n${isMobileDevice() ? '📱 Mobile' : '💻 Desktop'} में location enable करें:\n\n🔧 Browser settings में जाकर इस site को location allow करें\n\n🔄 या page refresh करके फिर try करें`,
+            `⚠️ Location permission not granted!\n\nEnable location on ${isMobileDevice() ? '📱 Mobile' : '💻 Desktop'}:\n\n🔧 Go to browser settings and allow location for this site\n\n🔄 Or refresh page and try again`,
             [
                 { text: '🔄 Refresh', action: 'location.reload()', color: '#4ECDC4' },
                 { text: '📱 Manual Contact', action: 'manualWhatsApp()', color: '#25D366' },
-                { text: 'समझ गया', action: 'hideMobileLocationPopup()' }
+                { text: 'Understood', action: 'hideMobileLocationPopup()' }
             ]
         );
         return;
@@ -358,9 +358,9 @@ function executeAction(actionType, productName = '') {
     
     if (!isAhmedabadUser) {
         showMobileLocationPopup(
-            '😔 Sorry! आप अहमदाबाद city में नहीं हैं।\n\n🚚 हम सिर्फ अहमदाबाद में ही toys deliver करते हैं।\n\n🔜 जल्दी ही other cities भी add करेंगे!',
+            '😔 Sorry! You are not in Ahmedabad city.\n\n🚚 We only deliver toys in Ahmedabad.\n\n📜 We will add other cities soon!',
             [
-                { text: 'समझ गया', action: 'hideMobileLocationPopup()' },
+                { text: 'Understood', action: 'hideMobileLocationPopup()' },
                 { text: 'Still Contact', action: 'manualWhatsApp()', color: '#25D366' }
             ]
         );
@@ -373,18 +373,18 @@ function executeAction(actionType, productName = '') {
         
         // Mobile-friendly name input
         if (isMobileDevice()) {
-            userName = prompt('🧸 अपना नाम बताएं:') || 'Customer';
+            userName = prompt('🧸 Tell us your name:') || 'Customer';
         } else {
-            userName = prompt('अपना नाम बताएं:') || 'Customer';
+            userName = prompt('Tell us your name:') || 'Customer';
         }
         
         if (userName && userName.trim()) {
-            let message = `Hi! 👋 मैं ${userName.trim()} हूं अहमदाबाद से।`;
+            let message = `Hi! 👋 I am ${userName.trim()} from Ahmedabad.`;
             
             if (productName) {
-                message += ` मुझे *${productName}* order करना है। 🧸`;
+                message += ` I want to order *${productName}*. 🧸`;
             } else {
-                message += ` मुझे आपके toys में interest है। कृपया details भेजें। 🎯`;
+                message += ` I am interested in your toys. Please send details. 🎯`;
             }
             
             message += `\n\n📍 Location verified ✅`;
@@ -393,27 +393,27 @@ function executeAction(actionType, productName = '') {
             
             // Open WhatsApp
             if (isMobileDevice()) {
-                // Mobile पर WhatsApp app में खोलने की कोशिश
+                // Try to open in WhatsApp app on mobile
                 window.location.href = whatsappURL;
             } else {
                 window.open(whatsappURL, '_blank');
             }
             
         } else {
-            alert('कृपया अपना नाम enter करें! 😊');
+            alert('Please enter your name! 😊');
         }
         
     } else if (actionType === 'call') {
         if (isMobileDevice()) {
-            // Mobile पर direct call
+            // Direct call on mobile
             window.location.href = 'tel:+918160154042';
         } else {
-            // Desktop पर number show करें
+            // Show number on desktop
             showMobileLocationPopup(
-                '📞 हमारा Contact Number:\n\n+91 8160154042\n\n💻 Desktop से अपने mobile phone से dial करें।',
+                '📞 Our Contact Number:\n\n+91 8160154042\n\n💻 Dial from your mobile phone from desktop.',
                 [
-                    { text: '📱 WhatsApp करें', action: 'executeAction("whatsapp")', color: '#25D366' },
-                    { text: 'Number Copy', action: 'copyPhoneNumber()', color: '#4ECDC4' },
+                    { text: '📱 WhatsApp', action: 'executeAction("whatsapp")', color: '#25D366' },
+                    { text: 'Copy Number', action: 'copyPhoneNumber()', color: '#4ECDC4' },
                     { text: 'Close', action: 'hideMobileLocationPopup()' }
                 ]
             );
@@ -425,12 +425,12 @@ function executeAction(actionType, productName = '') {
 function copyPhoneNumber() {
     if (navigator.clipboard) {
         navigator.clipboard.writeText('+918160154042').then(() => {
-            alert('📋 Phone number copied! अब अपने phone से dial करें।');
+            alert('📋 Phone number copied! Now dial from your phone.');
             hideMobileLocationPopup();
         });
     } else {
         // Fallback for older browsers
-        alert('📞 Number: +918160154042 (manually dial करें)');
+        alert('📞 Number: +918160154042 (dial manually)');
         hideMobileLocationPopup();
     }
 }
@@ -544,7 +544,7 @@ function createLocationBanner() {
         <div style="font-size: ${isMobileDevice() ? '1rem' : '0.95rem'}; margin-bottom: 12px; font-weight: 600;">
             📍 <strong>Location Required</strong><br>
             <span style="font-weight: 400; font-size: 0.9rem;">
-                कृपया location allow करें ताकि हम आपको serve कर सकें
+                Please allow location so we can serve you
             </span>
         </div>
         <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
@@ -597,11 +597,15 @@ function manualWhatsApp() {
     hideMobileLocationPopup();
     
     const userName = isMobileDevice() ? 
-        prompt('🧸 अपना नाम और area बताएं:\n(जैसे: Raj, Vastrapur)') :
-        prompt('अपना नाम और area बताएं:');
+        prompt('🧸 Tell us your name:') || 'Customer' :
+        prompt('Tell us your name:') || 'Customer';
         
     if (userName && userName.trim()) {
-        const message = `Hi! 👋 मैं ${userName.trim()} हूं।\n\n📍 कृपया confirm करें कि मैं अहमदाबाद में हूं या नहीं।\n\n🧸 मुझे आपके toys में interest है।`;
+        const message = `Hi! 👋 I am ${userName.trim()}.
+
+📍 Please confirm if I am in Ahmedabad or not.
+
+🧸 I am interested in your toys.`;
         const whatsappURL = `https://wa.me/918160154042?text=${encodeURIComponent(message)}`;
         
         if (isMobileDevice()) {
@@ -632,8 +636,8 @@ function filterProducts(searchTerm) {
     // Show results count
     if (searchTerm) {
         const resultsMsg = foundProducts > 0 ? 
-            `🔍 ${foundProducts} products मिले "${searchTerm}" के लिए` :
-            `😔 कोई product नहीं मिला "${searchTerm}" के लिए। कुछ और search करें।`;
+            `🔍 ${foundProducts} products found for "${searchTerm}"` :
+            `😔 No product found for "${searchTerm}". Try searching something else.`;
         
         // Show temporary result message
         const resultDiv = document.getElementById('search-results') || document.createElement('div');
@@ -684,7 +688,7 @@ if (responsiveSearchBtn && mobileSearchOverlay) {
         const searchInput = document.getElementById('mobile-search-input');
         if (searchInput) {
             searchInput.focus();
-            // Mobile पर keyboard trigger करने के लिए
+            // Trigger keyboard on mobile
             searchInput.click();
         }
     });
@@ -750,9 +754,9 @@ function handleLocationErrors() {
         if (!isLocationAllowed && locationCheckAttempted && locationAttempts < MAX_LOCATION_ATTEMPTS) {
             setTimeout(() => {
                 showMobileLocationPopup(
-                    '🌐 Internet connection restored!\n\nLocation अब बेहतर काम कर सकती है।',
+                    '🌐 Internet connection restored!\n\nLocation may work better now.',
                     [
-                        { text: '🔄 फिर Try करें', action: 'requestMobileLocation()', color: '#4ECDC4' },
+                        { text: '🔄 Try Again', action: 'requestMobileLocation()', color: '#4ECDC4' },
                         { text: 'Skip', action: 'hideMobileLocationPopup()' }
                     ]
                 );
@@ -782,7 +786,7 @@ if (newsletterForm) {
             }
             this.reset();
         } else {
-            alert('कृपया valid email address enter करें! 📧');
+            alert('Please enter a valid email address! 📧');
         }
     });
 }
@@ -795,11 +799,11 @@ if (contactForm) {
         
         if (isMobileDevice()) {
             showMobileLocationPopup(
-                '📧 Message sent successfully!\n\nहम जल्दी reply करेंगे। 🚀',
+                '📧 Message sent successfully!\n\nWe will reply soon. 🚀',
                 [{ text: '✅ Great!', action: 'hideMobileLocationPopup()', color: '#4CAF50' }]
             );
         } else {
-            alert('📧 Message sent! हम जल्दी reply करेंगे।');
+            alert('📧 Message sent! We will reply soon.');
         }
         this.reset();
     });
@@ -826,7 +830,7 @@ document.querySelectorAll('.wishlist-icon').forEach(icon => {
         setTimeout(() => this.style.transform = 'scale(1)', 200);
         
         if (isMobileDevice()) {
-            // Mobile पर haptic feedback (if supported)
+            // Mobile haptic feedback (if supported)
             if (navigator.vibrate) {
                 navigator.vibrate(50);
             }
@@ -924,6 +928,7 @@ window.addEventListener('scroll', () => {
     if (window.scrollY > scrollThreshold) {
         backToTopButton.style.opacity = '1';
         backToTopButton.style.transform = 'scale(1)';
+        backToTopButton.style.bottom = isMobileDevice() ? '10px' : '0';
         
         if (responsiveSearchBtn) {
             responsiveSearchBtn.style.opacity = '1';
@@ -932,6 +937,7 @@ window.addEventListener('scroll', () => {
     } else {
         backToTopButton.style.opacity = '0';
         backToTopButton.style.transform = 'scale(0)';
+        backToTopButton.style.bottom = isMobileDevice() ? '10px' : '0';
         
         if (responsiveSearchBtn) {
             responsiveSearchBtn.style.opacity = '0';
@@ -1013,11 +1019,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show location banner based on device type
     if (isMobileDevice()) {
-        // Mobile पर user-initiated location request करें
+        // User-initiated location request on mobile
         console.log('📱 Mobile detected - showing location banner');
         setTimeout(createLocationBanner, 2500);
     } else {
-        // Desktop पर auto-check कर सकते हैं but with delay
+        // Auto-check on desktop but with delay
         console.log('💻 Desktop detected - auto location check');
         setTimeout(() => {
             if (!locationCheckAttempted) {
@@ -1047,9 +1053,9 @@ window.addEventListener('error', (e) => {
     if (e.error.message.includes('geolocation') || e.error.message.includes('location')) {
         console.log('🔧 Location-related error detected, providing fallback...');
         showMobileLocationPopup(
-            '⚠️ Location में technical issue है।\n\nDirect contact करें:',
+            '⚠️ Technical issue with location.\n\nContact directly:',
             [
-                { text: '📱 WhatsApp करें', action: 'manualWhatsApp()', color: '#25D366' },
+                { text: '📱 WhatsApp', action: 'manualWhatsApp()', color: '#25D366' },
                 { text: 'Close', action: 'hideMobileLocationPopup()' }
             ]
         );
