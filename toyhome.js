@@ -389,7 +389,7 @@ function executeAction(actionType, productName = '') {
             
             message += `\n\n📍 Location verified ✅`;
             
-            const whatsappURL = `https://wa.me/918160154042?text=${encodeURIComponent(message)}`;
+            const whatsappURL = `https://wa.me/919879254030?text=${encodeURIComponent(message)}`;
             
             // Open WhatsApp
             if (isMobileDevice()) {
@@ -406,11 +406,11 @@ function executeAction(actionType, productName = '') {
     } else if (actionType === 'call') {
         if (isMobileDevice()) {
             // Direct call on mobile
-            window.location.href = 'tel:+918160154042';
+            window.location.href = 'tel:+919879254030';
         } else {
             // Show number on desktop
             showMobileLocationPopup(
-                '📞 Our Contact Number:\n\n+91 8160154042\n\n💻 Dial from your mobile phone from desktop.',
+                '📞 Our Contact Number:\n\n+91 9879254030\n\n💻 Dial from your mobile phone from desktop.',
                 [
                     { text: '📱 WhatsApp', action: 'executeAction("whatsapp")', color: '#25D366' },
                     { text: 'Copy Number', action: 'copyPhoneNumber()', color: '#4ECDC4' },
@@ -424,13 +424,13 @@ function executeAction(actionType, productName = '') {
 // Copy phone number function
 function copyPhoneNumber() {
     if (navigator.clipboard) {
-        navigator.clipboard.writeText('+918160154042').then(() => {
+        navigator.clipboard.writeText('+919879254030').then(() => {
             alert('📋 Phone number copied! Now dial from your phone.');
             hideMobileLocationPopup();
         });
     } else {
         // Fallback for older browsers
-        alert('📞 Number: +918160154042 (dial manually)');
+        alert('📞 Number: +919879254030 (dial manually)');
         hideMobileLocationPopup();
     }
 }
@@ -606,7 +606,7 @@ function manualWhatsApp() {
 📍 Please confirm if I am in Ahmedabad or not.
 
 🧸 I am interested in your toys.`;
-        const whatsappURL = `https://wa.me/918160154042?text=${encodeURIComponent(message)}`;
+        const whatsappURL = `https://wa.me/919879254030?text=${encodeURIComponent(message)}`;
         
         if (isMobileDevice()) {
             window.location.href = whatsappURL;
