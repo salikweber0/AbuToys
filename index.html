@@ -12,21 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Location Verification Banner -->
-    <div id="location-banner" class="location-banner" style="display: none;">
-        <div class="banner-content">
-            <div class="banner-icon">📍</div>
-            <div class="banner-text">
-                <strong>Location Required for Delivery</strong>
-                <p>We need to verify you're in Ahmedabad for accurate delivery charges</p>
-            </div>
-            <div class="banner-buttons">
-                <button onclick="requestLocation()" class="btn btn-location">Allow Location</button>
-                <button onclick="hideBanner()" class="btn btn-close">✕</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -63,9 +48,9 @@
             <h1 class="hero-title animate-fade-in">Best Toys for Happy Kids 🧸✨</h1>
             <p class="hero-subtitle animate-fade-in-delay">Serving Happiness in Ahmedabad since 2024</p>
             <div class="hero-buttons animate-fade-in-delay-2">
-                <a href="products.html" class="btn btn-primary">🛒 Shop Now</a>
-                <button id="whatsapp-btn" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp Us</button>
-                <button id="call-btn" class="btn btn-call">📞 Call Us Now</button>
+                <a href="products.html" class="btn btn-primary">🛍️ Shop Now</a>
+                <a href="https://wa.me/9879254030" target="_blank" id="whatsapp-btn" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+                <a href="tel:+919879254030" id="callAhmedabad" class="btn btn-call">📞 Call Us Now</a>
             </div>
         </div>
         <div class="hero-slider">
@@ -87,7 +72,7 @@
         <div class="container">
             <h2 class="section-title">✨ Featured Products</h2>
             <div class="products-grid">
-                <div class="product-card" data-product="Cute Teddy Bear" data-price="260">
+                <div class="product-card">
                     <div class="product-image">
                         <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSogV3XwUN0PIAUkK8tm-4ywkFCi7j90L_FJfEFda3LImmYDua1nshdJdQFUJSb7fSMwgcw19iYOep5VKmhSFC3h_4QPbJxSNxN1WHMIlw" alt="Cute Teddy Bear">
                         <div class="product-overlay">
@@ -96,19 +81,11 @@
                     </div>
                     <div class="product-info">
                         <h3>Cute Teddy Bear</h3>
-                        <div class="price-container">
-                            <p class="product-price">₹260 <span class="old-price">₹399</span></p>
-                            <div class="delivery-info">
-                                <span class="delivery-charge">📍 Calculating delivery...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-order" data-product="Cute Teddy Bear" disabled>
-                            <span class="btn-text">🔄 Verifying Location...</span>
-                        </button>
+                        <p class="product-price">₹260 <span class="old-price">₹399</span><span class="delivery-charge" id="delivery-charge-1"></span></p>
+                        <button class="btn btn-small order-btn" data-product="Cute Teddy Bear">Order Now</button>
                     </div>
                 </div>
-
-                <div class="product-card" data-product="Building Blocks Set" data-price="299">
+                <div class="product-card">
                     <div class="product-image">
                         <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=300&h=300&fit=crop" alt="Building Blocks Set">
                         <div class="product-overlay">
@@ -117,40 +94,24 @@
                     </div>
                     <div class="product-info">
                         <h3>Building Blocks Set</h3>
-                        <div class="price-container">
-                            <p class="product-price">₹299 <span class="old-price">₹450</span></p>
-                            <div class="delivery-info">
-                                <span class="delivery-charge">📍 Calculating delivery...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-order" data-product="Building Blocks Set" disabled>
-                            <span class="btn-text">🔄 Verifying Location...</span>
-                        </button>
+                        <p class="product-price">₹299 <span class="old-price">₹450</span><span class="delivery-charge" id="delivery-charge-2"></span></p>
+                        <button class="btn btn-small order-btn" data-product="Building Blocks Set">Order Now</button>
                     </div>
                 </div>
-
-                <div class="product-card" data-product="Future 09 Musical Car" data-price="290">
+                <div class="product-card">
                     <div class="product-image">
-                        <img src="https://images.meesho.com/images/products/357185098/uiq59_512.jpg" alt="Musical Car">
+                        <img src="https://images.meesho.com/images/products/357185098/uiq59_512.jpg" alt="Remote Control Car">
                         <div class="product-overlay">
                             <i class="fas fa-heart wishlist-icon"></i>
                         </div>
                     </div>
                     <div class="product-info">
                         <h3>Future 09 Musical Car</h3>
-                        <div class="price-container">
-                            <p class="product-price">₹290 <span class="old-price">₹430</span></p>
-                            <div class="delivery-info">
-                                <span class="delivery-charge">📍 Calculating delivery...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-order" data-product="Future 09 Musical Car" disabled>
-                            <span class="btn-text">🔄 Verifying Location...</span>
-                        </button>
+                        <p class="product-price">₹290 <span class="old-price">₹430</span><span class="delivery-charge" id="delivery-charge-3"></span></p>
+                        <button class="btn btn-small order-btn" data-product="Future 09 Musical Car">Order Now</button>
                     </div>
                 </div>
-
-                <div class="product-card" data-product="Princess Doll House" data-price="550">
+                <div class="product-card">
                     <div class="product-image">
                         <img src="https://m.media-amazon.com/images/I/71fCCUZraUL._UF1000,1000_QL80_.jpg" alt="Princess Doll House">
                         <div class="product-overlay">
@@ -159,40 +120,24 @@
                     </div>
                     <div class="product-info">
                         <h3>Princess Doll House</h3>
-                        <div class="price-container">
-                            <p class="product-price">₹550 <span class="old-price">₹799</span></p>
-                            <div class="delivery-info">
-                                <span class="delivery-charge">📍 Calculating delivery...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-order" data-product="Princess Doll House" disabled>
-                            <span class="btn-text">🔄 Verifying Location...</span>
-                        </button>
+                        <p class="product-price">₹550 <span class="old-price">₹799</span><span class="delivery-charge" id="delivery-charge-4"></span></p>
+                        <button class="btn btn-small order-btn" data-product="Princess Doll House">Order Now</button>
                     </div>
                 </div>
-
-                <div class="product-card" data-product="Remote Control Helicopter" data-price="280">
+                <div class="product-card">
                     <div class="product-image">
-                        <img src="https://m.media-amazon.com/images/I/61uIlAs1RhL._UF1000,1000_QL80_.jpg" alt="RC Helicopter">
+                        <img src="https://m.media-amazon.com/images/I/61uIlAs1RhL._UF1000,1000_QL80_.jpg" alt="Remote Control helicopter">
                         <div class="product-overlay">
                             <i class="fas fa-heart wishlist-icon"></i>
                         </div>
                     </div>
                     <div class="product-info">
                         <h3>Remote Control Helicopter</h3>
-                        <div class="price-container">
-                            <p class="product-price">₹280 <span class="old-price">₹399</span></p>
-                            <div class="delivery-info">
-                                <span class="delivery-charge">📍 Calculating delivery...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-order" data-product="Remote Control Helicopter" disabled>
-                            <span class="btn-text">🔄 Verifying Location...</span>
-                        </button>
+                        <p class="product-price">₹280 <span class="old-price">₹399</span><span class="delivery-charge" id="delivery-charge-5"></span></p>
+                        <button class="btn btn-small order-btn" data-product="Remote Control Helicopter">Order Now</button>
                     </div>
                 </div>
-
-                <div class="product-card" data-product="Toy Weapons" data-price="240">
+                <div class="product-card">
                     <div class="product-image">
                         <img src="https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=1080/da/cms-assets/cms/product/15bbdedd-8b9f-4769-a912-e2c66f9428f7.jpg" alt="Toy Weapons">
                         <div class="product-overlay">
@@ -201,15 +146,8 @@
                     </div>
                     <div class="product-info">
                         <h3>Toy Weapons</h3>
-                        <div class="price-container">
-                            <p class="product-price">₹240 <span class="old-price">₹399</span></p>
-                            <div class="delivery-info">
-                                <span class="delivery-charge">📍 Calculating delivery...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-order" data-product="Toy Weapons" disabled>
-                            <span class="btn-text">🔄 Verifying Location...</span>
-                        </button>
+                        <p class="product-price">₹240 <span class="old-price">₹399</span><span class="delivery-charge" id="delivery-charge-6"></span></p>
+                        <button class="btn btn-small order-btn" data-product="Toy Weapons">Order Now</button>
                     </div>
                 </div>
             </div>
@@ -228,7 +166,7 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">🛡️</div>
-                    <h3>Safe &amp; Non-Toxic</h3>
+                    <h3>Safe & Non-Toxic</h3>
                     <p>All toys are tested for safety and made with child-safe materials</p>
                 </div>
                 <div class="feature-card">
@@ -315,10 +253,12 @@
             <div class="cta-content">
                 <h2>❤️ Like Something? Order Instantly!</h2>
                 <p>Get in touch with us on WhatsApp for quick orders and instant responses</p>
-                <button id="cta-whatsapp-btn" class="btn btn-whatsapp">
-                    <i class="fab fa-whatsapp"></i>
-                    Meet on WhatsApp
-                </button>
+                <a href="https://wa.me/9879254030" target="_blank">
+                    <button class="btn btn-whatsapp" onclick="openWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                        Meet on WhatsApp
+                    </button>
+                </a>
             </div>
         </div>
     </section>
@@ -351,7 +291,7 @@
     <section class="newsletter">
         <div class="container">
             <div class="newsletter-content">
-                <h2>🎁 Subscribe for Special Offers!</h2>
+                <h2>📮 Subscribe for Special Offers!</h2>
                 <p>Get notified about festive discounts and new arrivals</p>
                 <form class="newsletter-form">
                     <input type="email" placeholder="Enter your email address" required>
@@ -367,7 +307,7 @@
             <h2 class="section-title">📞 Get in Touch</h2>
             <div class="contact-grid">
                 <div class="contact-info-box">
-                    <p><i class="fas fa-map-marker-alt"></i> Burkhaposh Masjid, Old City, Halim Ni Khadki, Shahpur, Ahmedabad - 380001</p>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Toy Street, Satellite, Ahmedabad - 380015</p>
                     <p><i class="fas fa-phone"></i> +91 9879254030</p>
                     <p><i class="fas fa-envelope"></i> AbuToys9879@gmail.com</p>
                 </div>
@@ -395,7 +335,7 @@
                     <h3>🧸 AbuToys</h3>
                     <p>Making childhood magical since 2024</p>
                     <div class="social-icons">
-                        <a href="#" id="footer-whatsapp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://wa.me/9879254030" target="_blank" onclick="openWhatsApp()"><i class="fab fa-whatsapp"></i></a>
                         <a href="#" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
                         <a href="#" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
                     </div>
@@ -432,24 +372,9 @@
     <div id="mobile-search-overlay" class="mobile-search-overlay">
         <div class="mobile-search-content">
             <input type="text" id="mobile-search-input" class="search-input" placeholder="Search products...">
-            <button id="mobile-search-close" class="close-search">✕</button>
         </div>
     </div>
 
-    <!-- Location Status Modal -->
-    <div id="location-modal" class="location-modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">📍 Location Verification</h3>
-                <button onclick="closeLocationModal()" class="modal-close">✕</button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-message">Checking your location...</p>
-                <div id="modal-buttons" class="modal-buttons"></div>
-            </div>
-        </div>
-    </div>
-
-    <script src="enhanced-abutoys.js"></script>
+    <script src="toyhome.js"></script>
 </body>
 </html>
