@@ -10,6 +10,119 @@
     <link rel="stylesheet" href="toyproduct.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- HTTPS Redirect + Security Code -->
+<script>
+// Force HTTPS redirect
+if (location.protocol !== 'https:' && 
+    !location.hostname.includes('localhost') && 
+    !location.hostname.includes('127.0.0.1')) {
+    location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+}
+
+// Right click disable
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Inspect element shortcuts disable
+document.addEventListener('keydown', function(e) {
+    // F12 disable
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+I disable
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+C disable
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+U disable (view source)
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+S disable (save page)
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Developer tools detection
+let devtools = {open: false, orientation: null};
+setInterval(function() {
+    if (window.outerHeight - window.innerHeight > 100 || window.outerWidth - window.innerWidth > 100) {
+        if (!devtools.open) {
+            devtools.open = true;
+            console.clear();
+            document.body.innerHTML = '<h1 style="text-align:center; margin-top:50px; color: red;">Access Denied! 🚫</h1>';
+        }
+    } else {
+        devtools.open = false;
+    }
+}, 500);
+</script>
+<!-- Direct Access Blocking for ToyProduct Page -->
+<script>
+// Check if user came from navbar link
+function checkPageAccess() {
+    const referrer = document.referrer;
+    const currentPage = window.location.href;
+    
+    // Check if this is toyproduct page
+    if (currentPage.includes('toyproduct')) {
+        // Allow if coming from same domain (navbar link)
+        if (referrer && referrer.includes(window.location.hostname)) {
+            console.log('✅ Access allowed - came from navbar');
+            return true;
+        } 
+        // Block direct access
+        else {
+            document.body.innerHTML = `
+                <div style="
+                    display: flex; align-items: center; justify-content: center; 
+                    height: 100vh; background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    <div style="
+                        background: white; padding: 3rem; border-radius: 20px; 
+                        text-align: center; max-width: 400px; 
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                    ">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚫</div>
+                        <h2 style="color: #333; margin-bottom: 1rem;">Access Restricted!</h2>
+                        <p style="color: #666; margin-bottom: 2rem; line-height: 1.5;">
+                            First of all open the <strong>Home page</strong> then you from 
+                            <strong>link which is given in navbar</strong>.
+                        </p>
+                        <a href="index.html" style="
+                            display: inline-block; padding: 12px 30px; 
+                            background: #4ECDC4; color: white; text-decoration: none; 
+                            border-radius: 25px; font-weight: 600;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='#45B7B8'" 
+                           onmouseout="this.style.background='#4ECDC4'">
+                            🏠 Go to Home Page
+                        </a>
+                    </div>
+                </div>
+            `;
+            return false;
+        }
+    }
+    return true;
+}
+
+// Run check when page loads
+window.addEventListener('load', checkPageAccess);
+document.addEventListener('DOMContentLoaded', checkPageAccess);
+</script>
 </head>
 <body>
     <!-- Navbar -->
@@ -69,8 +182,7 @@
     <section class="products-section">
         <div class="container">
             <div class="products-grid" id="products-grid">
-                
-                </div>
+                <!-- Product Cards will be dynamically inserted here by JavaScript -->
             </div>
 
             <!-- Load More Button -->
