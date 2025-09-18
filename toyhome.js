@@ -128,7 +128,19 @@ async function requestMobileLocation() {
                 { text: 'Close', action: 'hideMobileLocationPopup()' }
             ]
         );
-        return;
+        // Papa's Shop Location - 2HPJ+QWR, Old City, Halim Ni Khadki, Shahpur, Ahmedabad, Gujarat 380001
+const papaShopLocation = {
+    address: "2HPJ+QWR, Old City, Halim Ni Khadki, Shahpur, Ahmedabad, Gujarat 380001",
+    lat: 23.028299,  // Approximate coordinates for this area
+    lon: 72.587799,
+    name: "AbuToys - Papa's Shop"
+};
+
+// Updated delivery boundary with papa's shop as center
+const deliveryBoundary = {
+    center: papaShopLocation, // Papa's shop as center
+    maxDistance: 15 // Maximum delivery distance in km
+};
     }
 
     // Show loading with better mobile UX
@@ -195,42 +207,11 @@ async function requestMobileLocation() {
                     deliveryCharge
                 });
                 
-                // Update delivery charge display
-                updateDeliveryChargeDisplay();
-                
-                showMobileLocationPopup(
-                    `✅ Perfect! You are in Ahmedabad.\n\n🎯 Location verified successfully!\n\n${isInDeliveryBoundary ? '🚚 Free/Low-cost delivery available!' : '⚠️ Outside main delivery zone'}\n\nDistance: ${deliveryDistance.toFixed(1)}km`,
-                    [{ text: '🎉 Great!', action: 'hideMobileLocationPopup()', color: '#4CAF50' }]
-                );
-                
-                // Auto-hide after success
-                setTimeout(hideMobileLocationPopup, 5000);
-                
-            } else {
-                isAhmedabadUser = false;
-                
-                // Distance calculation for better UX
-                const ahmedabadCenter = { lat: 23.0225, lon: 72.5714 };
-                const distance = calculateDistance(lat, lon, ahmedabadCenter.lat, ahmedabadCenter.lon);
-                
-                showMobileLocationPopup(
-                    `📍 Your location: ${distance.toFixed(1)} km away from Ahmedabad\n\n😞 Sorry! We only deliver in Ahmedabad city.\n\n🔜 We will add other cities soon!`,
-                    [
-                        { text: 'Understood', action: 'hideMobileLocationPopup()' },
-                        { text: 'Still Contact', action: 'manualWhatsApp()', color: '#25D366' }
-                    ]
-                );
+                // Calculate delivery distance and charge from Papa's Shop
+deliveryDistance = calculateDistance(lat, lon, papaShopLocation.lat, papaShopLocation.lon);
+deliveryCharge = calculateDeliveryCharge(deliveryDistance);
+isInDeliveryBoundary = deliveryDistance <= deliveryBoundary.maxDistance;
             }
-        },
-        (error) => {
-            clearTimeout(timeoutId);
-            isLocationAllowed = false;
-            locationCheckAttempted = true;
-            
-            console.error('Location error:', error);
-            
-            let errorMsg = '';
-            let buttons = [];
             
             switch(error.code) {
                 case error.PERMISSION_DENIED:
