@@ -10,6 +10,64 @@
     <link rel="stylesheet" href="toyhome.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- HTTPS Redirect + Security Code -->
+<script>
+// Force HTTPS redirect
+if (location.protocol !== 'https:' && 
+    !location.hostname.includes('localhost') && 
+    !location.hostname.includes('127.0.0.1')) {
+    location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+}
+
+// Right click disable
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Inspect element shortcuts disable
+document.addEventListener('keydown', function(e) {
+    // F12 disable
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+I disable
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+C disable
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+U disable (view source)
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+S disable (save page)
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Developer tools detection
+let devtools = {open: false, orientation: null};
+setInterval(function() {
+    if (window.outerHeight - window.innerHeight > 100 || window.outerWidth - window.innerWidth > 100) {
+        if (!devtools.open) {
+            devtools.open = true;
+            console.clear();
+            document.body.innerHTML = '<h1 style="text-align:center; margin-top:50px; color: red;">Access Denied! 🚫</h1>';
+        }
+    } else {
+        devtools.open = false;
+    }
+}, 500);
+</script>
 </head>
 <body>
     <!-- Navbar -->
@@ -228,7 +286,7 @@
                     </form>
                 </div>
                 <div class="contact-map">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d131.1726670080486!2d72.58226218969033!3d23.03700579564675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1757985868625!5m2!1sen!2sin"
+                    <iframe src="https://www.google.com/maps/place/Abu+Wala+Toys/@23.0369849,72.5821045,32m/data=!3m1!1e3!4m6!3m5!1s0x395e85003cc4458d:0x18176afb34712d04!8m2!3d23.0369976!4d72.582251!16s%2Fg%2F11ykhw76hr?entry=ttu&g_ep=EgoyMDI1MDkxNS4wIKXMDSoASAFQAw%3D%3D"
                         width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
