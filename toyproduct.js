@@ -217,18 +217,14 @@ async function requestMobileLocation() {
                 setTimeout(hideMobileLocationPopup, 4000);
                 
             } else {
-                isAhmedabadUser = false;
-                
-                const ahmedabadCenter = { lat: 23.0225, lon: 72.5714 };
-                const distance = calculateDistance(lat, lon, ahmedabadCenter.lat, ahmedabadCenter.lon);
-                
-                showMobileLocationPopup(
-                    `📍 Your location: ${distance.toFixed(1)} km away from Ahmedabad\n\n😔 Sorry! We only deliver in Ahmedabad city.\n\n📜 We will add other cities soon!`,
-                    [
-                        { text: 'Understood', action: 'hideMobileLocationPopup()' },
-                        { text: 'Still Contact', action: 'manualWhatsApp()', color: '#25D366' }
-                    ]
-                );
+                // REPLACE WITH THIS
+showMobileLocationPopup(
+    'Sorry! You are not in Ahmedabad city.\n\nWe only deliver toys in Ahmedabad.\n\nWe will add other cities soon!',
+    [
+        { text: 'Understood', action: 'hideMobileLocationPopup()' },
+        { text: 'Still Contact', action: 'manualWhatsApp()', color: '#25D366' }
+    ]
+);
             }
         },
         (error) => {
@@ -289,17 +285,6 @@ async function requestMobileLocation() {
     );
 }
 
-// Distance calculation helper
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-}
 
 // =================== BUTTON ACTIONS ===================
 function executeAction(actionType, productName = '') {
