@@ -1,7 +1,7 @@
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 }; // Abu Wala Toys coordinates
 const DELIVERY_RANGE_KM = 70;
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTnSoYAbSlEtITVnfMGXz6b00MQnb6Oveb5HNCs6fF0JAjMXcZ8JiM69RnBT_ycWts4w/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ13CxV5hDUAVPw5fk8Z81Rbu3SNLQgRtRoTZilaQKVal-pgfUx2w3us8-LOL-LwmwbQ/exec";
 
 // =================== SECURITY CHECKER ===================
 const isHTTP = location.protocol === "http:";
@@ -195,7 +195,7 @@ class UserManager {
                 return localUser;
             }
 
-            // Try Excel/Server login
+            // Try server login
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -205,7 +205,7 @@ class UserManager {
             const result = await response.json();
 
             if (result.success) {
-                // Login successful - store server user data locally
+                // Store server user data locally
                 if (result.user) {
                     const userData = { ...result.user, password }; // Add password for local storage
                     localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
@@ -214,34 +214,22 @@ class UserManager {
                 showPopup("Login successful!", "success");
                 return result.user;
             } else {
-                // Handle specific error messages from Excel
-                if (result.error === 'account_not_found') {
-                    showPopup("Account not found. Please check your email or create a new account.", "error");
-                } else if (result.error === 'password_incorrect') {
-                    showPopup("Password incorrect. Please try again.", "error");
-                } else {
-                    showPopup("Login failed. Please try again.", "error");
-                }
-                throw new Error(result.error || "login_failed");
+                showPopup("Account not found or incorrect credentials.", "error");
+                throw new Error("login_failed");
             }
 
         } catch (error) {
             console.error("Login error:", error);
 
-            // Only fallback to local login if it's a network error, not auth error
-            if (error.message !== 'account_not_found' && error.message !== 'password_incorrect') {
-                const localUser = this.getUser(email);
-                if (localUser && localUser.password === password) {
-                    this.setCurrentUser(email);
-                    showPopup("Login successful (offline mode)!", "success");
-                    return localUser;
-                }
+            // Fallback to local login if network error
+            const localUser = this.getUser(email);
+            if (localUser && localUser.password === password) {
+                this.setCurrentUser(email);
+                showPopup("Login successful (offline mode)!", "success");
+                return localUser;
             }
 
-            // If no local fallback available
-            if (!error.message.includes('not found') && !error.message.includes('incorrect')) {
-                showPopup("Unable to connect to server. Please check your internet connection.", "error");
-            }
+            showPopup("Login failed. Please check your credentials.", "error");
             throw error;
         }
     }
@@ -672,45 +660,7 @@ function createFloatingButtons() {
     whatsappFloat.addEventListener("click", openWhatsApp);
     document.body.appendChild(whatsappFloat);
 
-    // Back to Top Button
-    const backToTop = document.createElement("div");
-    backToTop.innerHTML = `<i class="fas fa-arrow-up"></i>`;
-    backToTop.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        right: 20px;
-        background: #333;
-        color: white;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        cursor: pointer;
-        z-index: 999;
-        font-size: 20px;
-        transition: all 0.3s ease;
-        opacity: 0;
-        visibility: hidden;
-    `;
 
-    backToTop.addEventListener("click", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    backToTop.addEventListener("mouseenter", () => {
-        backToTop.style.background = "#555";
-        backToTop.style.transform = "scale(1.05)";
-    });
-
-    backToTop.addEventListener("mouseleave", () => {
-        backToTop.style.background = "#333";
-        backToTop.style.transform = "scale(1)";
-    });
-
-    document.body.appendChild(backToTop);
 
     // Show/Hide floating buttons on scroll
     window.addEventListener("scroll", () => {
@@ -752,5 +702,4 @@ document.addEventListener("click", (e) => {
         e.preventDefault();
         openWhatsApp();
     }
-
 });
