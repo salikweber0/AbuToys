@@ -1,7 +1,7 @@
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 }; // Abu Wala Toys coordinates
 const DELIVERY_RANGE_KM = 70;
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ13CxV5hDUAVPw5fk8Z81Rbu3SNLQgRtRoTZilaQKVal-pgfUx2w3us8-LOL-LwmwbQ/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTnSoYAbSlEtITVnfMGXz6b00MQnb6Oveb5HNCs6fF0JAjMXcZ8JiM69RnBT_ycWts4w/exec";
 
 // =================== SECURITY CHECKER ===================
 const isHTTP = location.protocol === "http:";
@@ -752,4 +752,5 @@ document.addEventListener("click", (e) => {
         e.preventDefault();
         openWhatsApp();
     }
+
 });
