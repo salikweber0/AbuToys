@@ -1,7 +1,7 @@
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 }; // Abu Wala Toys coordinates
 const DELIVERY_RANGE_KM = 70;
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ13CxV5hDUAVPw5fk8Z81Rbu3SNLQgRtRoTZilaQKVal-pgfUx2w3us8-LOL-LwmwbQ/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzh43GnaiyFhfc8aRZe703DpVWCmbk3_2_hq_YYMFW8EgoNTTWbZY-lX3fXqiqLuhfgvA/exec";
 
 // =================== SECURITY CHECKER ===================
 const isHTTP = location.protocol === "http:";
@@ -53,7 +53,6 @@ class LocationManager {
                 localStorage.setItem("abutoys_location_status", "in_range");
                 showPopup(`Location Verified! You are within ${Math.round(distance)} km of the shop.`, "success");
 
-                // Check if user is NOT logged in and we're on HTTPS, then show account modal
                 setTimeout(() => {
                     if (isHTTPS && !userManager.isLoggedIn()) {
                         showAccountModal();
@@ -108,7 +107,6 @@ class UserManager {
         }
     }
 
-    // Check if user is logged in (not visitor, not null)
     isLoggedIn() {
         return this.currentUser && this.currentUser !== "visitor" && this.currentUser !== "null";
     }
@@ -126,7 +124,6 @@ class UserManager {
     }
 
     async register(userData) {
-        // Block registration on HTTP
         if (isHTTP) {
             showPopup("Account creation is not available on unsecured connection. Please use HTTPS.", "error");
             return false;
@@ -135,10 +132,8 @@ class UserManager {
         try {
             showPopup("Creating your account...", "loading");
 
-            // First save locally
             localStorage.setItem(`abutoys_user_${userData.email}`, JSON.stringify(userData));
 
-            // Create FormData to match your HTML form structure
             const formData = new FormData();
             formData.append('fullName', userData.fullName);
             formData.append('email', userData.email);
@@ -146,7 +141,6 @@ class UserManager {
             formData.append('phone', userData.phone);
             formData.append('address', userData.address);
 
-            // Send to Google Sheets using the same URL as your form action
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 body: formData
@@ -162,7 +156,6 @@ class UserManager {
                 showPopup("Email already registered! Try logging in instead.", "error");
                 return false;
             } else {
-                // Local save succeeded, sheet save failed - still allow registration
                 this.setCurrentUser(userData.email);
                 showPopup("Account created locally. Data will sync when server is available.", "success");
                 return true;
@@ -170,7 +163,6 @@ class UserManager {
 
         } catch (error) {
             console.error("Registration error:", error);
-            // If network fails, still allow local registration
             this.setCurrentUser(userData.email);
             showPopup("Account created locally (offline mode).", "success");
             return true;
@@ -178,7 +170,6 @@ class UserManager {
     }
 
     async login(email, password) {
-        // Block login on HTTP
         if (isHTTP) {
             showPopup("Login is not available on unsecured connection. Please use HTTPS.", "error");
             return null;
@@ -187,7 +178,6 @@ class UserManager {
         try {
             showPopup("Logging in...", "loading");
 
-            // Check local storage first
             const localUser = this.getUser(email);
             if (localUser && localUser.password === password) {
                 this.setCurrentUser(email);
@@ -195,7 +185,6 @@ class UserManager {
                 return localUser;
             }
 
-            // Try server login
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -205,23 +194,28 @@ class UserManager {
             const result = await response.json();
 
             if (result.success) {
-                // Store server user data locally
                 if (result.user) {
-                    const userData = { ...result.user, password }; // Add password for local storage
+                    const userData = { ...result.user, password };
                     localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
                 }
                 this.setCurrentUser(email);
                 showPopup("Login successful!", "success");
                 return result.user;
             } else {
-                showPopup("Account not found or incorrect credentials.", "error");
+                // 🟢 FIXED ERROR HANDLING
+                if (result.error === "incorrect_password") {
+                    showPopup("Password incorrect!", "error");
+                } else if (result.error === "user_not_found") {
+                    showPopup("Account not found!", "error");
+                } else {
+                    showPopup("Login failed. Try again.", "error");
+                }
                 throw new Error("login_failed");
             }
 
         } catch (error) {
             console.error("Login error:", error);
 
-            // Fallback to local login if network error
             const localUser = this.getUser(email);
             if (localUser && localUser.password === password) {
                 this.setCurrentUser(email);
@@ -276,6 +270,9 @@ class UserManager {
 // =================== INITIALIZE MANAGERS ===================
 const locationManager = new LocationManager();
 const userManager = new UserManager();
+
+// ... (baaki pura code same rahega, popups, forms, etc)
+
 
 // =================== SECURITY HANDLER (HTTP vs HTTPS) ===================
 function enforceSecurityMode() {
