@@ -1,7 +1,7 @@
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 }; // Abu Wala Toys coordinates
 const DELIVERY_RANGE_KM = 70;
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzh43GnaiyFhfc8aRZe703DpVWCmbk3_2_hq_YYMFW8EgoNTTWbZY-lX3fXqiqLuhfgvA/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
 
 // =================== SECURITY CHECKER ===================
 const isHTTP = location.protocol === "http:";
@@ -202,16 +202,16 @@ class UserManager {
                 showPopup("Login successful!", "success");
                 return result.user;
             } else {
-                // 🟢 FIXED ERROR HANDLING
                 if (result.error === "incorrect_password") {
-                    showPopup("Password incorrect!", "error");
+                    showPopup("❌ Wrong password!", "error");
                 } else if (result.error === "user_not_found") {
-                    showPopup("Account not found!", "error");
+                    showPopup("❌ No account with this email!", "error");
                 } else {
                     showPopup("Login failed. Try again.", "error");
                 }
                 throw new Error("login_failed");
             }
+
 
         } catch (error) {
             console.error("Login error:", error);
@@ -284,7 +284,7 @@ function enforceSecurityMode() {
 
         // Show HTTP warning popup
         showPopup("You are browsing on an unsecured connection (HTTP). Visitor Mode is enabled for your safety.", "warning");
-        
+
         // Block user features on HTTP
         blockHTTPFeatures();
     }
@@ -335,9 +335,9 @@ function openWhatsApp() {
 
     let message;
     if (locationStatus === "in_range") {
-        message = `Hi ${userName} from Ahmedabad. In range of ${DELIVERY_RANGE_KM} km`;
+        message = `Hi, I am ${userName} from Ahmedabad. In range of ${DELIVERY_RANGE_KM} km`;
     } else {
-        message = `Hi ${userName} from Ahmedabad. But not in the delivery range.`;
+        message = `Hi, I am ${userName} from Ahmedabad. But not in the delivery range.`;
     }
 
     const encodedMessage = encodeURIComponent(message);
@@ -402,7 +402,7 @@ function handleCartClick() {
         handleHTTPClick("Cart");
         return;
     }
-    
+
     // Your cart functionality here
     console.log("Cart clicked - full functionality available on HTTPS");
     // Add your cart logic here
@@ -504,7 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loginForm) {
         loginForm.addEventListener("submit", async e => {
             e.preventDefault();
-            
+
             if (isHTTP) {
                 handleHTTPClick("Login");
                 return;
