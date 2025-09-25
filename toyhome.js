@@ -1,7 +1,11 @@
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 }; // Abu Wala Toys coordinates
 const DELIVERY_RANGE_KM = 70;
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
+
+// Alag URLs
+const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
+const LOGIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJEwSo6rR01PA4TiCDTmjyjFaAN67VEJyz7ZNgjQK5j-AFgPnB21TE-vbfBdI_n_kl0g/exec";
+
 
 // =================== SECURITY CHECKER ===================
 const isHTTP = location.protocol === "http:";
@@ -141,7 +145,7 @@ class UserManager {
             formData.append('phone', userData.phone);
             formData.append('address', userData.address);
 
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
+            const response = await fetch(SIGNUP_SCRIPT_URL, {
                 method: "POST",
                 body: formData
             });
@@ -185,11 +189,12 @@ class UserManager {
                 return localUser;
             }
 
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
+            const response = await fetch(LOGIN_SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "login", email, password })
             });
+
 
             const result = await response.json();
 
