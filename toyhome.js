@@ -53,7 +53,7 @@ class LocationManager {
             if (distance <= DELIVERY_RANGE_KM) {
                 this.locationStatus = "in_range";
                 localStorage.setItem("abutoys_location_status", "in_range");
-                showPopup(`Location Verified! You are within ${Math.round(distance)} km of the shop.`, "success");
+                showPopup(`Location Verified! You are able to order our toys of the shop.`, "success");
 
                 setTimeout(() => {
                     if (isHTTPS && !userManager.isLoggedIn()) {
@@ -277,7 +277,7 @@ function openWhatsApp() {
 
     let message;
     if (locationStatus === "in_range") {
-        message = `Hi, I am ${userName} from Ahmedabad. In range of ${DELIVERY_RANGE_KM} km`;
+        message = `Hi, I am ${userName} from Ahmedabad. In the range of ${DELIVERY_RANGE_KM} km`;
     } else {
         message = `Hi, I am ${userName} from Ahmedabad. But not in the delivery range.`;
     }
@@ -620,3 +620,4 @@ document.addEventListener("click", (e) => {
         openWhatsApp();
     }
 });
+
