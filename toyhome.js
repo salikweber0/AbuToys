@@ -96,7 +96,6 @@ class LocationManager {
     }
 }
 
-// =================== USER SYSTEM ===================
 class UserManager {
     constructor() {
         this.currentUser = localStorage.getItem("abutoys_current_user");
@@ -127,6 +126,7 @@ class UserManager {
         this.updateUserDisplay();
     }
 
+    // 🔵 SIGNUP
     async register(userData) {
         if (isHTTP) {
             showPopup("Account creation is not available on unsecured connection. Please use HTTPS.", "error");
@@ -136,14 +136,12 @@ class UserManager {
         try {
             showPopup("Creating your account...", "loading");
 
-            localStorage.setItem(`abutoys_user_${userData.email}`, JSON.stringify(userData));
-
             const formData = new FormData();
-            formData.append('fullName', userData.fullName);
-            formData.append('email', userData.email);
-            formData.append('password', userData.password);
-            formData.append('phone', userData.phone);
-            formData.append('address', userData.address);
+            formData.append("fullName", userData.fullName);
+            formData.append("email", userData.email);
+            formData.append("password", userData.password);
+            formData.append("phone", userData.phone);
+            formData.append("address", userData.address);
 
             const response = await fetch(SIGNUP_SCRIPT_URL, {
                 method: "POST",
@@ -153,26 +151,26 @@ class UserManager {
             const result = await response.json();
 
             if (result.success) {
+                localStorage.setItem(`abutoys_user_${userData.email}`, JSON.stringify(userData));
                 this.setCurrentUser(userData.email);
-                showPopup("Account created successfully!", "success");
+                showPopup("✅ Account created successfully!", "success");
                 return true;
-            } else if (result.error === 'email_exists') {
-                showPopup("Email already registered! Try logging in instead.", "error");
+            } else if (result.error === "email_exists") {
+                showPopup("❌ Email already registered! Try logging in instead.", "error");
                 return false;
             } else {
-                this.setCurrentUser(userData.email);
-                showPopup("Account created locally. Data will sync when server is available.", "success");
-                return true;
+                showPopup("Signup failed. Try again later.", "error");
+                return false;
             }
 
         } catch (error) {
             console.error("Registration error:", error);
-            this.setCurrentUser(userData.email);
-            showPopup("Account created locally (offline mode).", "success");
-            return true;
+            showPopup("Server error. Please try again later.", "error");
+            return false;
         }
     }
 
+    // 🔴 LOGIN
     async login(email, password) {
         if (isHTTP) {
             showPopup("Login is not available on unsecured connection. Please use HTTPS.", "error");
@@ -182,29 +180,19 @@ class UserManager {
         try {
             showPopup("Logging in...", "loading");
 
-            const localUser = this.getUser(email);
-            if (localUser && localUser.password === password) {
-                this.setCurrentUser(email);
-                showPopup("Login successful!", "success");
-                return localUser;
-            }
-
             const response = await fetch(LOGIN_SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "login", email, password })
             });
 
-
             const result = await response.json();
 
             if (result.success) {
-                if (result.user) {
-                    const userData = { ...result.user, password };
-                    localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
-                }
+                const userData = { ...result.user, password };
+                localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
                 this.setCurrentUser(email);
-                showPopup("Login successful!", "success");
+                showPopup("✅ Login successful!", "success");
                 return result.user;
             } else {
                 if (result.error === "incorrect_password") {
@@ -214,25 +202,17 @@ class UserManager {
                 } else {
                     showPopup("Login failed. Try again.", "error");
                 }
-                throw new Error("login_failed");
+                return null;
             }
-
 
         } catch (error) {
             console.error("Login error:", error);
-
-            const localUser = this.getUser(email);
-            if (localUser && localUser.password === password) {
-                this.setCurrentUser(email);
-                showPopup("Login successful (offline mode)!", "success");
-                return localUser;
-            }
-
-            showPopup("Login failed. Please check your credentials.", "error");
-            throw error;
+            showPopup("Server error. Please try again later.", "error");
+            return null;
         }
     }
 
+    // 🟢 User info display
     updateUserDisplay() {
         const userNameDisplay = document.getElementById("userNameDisplay");
         const userIcon = document.getElementById("userIcon");
