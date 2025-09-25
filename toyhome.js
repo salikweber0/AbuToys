@@ -4,8 +4,6 @@ const DELIVERY_RANGE_KM = 70;
 
 // Alag URLs
 const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
-const LOGIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJEwSo6rR01PA4TiCDTmjyjFaAN67VEJyz7ZNgjQK5j-AFgPnB21TE-vbfBdI_n_kl0g/exec";
-
 
 // =================== SECURITY CHECKER ===================
 const isHTTP = location.protocol === "http:";
@@ -170,47 +168,6 @@ class UserManager {
         }
     }
 
-    // 🔴 LOGIN
-    async login(email, password) {
-        if (isHTTP) {
-            showPopup("Login is not available on unsecured connection. Please use HTTPS.", "error");
-            return null;
-        }
-
-        try {
-            showPopup("Logging in...", "loading");
-
-            const response = await fetch(LOGIN_SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "login", email, password })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                const userData = { ...result.user, password };
-                localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
-                this.setCurrentUser(email);
-                showPopup("✅ Login successful!", "success");
-                return result.user;
-            } else {
-                if (result.error === "incorrect_password") {
-                    showPopup("❌ Wrong password!", "error");
-                } else if (result.error === "user_not_found") {
-                    showPopup("❌ No account with this email!", "error");
-                } else {
-                    showPopup("Login failed. Try again.", "error");
-                }
-                return null;
-            }
-
-        } catch (error) {
-            console.error("Login error:", error);
-            showPopup("Server error. Please try again later.", "error");
-            return null;
-        }
-    }
 
     // 🟢 User info display
     updateUserDisplay() {
@@ -444,7 +401,6 @@ function showPopup(message, type = "info") {
 // =================== FORMS & DOM ===================
 document.addEventListener("DOMContentLoaded", () => {
     const signupForm = document.getElementById("signupForm");
-    const loginForm = document.getElementById("loginForm");
     const userIcon = document.getElementById("userIcon");
     const cartIcon = document.getElementById("cartIcon");
 
@@ -482,27 +438,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const success = await userManager.register(userData);
             if (success) {
                 closeAccountModal();
-            }
-        });
-    }
-
-    if (loginForm) {
-        loginForm.addEventListener("submit", async e => {
-            e.preventDefault();
-
-            if (isHTTP) {
-                handleHTTPClick("Login");
-                return;
-            }
-
-            const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-            const password = document.getElementById("loginPassword").value;
-
-            try {
-                await userManager.login(email, password);
-                closeAccountModal();
-            } catch (error) {
-                // Error handling done in login method
             }
         });
     }
