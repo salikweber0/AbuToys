@@ -266,9 +266,16 @@ function handleHTTPClick(elementName) {
 enforceSecurityMode();
 
 // =================== WHATSAPP INTEGRATION ===================
+// =================== WHATSAPP INTEGRATION ===================
 function openWhatsApp() {
     const locationStatus = locationManager.getLocationStatus();
     const userName = userManager.getCurrentUserName();
+
+    // Check if user is in visitor mode
+    if (userManager.currentUser === "visitor") {
+        showPopup("Sorry, you are unable to use this function because you are in Visitor Mode. Please create an account to access WhatsApp support.", "warning");
+        return;
+    }
 
     if (locationStatus === "permission_denied" || locationStatus === "unknown") {
         showPopup("WhatsApp access restricted until we can verify your location. Please enable location access.", "error");
@@ -620,4 +627,3 @@ document.addEventListener("click", (e) => {
         openWhatsApp();
     }
 });
-
