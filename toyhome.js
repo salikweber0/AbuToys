@@ -6,7 +6,8 @@ const DELIVERY_RANGE_KM = 70;
 const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
 
 // =================== SECURITY CHECKER ===================
-const isHTTP = location.protocol === "http:";
+const isLocalhost = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+const isHTTP = location.protocol === "http:" && !isLocalhost;
 const isHTTPS = location.protocol === "https:";
 
 // =================== LOCATION MANAGER ===================
@@ -627,3 +628,4 @@ document.addEventListener("click", (e) => {
         openWhatsApp();
     }
 });
+
