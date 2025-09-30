@@ -18,18 +18,48 @@ class LocationManager {
     }
 
     calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // km
-        const toRad = deg => deg * Math.PI / 180;
+        const R = 6371; // Earth radius in km
+        const toRad = deg => deg * (Math.PI / 180);
+        
         const dLat = toRad(lat2 - lat1);
         const dLon = toRad(lon2 - lon1);
+        
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                  Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        const distance = R * c;
+        
+        return distance;
     }
 
-    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }) {
+    calculateDeliveryCharge(distance) {
+        // Distance in km
+        if (distance <= 0.5) {
+            return 0; // Free - shop ke paas hai
+        } else if (distance > 0.5 && distance <= 1.5) {
+            return 15;
+        } else if (distance > 1.5 && distance <= 2.5) {
+            return 25;
+        } else if (distance > 2.5 && distance <= 3.5) {
+            return 35;
+        } else if (distance > 3.5 && distance <= 5) {
+            return 50;
+        } else if (distance > 5 && distance <= 10) {
+            return 75;
+        } else if (distance > 10 && distance <= 20) {
+            return 100;
+        } else if (distance > 20 && distance <= 40) {
+            return 150;
+        } else if (distance > 40 && distance <= 70) {
+            return 200;
+        } else {
+            return -1; // Out of range
+        }
+    }
+
+    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
                 reject({ code: 0, message: "Geolocation not supported" });
@@ -47,14 +77,22 @@ class LocationManager {
         try {
             const location = await this.getCurrentLocation();
             const distance = this.calculateDistance(location.lat, location.lng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
+            const deliveryCharge = this.calculateDeliveryCharge(distance);
 
             this.userLocation = location;
             localStorage.setItem("abutoys_user_location", JSON.stringify(location));
+            localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
+            localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
 
-            if (distance <= DELIVERY_RANGE_KM) {
+            if (distance <= DELIVERY_RANGE_KM && deliveryCharge !== -1) {
                 this.locationStatus = "in_range";
                 localStorage.setItem("abutoys_location_status", "in_range");
-                showPopup(`Location Verified! You are able to order our toys of the shop.`, "success");
+                
+                if (distance <= 0.5) {
+                    showPopup(`Location Verified! You are very close to our shop (${distance.toFixed(2)} km). Consider visiting us for offline purchase!`, "success");
+                } else {
+                    showPopup(`Location Verified! Delivery charge: ₹${deliveryCharge}`, "success");
+                }
 
                 setTimeout(() => {
                     if (isHTTPS && !userManager.isLoggedIn()) {
@@ -64,10 +102,11 @@ class LocationManager {
             } else {
                 this.locationStatus = "out_of_range";
                 localStorage.setItem("abutoys_location_status", "out_of_range");
+                localStorage.setItem("abutoys_delivery_charge", "0");
                 showPopup(`You are ${Math.round(distance)} km away. We do not deliver to this location.`, "warning");
             }
 
-            return { location, distance, status: this.locationStatus };
+            return { location, distance, status: this.locationStatus, deliveryCharge };
 
         } catch (error) {
             console.warn("Location error:", error);
@@ -75,14 +114,17 @@ class LocationManager {
             if (error && error.code === error.PERMISSION_DENIED) {
                 this.locationStatus = "permission_denied";
                 localStorage.setItem("abutoys_location_status", "permission_denied");
+                localStorage.setItem("abutoys_delivery_charge", "0");
                 showPopup("Location permission denied. Please allow location access to verify delivery availability.", "warning");
             } else if (error && error.code === error.TIMEOUT) {
                 this.locationStatus = "unknown";
                 localStorage.setItem("abutoys_location_status", "unknown");
+                localStorage.setItem("abutoys_delivery_charge", "0");
                 showPopup("Location request timed out. Try again or check your device settings.", "warning");
             } else {
                 this.locationStatus = "unknown";
                 localStorage.setItem("abutoys_location_status", "unknown");
+                localStorage.setItem("abutoys_delivery_charge", "0");
                 showPopup("Unable to determine your location. Please enable location services and try again.", "warning");
             }
 
@@ -125,7 +167,6 @@ class UserManager {
         this.updateUserDisplay();
     }
 
-    // 🔵 SIGNUP
     async register(userData) {
         if (isHTTP) {
             showPopup("Account creation is not available on unsecured connection. Please use HTTPS.", "error");
@@ -169,8 +210,6 @@ class UserManager {
         }
     }
 
-
-    // 🟢 User info display
     updateUserDisplay() {
         const userNameDisplay = document.getElementById("userNameDisplay");
         const userIcon = document.getElementById("userIcon");
@@ -214,27 +253,18 @@ class UserManager {
 const locationManager = new LocationManager();
 const userManager = new UserManager();
 
-// ... (baaki pura code same rahega, popups, forms, etc)
-
-
 // =================== SECURITY HANDLER (HTTP vs HTTPS) ===================
 function enforceSecurityMode() {
     if (isHTTP) {
-        // Force Visitor Mode automatically on HTTP
         localStorage.setItem("abutoys_current_user", "visitor");
         userManager.currentUser = "visitor";
         userManager.updateUserDisplay();
-
-        // Show HTTP warning popup
         showPopup("You are browsing on an unsecured connection (HTTP). Visitor Mode is enabled for your safety.", "warning");
-
-        // Block user features on HTTP
         blockHTTPFeatures();
     }
 }
 
 function blockHTTPFeatures() {
-    // Block user icon functionality
     const userIcon = document.getElementById("userIcon");
     if (userIcon) {
         userIcon.style.opacity = "0.5";
@@ -242,7 +272,6 @@ function blockHTTPFeatures() {
         userIcon.title = "Account features disabled on HTTP";
     }
 
-    // Block cart icon functionality
     const cartIcon = document.getElementById("cartIcon");
     if (cartIcon) {
         cartIcon.style.opacity = "0.5";
@@ -250,7 +279,6 @@ function blockHTTPFeatures() {
         cartIcon.title = "Cart features disabled on HTTP";
     }
 
-    // You can add more elements to block here
     const elementsToBlock = document.querySelectorAll('.secure-only');
     elementsToBlock.forEach(el => {
         el.style.opacity = "0.5";
@@ -263,16 +291,13 @@ function handleHTTPClick(elementName) {
     showPopup(`${elementName} is not available on unsecured connection (HTTP). Please use HTTPS for full functionality.`, "error");
 }
 
-// Initialize security mode only once
 enforceSecurityMode();
 
-// =================== WHATSAPP INTEGRATION ===================
 // =================== WHATSAPP INTEGRATION ===================
 function openWhatsApp() {
     const locationStatus = locationManager.getLocationStatus();
     const userName = userManager.getCurrentUserName();
 
-    // Check if user is in visitor mode
     if (userManager.currentUser === "visitor") {
         showPopup("Sorry, you are unable to use this function because you are in Visitor Mode. Please create an account to access WhatsApp support.", "warning");
         return;
@@ -297,7 +322,6 @@ function openWhatsApp() {
 
 // =================== ACCOUNT MODAL ===================
 function showAccountModal() {
-    // Block account modal on HTTP
     if (isHTTP) {
         handleHTTPClick("Account");
         return;
@@ -305,7 +329,6 @@ function showAccountModal() {
 
     const locationStatus = locationManager.getLocationStatus();
 
-    // If user is already logged in, don't show the modal
     if (userManager.isLoggedIn()) {
         showPopup(`Welcome back ${userManager.getCurrentUserName()}!`, "success");
         return;
@@ -352,10 +375,7 @@ function handleCartClick() {
         handleHTTPClick("Cart");
         return;
     }
-
-    // Your cart functionality here
     console.log("Cart clicked - full functionality available on HTTPS");
-    // Add your cart logic here
 }
 
 // =================== POPUP SYSTEM ===================
@@ -412,7 +432,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const userIcon = document.getElementById("userIcon");
     const cartIcon = document.getElementById("cartIcon");
 
-    // Phone number validation
     const phoneInput = document.getElementById("phone");
     if (phoneInput) {
         phoneInput.addEventListener("input", (e) => {
@@ -450,7 +469,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // User icon click handler
     if (userIcon) {
         userIcon.addEventListener("click", () => {
             if (isHTTP) {
@@ -459,21 +477,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (userManager.isLoggedIn()) {
-                // User is logged in, show user options or profile
                 showPopup(`Hello ${userManager.getCurrentUserName()}! You are already logged in.`, "info");
             } else {
-                // User is not logged in, show account modal
                 showAccountModal();
             }
         });
     }
 
-    // Cart icon click handler
     if (cartIcon) {
         cartIcon.addEventListener("click", handleCartClick);
     }
 
-    // Initialize floating buttons after DOM is loaded
     createFloatingButtons();
 });
 
@@ -503,6 +517,7 @@ function showWelcomeMessage() {
             document.getElementById("welcomeOkBtn").addEventListener("click", async () => {
                 popup.remove();
                 sessionStorage.setItem("abutoys_welcomed", "true");
+                localStorage.setItem("abutoys_home_visited", "true");
 
                 showPopup("Checking your location for delivery...", "loading");
                 setTimeout(async () => {
@@ -512,6 +527,8 @@ function showWelcomeMessage() {
                 }, 1000);
             });
         }, 700);
+    } else {
+        localStorage.setItem("abutoys_home_visited", "true");
     }
 }
 
@@ -547,7 +564,6 @@ function initHeroSlider() {
 
 // =================== FLOATING BUTTONS ===================
 function createFloatingButtons() {
-    // WhatsApp Float Button
     const whatsappFloat = document.createElement("div");
     whatsappFloat.className = "whatsapp-float";
     whatsappFloat.innerHTML = `<i class="fab fa-whatsapp"></i>`;
@@ -585,11 +601,7 @@ function createFloatingButtons() {
     whatsappFloat.addEventListener("click", openWhatsApp);
     document.body.appendChild(whatsappFloat);
 
-
-
-    // Show/Hide floating buttons on scroll
     window.addEventListener("scroll", () => {
-        // Navbar background change
         const navbar = document.getElementById("navbar");
         if (navbar) {
             if (window.scrollY > 100) {
@@ -601,17 +613,12 @@ function createFloatingButtons() {
             }
         }
 
-        // Show/hide floating buttons
         if (window.scrollY > 300) {
             whatsappFloat.style.opacity = "1";
             whatsappFloat.style.visibility = "visible";
-            backToTop.style.opacity = "1";
-            backToTop.style.visibility = "visible";
         } else {
             whatsappFloat.style.opacity = "0";
             whatsappFloat.style.visibility = "hidden";
-            backToTop.style.opacity = "0";
-            backToTop.style.visibility = "hidden";
         }
     });
 }
@@ -621,7 +628,6 @@ initMobileNavigation();
 initHeroSlider();
 showWelcomeMessage();
 
-// WhatsApp click handler for other elements
 document.addEventListener("click", (e) => {
     if (e.target.closest('a') && e.target.closest('a').href && e.target.closest('a').href.includes("wa.me")) {
         e.preventDefault();
