@@ -910,11 +910,11 @@ async function loadProductsFromSheet() {
                         <span class="current-price">₹${item.Price || "0"}</span>
                         ${item["Old Price"] ? `<span class="old-price">₹${item["Old Price"]}</span>` : ""}
                     </div>
-                    <div class="delivery-info" style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                    <div class="delivery-info" style="font-size: 1rem; font-weight: 500; color: #666; margin-top: 8px;">
                         ${userDataManager.deliveryCharge > 0 ? `Delivery: ₹${userDataManager.deliveryCharge}` : 'Free Delivery!'}
                     </div>
                     ${userDataManager.deliveryCharge > 0 ? `
-                        <div class="total-price" style="font-size: 17px; font-weight: 600; color: #4ECDC4; margin-top: 5px;">
+                        <div class="total-price" style="font-size: 1.15rem; font-weight: 700; color: #4ECDC4; margin-top: 8px;">
                             Total: ₹${totalPrice}
                         </div>
                     ` : ''}
@@ -922,7 +922,7 @@ async function loadProductsFromSheet() {
             ` : '';
 
             const buttonsHTML = shouldShowPrice ? `
-                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #4ECDC4; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%;">
+                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #4ECDC4; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block;">
                     Add to Cart
                 </button>
             ` : '';
