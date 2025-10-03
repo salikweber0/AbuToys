@@ -825,6 +825,10 @@ function createFloatingButtons() {
 // =================== INITIALIZATION ===================
 initMobileNavigation();
 initHeroSlider();
+
+// âœ… HOME PAGE VISIT FLAG SET KARO
+sessionStorage.setItem("abutoys_home_visited", "true");
+
 showWelcomeMessage();
 
 document.addEventListener("click", (e) => {
