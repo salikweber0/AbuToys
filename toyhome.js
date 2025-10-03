@@ -1,9 +1,9 @@
 // =================== CONFIG ===================
-const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 }; // Abu Wala Toys coordinates
+const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 };
 const DELIVERY_RANGE_KM = 70;
 
-// Alag URLs
 const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
+const LOGIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
 
 // =================== SECURITY CHECKER ===================
 const isLocalhost = location.hostname === "127.0.0.1" || location.hostname === "localhost";
@@ -18,7 +18,7 @@ class LocationManager {
     }
 
     calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Earth radius in km
+        const R = 6371;
         const toRad = deg => deg * (Math.PI / 180);
         
         const dLat = toRad(lat2 - lat1);
@@ -35,162 +35,27 @@ class LocationManager {
     }
 
     calculateDeliveryCharge(distance) {
-        // Distance in km
-        if (distance <= 0.5) {
-            return 0; // Free - shop ke paas hai
-        } else if (distance > 0.5 && distance <= 1.5) {
-            return 15;
-        } else if (distance > 1.5 && distance <= 2.5) {
-            return 25;
-        } else if (distance > 2.5 && distance <= 3.5) {
-            return 35;
-        } else if (distance > 3.5 && distance <= 4.5) {
-            return 45;
-        } else if (distance > 4.5 && distance <= 5.5) {
-            return 55;
-        } else if (distance > 5.5 && distance <= 6.5) {
-            return 65;
-        } else if (distance > 6.5 && distance <= 7.5) {
-            return 75;
-        } else if (distance > 7.5 && distance <= 8.5) {
-            return 85;
-        } else if (distance > 8.5 && distance <= 9.5) {
-            return 95;
-        } else if (distance > 9.5 && distance <= 10.5) {
-            return 105;
-        } else if (distance > 10.5 && distance <= 11.5) {
-            return 115;
-        } else if (distance > 11.5 && distance <= 12.5) {
-            return 125;
-        } else if (distance > 12.5 && distance <= 13.5) {
-            return 135;
-        } else if (distance > 13.5 && distance <= 14.5) {
-            return 145;
-        } else if (distance > 14.5 && distance <= 15.5) {
-            return 155;
-        } else if (distance > 15.5 && distance <= 16.5) {
-            return 165;
-        } else if (distance > 16.5 && distance <= 17.5) {
-            return 175;
-        } else if (distance > 17.5 && distance <= 18.5) {
-            return 185;
-        } else if (distance > 18.5 && distance <= 19.5) {
-            return 195;
-        } else if (distance > 19.5 && distance <= 20.5) {
-            return 205;
-        } else if (distance > 20.5 && distance <= 21.5) {
-            return 215;
-        } else if (distance > 21.5 && distance <= 22.5) {
-            return 225;
-        } else if (distance > 22.5 && distance <= 23.5) {
-            return 235;
-        } else if (distance > 23.5 && distance <= 24.5) {
-            return 245;
-        } else if (distance > 24.5 && distance <= 25.5) {
-            return 255;
-        } else if (distance > 25.5 && distance <= 26.5) {
-            return 265;
-        } else if (distance > 26.5 && distance <= 27.5) {
-            return 275;
-        } else if (distance > 27.5 && distance <= 28.5) {
-            return 285;
-        } else if (distance > 28.5 && distance <= 29.5) {
-            return 295;
-        } else if (distance > 29.5 && distance <= 30.5) {
-            return 305;
-        } else if (distance > 30.5 && distance <= 31.5) {
-            return 315;
-        } else if (distance > 31.5 && distance <= 32.5) {
-            return 325;
-        } else if (distance > 32.5 && distance <= 33.5) {
-            return 335;
-        } else if (distance > 33.5 && distance <= 34.5) {
-            return 345;
-        } else if (distance > 34.5 && distance <= 35.5) {
-            return 355;
-        } else if (distance > 35.5 && distance <= 36.5) {
-            return 365;
-        } else if (distance > 36.5 && distance <= 37.5) {
-            return 375;
-        } else if (distance > 37.5 && distance <= 38.5) {
-            return 385;
-        } else if (distance > 38.5 && distance <= 39.5) {
-            return 395;
-        } else if (distance > 39.5 && distance <= 40.5) {
-            return 405;
-        } else if (distance > 40.5 && distance <= 41.5) {
-            return 415;
-        } else if (distance > 41.5 && distance <= 42.5) {
-            return 425;
-        } else if (distance > 42.5 && distance <= 43.5) {
-            return 435;
-        } else if (distance > 43.5 && distance <= 44.5) {
-            return 445;
-        } else if (distance > 44.5 && distance <= 45.5) {
-            return 455;
-        } else if (distance > 45.5 && distance <= 46.5) {
-            return 465;
-        } else if (distance > 46.5 && distance <= 47.5) {
-            return 475;
-        } else if (distance > 47.5 && distance <= 48.5) {
-            return 485;
-        } else if (distance > 48.5 && distance <= 49.5) {
-            return 495;
-        } else if (distance > 49.5 && distance <= 50.5) {
-            return 505;
-        } else if (distance > 50.5 && distance <= 51.5) {
-            return 515;
-        } else if (distance > 51.5 && distance <= 52.5) {
-            return 525;
-        } else if (distance > 52.5 && distance <= 53.5) {
-            return 535;
-        } else if (distance > 53.5 && distance <= 54.5) {
-            return 545;
-        } else if (distance > 54.5 && distance <= 55.5) {
-            return 555;
-        } else if (distance > 55.5 && distance <= 56.5) {
-            return 565;
-        } else if (distance > 56.5 && distance <= 57.5) {
-            return 575;
-        } else if (distance > 57.5 && distance <= 58.5) {
-            return 585;
-        } else if (distance > 58.5 && distance <= 59.5) {
-            return 595;
-        } else if (distance > 59.5 && distance <= 60.5) {
-            return 605;
-        } else if (distance > 60.5 && distance <= 61.5) {
-            return 615;
-        } else if (distance > 61.5 && distance <= 62.5) {
-            return 625;
-        } else if (distance > 62.5 && distance <= 63.5) {
-            return 635;
-        } else if (distance > 63.5 && distance <= 64.5) {
-            return 645;
-        } else if (distance > 64.5 && distance <= 65.5) {
-            return 655;
-        } else if (distance > 65.5 && distance <= 66.5) {
-            return 665;
-        } else if (distance > 66.5 && distance <= 67.5) {
-            return 675;
-        } else if (distance > 67.5 && distance <= 68.5) {
-            return 685;
-        } else if (distance > 68.5 && distance <= 69.5) {
-            return 695;
-        } else if (distance > 69.5 && distance <= 70) {
-            return 705;
-        } else {
-            return -1; // Out of range (70km se zyada)
-        }
+        if (distance <= 0.5) return 0;
+        else if (distance <= 1.5) return 15;
+        else if (distance <= 2.5) return 25;
+        else if (distance <= 3.5) return 35;
+        else if (distance <= 4.5) return 45;
+        else if (distance <= 5.5) return 55;
+        else if (distance <= 6.5) return 65;
+        else if (distance <= 7.5) return 75;
+        else if (distance <= 8.5) return 85;
+        else if (distance <= 9.5) return 95;
+        else if (distance <= 10.5) return 105;
+        else if (distance <= 70) return 105 + Math.floor((distance - 10.5)) * 10;
+        else return -1;
     }
 
     async checkLocationAvailability() {
-        // Pehle check karo ki Permissions API available hai
         if ('permissions' in navigator) {
             try {
                 const result = await navigator.permissions.query({ name: 'geolocation' });
-                return result.state; // 'granted', 'denied', or 'prompt'
+                return result.state;
             } catch (e) {
-                // Agar Permissions API kaam nahi kare toh normal flow
                 return 'prompt';
             }
         }
@@ -204,31 +69,26 @@ class LocationManager {
                 return;
             }
             
-            // IMPORTANT: maximumAge: 0 forces fresh location request
-            // Ye ensure karta hai ki browser fresh permission maangega
             navigator.geolocation.getCurrentPosition(
                 pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
                 err => reject(err),
-                { ...options, maximumAge: 0 } // Always force fresh location
+                { ...options, maximumAge: 0 }
             );
         });
     }
 
     async checkLocationAndSetStatus() {
         try {
-            // Pehle permission status check karo
             const permissionStatus = await this.checkLocationAvailability();
             
             if (permissionStatus === 'denied') {
-                // Agar pehle se denied hai
                 this.locationStatus = "permission_denied";
                 localStorage.setItem("abutoys_location_status", "permission_denied");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("🚫 Location permission is blocked. Please enable location permission in your browser settings to verify delivery availability.", "warning");
+                showPopup("Location permission is blocked. Please enable location permission in your browser settings.", "warning");
                 return { location: null, distance: null, status: this.locationStatus };
             }
 
-            // Loading message dikhao
             showPopup("Getting your location...", "loading");
             
             const location = await this.getCurrentLocation();
@@ -240,7 +100,6 @@ class LocationManager {
             localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
             localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
 
-            // Loading popup hatao
             const loadingPopup = document.getElementById("custom-popup");
             if (loadingPopup) loadingPopup.remove();
 
@@ -249,13 +108,13 @@ class LocationManager {
                 localStorage.setItem("abutoys_location_status", "in_range");
                 
                 if (distance <= 0.5) {
-                    showPopup(`✅ Location Verified! You are very close to our shop (${distance.toFixed(2)} km). Consider visiting us for offline purchase!`, "success");
+                    showPopup(`Location Verified! You are very close (${distance.toFixed(2)} km). Consider visiting us!`, "success");
                 } else {
-                    showPopup(`✅ Location Verified! Delivery charge: ₹${deliveryCharge}`, "success");
+                    showPopup(`Location Verified! Delivery charge: Rs.${deliveryCharge}`, "success");
                 }
 
                 setTimeout(() => {
-                    if (isHTTPS && !userManager.isLoggedIn()) {
+                    if (!userManager.isLoggedIn() && !userManager.isFreeVisit()) {
                         showAccountModal();
                     }
                 }, 1000);
@@ -263,7 +122,7 @@ class LocationManager {
                 this.locationStatus = "out_of_range";
                 localStorage.setItem("abutoys_location_status", "out_of_range");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup(`⚠️ You are ${Math.round(distance)} km away. We do not deliver to this location.`, "warning");
+                showPopup(`You are ${Math.round(distance)} km away. We do not deliver to this location.`, "warning");
             }
 
             return { location, distance, status: this.locationStatus, deliveryCharge };
@@ -271,42 +130,32 @@ class LocationManager {
         } catch (error) {
             console.warn("Location error:", error);
 
-            // Loading popup hatao
             const loadingPopup = document.getElementById("custom-popup");
             if (loadingPopup) loadingPopup.remove();
 
-            // Error codes:
-            // 1 = PERMISSION_DENIED (User ne deny kiya)
-            // 2 = POSITION_UNAVAILABLE (Device location OFF hai)
-            // 3 = TIMEOUT
-
             if (error && error.code === 1) {
-                // User ne actively deny kiya browser popup mein
                 this.locationStatus = "permission_denied";
                 localStorage.setItem("abutoys_location_status", "permission_denied");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("❌ Location permission denied. Please allow location access to verify delivery availability.", "warning");
+                showPopup("Location permission denied. Please allow location access.", "warning");
             } else if (error && error.code === 2) {
-                // Device ki location OFF hai
                 this.locationStatus = "location_unavailable";
                 localStorage.setItem("abutoys_location_status", "location_unavailable");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("📍 Your device location is turned OFF. Please turn on your device location (GPS) and try again.", "warning");
+                showPopup("Your device location is OFF. Please turn on GPS and try again.", "warning");
             } else if (error && error.code === 3) {
-                // Timeout
                 this.locationStatus = "unknown";
                 localStorage.setItem("abutoys_location_status", "unknown");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("⏱️ Location request timed out. Please check your GPS signal and try again.", "warning");
+                showPopup("Location request timed out. Please check your GPS signal.", "warning");
             } else {
-                // Koi aur error
                 this.locationStatus = "unknown";
                 localStorage.setItem("abutoys_location_status", "unknown");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("⚠️ Unable to get your location. Please make sure location services are enabled and try again.", "warning");
+                showPopup("Unable to get your location. Please enable location services.", "warning");
             }
 
-            return { location: null, distance: null, status: this.locationStatus, error };
+            return { location, distance: null, status: this.locationStatus, error };
         }
     }
 
@@ -333,10 +182,15 @@ class UserManager {
         return this.currentUser && this.currentUser !== "visitor" && this.currentUser !== "null";
     }
 
+    isFreeVisit() {
+        return this.currentUser === "visitor";
+    }
+
     setCurrentUser(email) {
         localStorage.setItem("abutoys_current_user", email);
         this.currentUser = email;
         this.updateUserDisplay();
+        this.enableFeaturesForLoggedInUser();
     }
 
     logout() {
@@ -345,9 +199,54 @@ class UserManager {
         this.updateUserDisplay();
     }
 
+    async login(email, password) {
+        const localUser = this.getUser(email);
+        if (localUser) {
+            if (localUser.password === password) {
+                this.setCurrentUser(email);
+                return { success: true, message: "Login successful!" };
+            } else {
+                return { success: false, error: "Password incorrect" };
+            }
+        }
+
+        try {
+            showPopup("Checking credentials...", "loading");
+            const response = await fetch(`${LOGIN_SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+            const data = await response.json();
+
+            const loadingPopup = document.getElementById("custom-popup");
+            if (loadingPopup) loadingPopup.remove();
+
+            if (data.success && data.user) {
+                const userData = {
+                    fullName: data.user.fullName,
+                    email: data.user.email,
+                    password: data.user.password,
+                    phone: data.user.phone,
+                    address: data.user.address
+                };
+                localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
+                this.setCurrentUser(email);
+                return { success: true, message: "Login successful!" };
+            } else if (data.error === "account_deleted") {
+                return { success: false, error: "This account has been deleted" };
+            } else if (data.error === "wrong_password") {
+                return { success: false, error: "Password incorrect" };
+            } else {
+                return { success: false, error: "Account not found" };
+            }
+        } catch (error) {
+            const loadingPopup = document.getElementById("custom-popup");
+            if (loadingPopup) loadingPopup.remove();
+            console.error("Login error:", error);
+            return { success: false, error: "Server error. Please try again." };
+        }
+    }
+
     async register(userData) {
         if (isHTTP) {
-            showPopup("Account creation is not available on unsecured connection. Please use HTTPS.", "error");
+            showPopup("Account creation not available on HTTP.", "error");
             return false;
         }
 
@@ -371,10 +270,10 @@ class UserManager {
             if (result.success) {
                 localStorage.setItem(`abutoys_user_${userData.email}`, JSON.stringify(userData));
                 this.setCurrentUser(userData.email);
-                showPopup("✅ Account created successfully!", "success");
+                showPopup("Account created successfully!", "success");
                 return true;
             } else if (result.error === "email_exists") {
-                showPopup("❌ Email already registered! Try logging in instead.", "error");
+                showPopup("Email already registered! Try logging in.", "error");
                 return false;
             } else {
                 showPopup("Signup failed. Try again later.", "error");
@@ -405,7 +304,7 @@ class UserManager {
             userNameDisplay.textContent = "Hello Visitor!";
             userNameDisplay.style.display = "block";
             userIcon.classList.remove("active");
-            userIcon.title = "Visitor Mode";
+            userIcon.title = "Visitor Mode - Click to Sign In";
             return;
         }
 
@@ -415,7 +314,12 @@ class UserManager {
     }
 
     loadCurrentUser() {
-        if (this.currentUser) this.updateUserDisplay();
+        if (this.currentUser) {
+            this.updateUserDisplay();
+            if (this.isFreeVisit()) {
+                this.disableFeaturesForVisitor();
+            }
+        }
     }
 
     getCurrentUserName() {
@@ -425,19 +329,49 @@ class UserManager {
         }
         return "Visitor";
     }
+
+    enableFeaturesForLoggedInUser() {
+        const whatsappFloat = document.querySelector(".whatsapp-float");
+        const cartIcon = document.getElementById("cartIcon");
+        
+        if (whatsappFloat) {
+            whatsappFloat.style.opacity = "1";
+            whatsappFloat.style.cursor = "pointer";
+        }
+        
+        if (cartIcon) {
+            cartIcon.style.opacity = "1";
+            cartIcon.style.cursor = "pointer";
+        }
+    }
+
+    disableFeaturesForVisitor() {
+        const whatsappFloat = document.querySelector(".whatsapp-float");
+        const cartIcon = document.getElementById("cartIcon");
+        
+        if (whatsappFloat) {
+            whatsappFloat.style.opacity = "0.5";
+            whatsappFloat.style.cursor = "not-allowed";
+        }
+        
+        if (cartIcon) {
+            cartIcon.style.opacity = "0.5";
+            cartIcon.style.cursor = "not-allowed";
+        }
+    }
 }
 
 // =================== INITIALIZE MANAGERS ===================
 const locationManager = new LocationManager();
 const userManager = new UserManager();
 
-// =================== SECURITY HANDLER (HTTP vs HTTPS) ===================
+// =================== SECURITY HANDLER ===================
 function enforceSecurityMode() {
     if (isHTTP) {
         localStorage.setItem("abutoys_current_user", "visitor");
         userManager.currentUser = "visitor";
         userManager.updateUserDisplay();
-        showPopup("You are browsing on an unsecured connection (HTTP). Visitor Mode is enabled for your safety.", "warning");
+        showPopup("You are on HTTP. Visitor Mode enabled for safety.", "warning");
         blockHTTPFeatures();
     }
 }
@@ -447,52 +381,33 @@ function blockHTTPFeatures() {
     if (userIcon) {
         userIcon.style.opacity = "0.5";
         userIcon.style.cursor = "not-allowed";
-        userIcon.title = "Account features disabled on HTTP";
     }
 
     const cartIcon = document.getElementById("cartIcon");
     if (cartIcon) {
         cartIcon.style.opacity = "0.5";
         cartIcon.style.cursor = "not-allowed";
-        cartIcon.title = "Cart features disabled on HTTP";
     }
-
-    const elementsToBlock = document.querySelectorAll('.secure-only');
-    elementsToBlock.forEach(el => {
-        el.style.opacity = "0.5";
-        el.style.cursor = "not-allowed";
-        el.title = "Feature disabled on HTTP";
-    });
 }
 
 function handleHTTPClick(elementName) {
-    showPopup(`${elementName} is not available on unsecured connection (HTTP). Please use HTTPS for full functionality.`, "error");
+    showPopup(`${elementName} not available on HTTP.`, "error");
 }
 
 enforceSecurityMode();
 
 // =================== WHATSAPP INTEGRATION ===================
 function openWhatsApp() {
+    if (userManager.isFreeVisit()) {
+        showPopup("WhatsApp is disabled in Free Visit mode. Please sign in to access support.", "warning");
+        return;
+    }
+
     const locationStatus = locationManager.getLocationStatus();
     const userName = userManager.getCurrentUserName();
 
-    if (userManager.currentUser === "visitor") {
-        showPopup("Sorry, you are unable to use this function because you are in Visitor Mode. Please create an account to access WhatsApp support.", "warning");
-        return;
-    }
-
-    if (locationStatus === "permission_denied") {
-        showPopup("📍 Please enable location permission in browser settings to access WhatsApp.", "error");
-        return;
-    }
-
-    if (locationStatus === "location_unavailable") {
-        showPopup("📍 Please turn on your device location (GPS) to access WhatsApp.", "error");
-        return;
-    }
-
-    if (locationStatus === "unknown") {
-        showPopup("⚠️ We need to verify your location first. Please enable location services.", "error");
+    if (locationStatus === "permission_denied" || locationStatus === "location_unavailable") {
+        showPopup("Please enable location to access WhatsApp.", "error");
         return;
     }
 
@@ -500,12 +415,11 @@ function openWhatsApp() {
     if (locationStatus === "in_range") {
         message = `Hi, I am ${userName} from Ahmedabad. In the range of ${DELIVERY_RANGE_KM} km`;
     } else {
-        message = `Hi, I am ${userName} from Ahmedabad. But not in the delivery range.`;
+        message = `Hi, I am ${userName} from Ahmedabad. Not in delivery range.`;
     }
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/9879254030?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(`https://wa.me/9879254030?text=${encodedMessage}`, '_blank');
 }
 
 // =================== ACCOUNT MODAL ===================
@@ -515,28 +429,17 @@ function showAccountModal() {
         return;
     }
 
-    const locationStatus = locationManager.getLocationStatus();
-
     if (userManager.isLoggedIn()) {
-        showPopup(`Welcome back ${userManager.getCurrentUserName()}!`, "success");
+        window.location.href = "userprofile.html";
         return;
     }
 
-    if (locationStatus === "in_range") {
-        document.getElementById("accountModal").style.display = "block";
-    } else if (locationStatus === "out_of_range") {
-        showPopup("Account access restricted. You are outside our delivery range.", "warning");
-    } else if (locationStatus === "permission_denied") {
-        showPopup("📍 Please enable location permission in browser settings to create an account.", "warning");
-    } else if (locationStatus === "location_unavailable") {
-        showPopup("📍 Please turn on your device location (GPS) to create an account.", "warning");
-    } else {
-        showPopup("⚠️ We cannot verify your location right now. Please enable location services and try again.", "warning");
-    }
+    document.getElementById("accountModal").style.display = "block";
 }
 
 function closeAccountModal() {
-    document.getElementById("accountModal").style.display = "none";
+    showPopup("Please choose Sign In or Free Visit to continue", "warning");
+    return false;
 }
 
 function showTab(tab) {
@@ -547,19 +450,13 @@ function showTab(tab) {
 }
 
 function setVisitorMode() {
-    const locationStatus = locationManager.getLocationStatus();
+    localStorage.setItem("abutoys_current_user", "visitor");
+    document.getElementById("accountModal").style.display = "none";
+    userManager.currentUser = "visitor";
+    userManager.updateUserDisplay();
+    userManager.disableFeaturesForVisitor();
     
-    // Visitor mode ab sabhi location status mein kaam karega
-    if (locationStatus === "in_range" || locationStatus === "out_of_range" || 
-        locationStatus === "permission_denied" || locationStatus === "location_unavailable") {
-        localStorage.setItem("abutoys_current_user", "visitor");
-        document.getElementById("accountModal").style.display = "none";
-        userManager.currentUser = "visitor";
-        userManager.updateUserDisplay();
-        showPopup("Welcome Visitor! You can browse our products.", "success");
-    } else {
-        showPopup("We need to verify your location before you can use Visitor mode.", "warning");
-    }
+    showPopup("Welcome Visitor! Browse only mode activated. Cart and WhatsApp are disabled.", "success");
 }
 
 // =================== CART FUNCTIONALITY ===================
@@ -568,7 +465,13 @@ function handleCartClick() {
         handleHTTPClick("Cart");
         return;
     }
-    console.log("Cart clicked - full functionality available on HTTPS");
+
+    if (userManager.isFreeVisit()) {
+        showPopup("Cart is disabled in Free Visit mode. Please sign in to add items.", "warning");
+        return;
+    }
+
+    console.log("Cart clicked");
 }
 
 // =================== POPUP SYSTEM ===================
@@ -610,17 +513,11 @@ function showPopup(message, type = "info") {
     }
 
     document.body.appendChild(popup);
-
-    if (isLoading) {
-        setTimeout(() => {
-            const el = document.getElementById("custom-popup");
-            if (el) el.remove();
-        }, 10000);
-    }
 }
 
 // =================== FORMS & DOM ===================
 document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
     const userIcon = document.getElementById("userIcon");
     const cartIcon = document.getElementById("cartIcon");
@@ -629,6 +526,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (phoneInput) {
         phoneInput.addEventListener("input", (e) => {
             e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener("submit", async e => {
+            e.preventDefault();
+
+            const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+            const password = document.getElementById("loginPassword").value;
+
+            const result = await userManager.login(email, password);
+            
+            if (result.success) {
+                document.getElementById("accountModal").style.display = "none";
+                showPopup(result.message, "success");
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showPopup(result.error, "error");
+            }
         });
     }
 
@@ -643,7 +559,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const phone = document.getElementById("phone").value;
             if (phone.length !== 10) {
-                showPopup("Phone number must be exactly 10 digits!", "error");
+                showPopup("Phone number must be 10 digits!", "error");
                 return;
             }
 
@@ -657,7 +573,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const success = await userManager.register(userData);
             if (success) {
-                closeAccountModal();
+                document.getElementById("accountModal").style.display = "none";
+                setTimeout(() => location.reload(), 1000);
             }
         });
     }
@@ -670,7 +587,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (userManager.isLoggedIn()) {
-                showPopup(`Hello ${userManager.getCurrentUserName()}! You are already logged in.`, "info");
+                window.location.href = "userprofile.html";
             } else {
                 showAccountModal();
             }
@@ -686,7 +603,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // =================== WELCOME & INITIAL LOCATION CHECK ===================
 function showWelcomeMessage() {
-    // Check karo ki pehli baar visit hai ya nahi
     const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
     
     if (isFirstVisit) {
@@ -696,10 +612,10 @@ function showWelcomeMessage() {
             popup.style.cssText = `
                 position: fixed; top:0; left:0; width:100%; height:100%;
                 background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
-                z-index:10001; color:#fff; font-size:1.1rem; text-align:center;
+                z-index:10001;
             `;
             popup.innerHTML = `
-                <div style="background:linear-gradient(45deg, #FF6B6B, #4ECDC4); color:#fff; padding:1.6rem; border-radius:14px; max-width:420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div style="background:linear-gradient(45deg, #FF6B6B, #4ECDC4); color:#fff; padding:1.6rem; border-radius:14px; max-width:420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align:center;">
                     <h2 style="margin-bottom:0.8rem; font-family: 'Fredoka One', cursive;">Welcome to AbuToys!</h2>
                     <p style="margin-bottom:1rem;">Enjoy shopping for the best toys in Ahmedabad!</p>
                     <button id="welcomeOkBtn" style="padding:10px 20px; border:none; border-radius:12px; background:rgba(255,255,255,0.9); color:#333; cursor:pointer; font-weight:bold;">
@@ -712,22 +628,10 @@ function showWelcomeMessage() {
 
             document.getElementById("welcomeOkBtn").addEventListener("click", async () => {
                 popup.remove();
-                
-                // Session mein store karo ki welcome dikha diya
                 sessionStorage.setItem("abutoys_welcomed", "true");
-                
-                // Ab location check karo - ye FRESH permission maangega
                 await locationManager.checkLocationAndSetStatus();
             });
         }, 700);
-    } else {
-        // Agar pehle se session mein hai (same session mein page reload), 
-        // toh stored status use karo
-        const storedStatus = localStorage.getItem("abutoys_location_status");
-        if (storedStatus && storedStatus !== "unknown") {
-            // Already location verified hai is session mein
-            console.log("Location already checked in this session:", storedStatus);
-        }
     }
 }
 
@@ -767,34 +671,21 @@ function createFloatingButtons() {
     whatsappFloat.className = "whatsapp-float";
     whatsappFloat.innerHTML = `<i class="fab fa-whatsapp"></i>`;
     whatsappFloat.style.cssText = `
-        position: fixed;
-        bottom: 100px;
-        right: 20px;
-        background: #25d366;
-        color: white;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: fixed; bottom: 100px; right: 20px;
+        background: #25d366; color: white; border-radius: 50%;
+        width: 60px; height: 60px; display: flex;
+        align-items: center; justify-content: center;
         box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-        cursor: pointer;
-        z-index: 999;
-        font-size: 28px;
-        transition: all 0.3s ease;
-        opacity: 0;
-        visibility: hidden;
+        cursor: pointer; z-index: 999; font-size: 28px;
+        transition: all 0.3s ease; opacity: 0; visibility: hidden;
     `;
 
     whatsappFloat.addEventListener("mouseenter", () => {
         whatsappFloat.style.transform = "scale(1.05)";
-        whatsappFloat.style.boxShadow = "0 6px 25px rgba(37, 211, 102, 0.6)";
     });
 
     whatsappFloat.addEventListener("mouseleave", () => {
         whatsappFloat.style.transform = "scale(1)";
-        whatsappFloat.style.boxShadow = "0 4px 20px rgba(37, 211, 102, 0.4)";
     });
 
     whatsappFloat.addEventListener("click", openWhatsApp);
@@ -826,9 +717,7 @@ function createFloatingButtons() {
 initMobileNavigation();
 initHeroSlider();
 
-// âœ… HOME PAGE VISIT FLAG SET KARO
 sessionStorage.setItem("abutoys_home_visited", "true");
-
 showWelcomeMessage();
 
 document.addEventListener("click", (e) => {
