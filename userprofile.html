@@ -33,6 +33,9 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
             z-index: 1000;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .back-btn:hover {
@@ -41,7 +44,7 @@
         }
 
         .container {
-            max-width: 550px;
+            max-width: 600px;
             margin: 80px auto 50px;
             background: white;
             border-radius: 25px;
@@ -51,106 +54,134 @@
 
         .profile-header {
             background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            padding: 40px 30px;
+            padding: 50px 30px;
             text-align: center;
             color: white;
         }
 
         .profile-icon {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 3.5rem;
+            margin: 0 auto 25px;
+            font-size: 4rem;
             color: #FF6B6B;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
 
         .profile-name {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .profile-email {
-            font-size: 1rem;
+            font-size: 1.1rem;
             opacity: 0.95;
         }
 
-        /* Profile Content */
         .profile-content {
-            padding: 35px;
+            padding: 40px;
         }
 
-        .info-group {
-            margin-bottom: 25px;
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #FF6B6B;
+            margin-bottom: 20px;
+            font-weight: 700;
+            border-bottom: 3px solid #4ECDC4;
+            padding-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .info-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .info-details {
+            flex: 1;
         }
 
         .info-label {
             font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 600;
+            color: #999;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .info-value {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: #333;
-            padding: 14px 16px;
-            background: #f8f9fa;
-            border-radius: 12px;
             font-weight: 500;
-            border: 2px solid #e9ecef;
+            word-break: break-word;
         }
 
-        .password-group {
+        .password-row {
             position: relative;
         }
 
-        .password-value {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-right: 10px;
-        }
-
-        .eye-btn {
+        .password-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
             color: #666;
             cursor: pointer;
             font-size: 1.3rem;
-            padding: 8px;
-            user-select: none;
-            transition: all 0.3s ease;
+            padding: 10px;
+            transition: color 0.3s;
         }
 
-        .eye-btn:active {
+        .password-toggle:active {
             color: #4ECDC4;
-            transform: scale(1.1);
         }
 
         .action-buttons {
             display: flex;
             gap: 15px;
-            margin-top: 35px;
+            margin-top: 40px;
         }
 
         .btn {
             flex: 1;
-            padding: 16px;
+            padding: 18px;
             border: none;
             border-radius: 15px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-logout {
@@ -175,137 +206,13 @@
             box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
         }
 
-        /* Login/Signup Form */
-        .form-section {
-            padding: 35px;
-        }
-
-        .modal-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        .tab-button.active {
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            color: white;
-            border-color: transparent;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .form-section input {
-            width: 100%;
-            padding: 14px 18px;
-            margin-bottom: 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .form-section input:focus {
-            outline: none;
-            border-color: #4ECDC4;
-            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
-        }
-
-        .phone-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .phone-prefix {
-            padding: 14px 18px;
-            background: #f0f0f0;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .phone-input-group input {
-            margin-bottom: 0;
-            flex: 1;
-        }
-
-        .btn-primary, .btn-secondary {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #7f8c8d;
-            transform: translateY(-3px);
-        }
-
-        .visitor-content {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .visitor-content h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.5rem;
-        }
-
-        .visitor-content p {
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        /* Popup */
         .popup-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
@@ -314,42 +221,42 @@
 
         .popup-content {
             background: white;
-            padding: 40px;
+            padding: 45px;
             border-radius: 25px;
-            max-width: 450px;
+            max-width: 480px;
             text-align: center;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
-            animation: popupSlide 0.3s ease-out;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: popupSlide 0.4s ease-out;
         }
 
         @keyframes popupSlide {
             from {
-                transform: translateY(-50px);
+                transform: scale(0.8) translateY(-50px);
                 opacity: 0;
             }
             to {
-                transform: translateY(0);
+                transform: scale(1) translateY(0);
                 opacity: 1;
             }
         }
 
         .popup-icon {
-            font-size: 4rem;
+            font-size: 5rem;
             margin-bottom: 25px;
         }
 
         .popup-title {
-            font-size: 1.8rem;
-            margin-bottom: 18px;
+            font-size: 2rem;
+            margin-bottom: 20px;
             color: #333;
             font-weight: 700;
         }
 
         .popup-message {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
+            margin-bottom: 35px;
+            line-height: 1.7;
         }
 
         .popup-buttons {
@@ -359,12 +266,12 @@
 
         .popup-btn {
             flex: 1;
-            padding: 14px;
+            padding: 16px;
             border: none;
             border-radius: 12px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.05rem;
             transition: all 0.3s ease;
         }
 
@@ -378,13 +285,23 @@
             transform: translateY(-2px);
         }
 
-        .btn-sure {
+        .btn-confirm {
             background: #e74c3c;
             color: white;
         }
 
-        .btn-sure:hover {
+        .btn-confirm:hover {
             background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-confirm-logout {
+            background: #4ECDC4;
+            color: white;
+        }
+
+        .btn-confirm-logout:hover {
+            background: #3ab3a3;
             transform: translateY(-2px);
         }
 
@@ -394,17 +311,59 @@
 
         .loading-spinner {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
         }
 
         .spinner {
-            font-size: 3.5rem;
+            font-size: 4.5rem;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        .redirect-section {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .redirect-icon {
+            font-size: 5rem;
+            margin-bottom: 25px;
+            color: #FF6B6B;
+        }
+
+        .redirect-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .redirect-message {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .redirect-btn {
+            display: inline-block;
+            padding: 16px 35px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .redirect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
 
         @media (max-width: 768px) {
@@ -418,6 +377,23 @@
                 padding: 10px 20px;
                 font-size: 0.9rem;
             }
+
+            .profile-content {
+                padding: 30px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .popup-content {
+                margin: 20px;
+                padding: 35px 25px;
+            }
+
+            .popup-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -425,7 +401,7 @@
     <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
 
     <div class="container">
-        <!-- Profile Section (when logged in) -->
+        <!-- Profile Section -->
         <div id="profileSection" class="hidden">
             <div class="profile-header">
                 <div class="profile-icon">
@@ -435,27 +411,53 @@
                 <p class="profile-email" id="profileEmail">Loading...</p>
             </div>
             <div class="profile-content">
-                <div class="info-group">
-                    <div class="info-label">Full Name</div>
-                    <div class="info-value" id="profileFullName">Loading...</div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Phone Number</div>
-                    <div class="info-value" id="profilePhone">Loading...</div>
-                </div>
-                <div class="info-group password-group">
-                    <div class="info-label">Password</div>
-                    <div class="info-value password-value">
-                        <span id="profilePassword">••••••••</span>
-                        <button class="eye-btn" id="eyeBtn" type="button">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                <div class="info-section">
+                    <h3 class="section-title">Personal Information</h3>
+                    
+                    <div class="info-row">
+                        <div class="info-icon"><i class="fas fa-user"></i></div>
+                        <div class="info-details">
+                            <div class="info-label">Full Name</div>
+                            <div class="info-value" id="profileFullName">Loading...</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="info-details">
+                            <div class="info-label">Email Address</div>
+                            <div class="info-value" id="profileEmailFull">Loading...</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon"><i class="fas fa-phone"></i></div>
+                        <div class="info-details">
+                            <div class="info-label">Phone Number</div>
+                            <div class="info-value" id="profilePhone">Loading...</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row password-row">
+                        <div class="info-icon"><i class="fas fa-lock"></i></div>
+                        <div class="info-details">
+                            <div class="info-label">Password</div>
+                            <div class="info-value" id="profilePassword">••••••••</div>
+                            <button class="password-toggle" id="passwordToggle" type="button">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="info-details">
+                            <div class="info-label">Address</div>
+                            <div class="info-value" id="profileAddress">Loading...</div>
+                        </div>
                     </div>
                 </div>
-                <div class="info-group">
-                    <div class="info-label">Address</div>
-                    <div class="info-value" id="profileAddress">Loading...</div>
-                </div>
+
                 <div class="action-buttons">
                     <button class="btn btn-logout" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -467,67 +469,41 @@
             </div>
         </div>
 
-        <!-- Login/Signup Section (when not logged in) -->
-        <div id="authSection" class="hidden">
+        <!-- Redirect Section (for non-logged users) -->
+        <div id="redirectSection" class="hidden">
             <div class="profile-header">
                 <div class="profile-icon">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-exclamation-circle"></i>
                 </div>
-                <h2 class="profile-name">Welcome to AbuToys</h2>
-                <p class="profile-email">Join our happy family!</p>
+                <h2 class="profile-name">Access Denied</h2>
             </div>
-            <div class="form-section">
-                <div class="modal-tabs">
-                    <button class="tab-button active" onclick="showTab('login')">Login</button>
-                    <button class="tab-button" onclick="showTab('signup')">Sign Up</button>
-                    <button class="tab-button" onclick="showTab('visitor')">Free Visit</button>
-                </div>
-
-                <!-- Login Tab -->
-                <div id="loginTab" class="tab-content active">
-                    <form id="loginForm">
-                        <input type="email" id="loginEmail" placeholder="Email Address" required>
-                        <input type="password" id="loginPassword" placeholder="Password" required>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-sign-in-alt"></i> Login to Account
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Signup Tab -->
-                <div id="signupTab" class="tab-content">
-                    <form id="signupForm">
-                        <input type="text" id="fullName" placeholder="Full Name" required>
-                        <input type="email" id="email" placeholder="Email Address" required>
-                        <input type="password" id="password" placeholder="Password" required>
-                        <div class="phone-input-group">
-                            <span class="phone-prefix">+91</span>
-                            <input type="tel" id="phone" placeholder="Phone Number (10 digits)" maxlength="10" pattern="[0-9]{10}" required>
-                        </div>
-                        <input type="text" id="address" placeholder="Address" required>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-user-plus"></i> Create Account
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Visitor Tab -->
-                <div id="visitorTab" class="tab-content">
-                    <div class="visitor-content">
-                        <h3>Explore as Visitor</h3>
-                        <p>Browse our products without creating an account. You can always sign up later to place orders!</p>
-                        <button onclick="setVisitorMode()" class="btn-secondary">
-                            <i class="fas fa-eye"></i> Continue as Visitor
-                        </button>
-                    </div>
-                </div>
+            <div class="redirect-section">
+                <div class="redirect-icon">🔒</div>
+                <h3 class="redirect-title">Please Sign In</h3>
+                <p class="redirect-message">You need to be signed in to view your profile. Please go to the home page to sign in or create an account.</p>
+                <a href="index.html" class="redirect-btn">
+                    <i class="fas fa-home"></i> Go to Home Page
+                </a>
             </div>
         </div>
 
         <!-- Loading -->
         <div id="loadingSection" class="loading-spinner">
             <div class="spinner">🔄</div>
-            <p style="margin-top: 20px; color: #666; font-size: 1.1rem;">Loading your profile...</p>
+            <p style="margin-top: 25px; color: #666; font-size: 1.2rem;">Loading your profile...</p>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Popup -->
+    <div class="popup-overlay" id="logoutPopup">
+        <div class="popup-content">
+            <div class="popup-icon">👋</div>
+            <h3 class="popup-title">Logout Confirmation</h3>
+            <p class="popup-message">You want to logout?</p>
+            <div class="popup-buttons">
+                <button class="popup-btn btn-cancel" id="cancelLogoutBtn">Cancel</button>
+                <button class="popup-btn btn-confirm-logout" id="confirmLogoutBtn">Sure</button>
+            </div>
         </div>
     </div>
 
@@ -536,20 +512,19 @@
         <div class="popup-content">
             <div class="popup-icon">⚠️</div>
             <h3 class="popup-title">Delete Account?</h3>
-            <p class="popup-message">If you delete your account, then all your data will be deleted. This action cannot be undone.</p>
+            <p class="popup-message">If you delete your account then all your data will be deleted. This action cannot be undone.</p>
             <div class="popup-buttons">
-                <button class="popup-btn btn-cancel" id="cancelBtn">Cancel</button>
-                <button class="popup-btn btn-sure" id="sureBtn">Sure, Delete</button>
+                <button class="popup-btn btn-cancel" id="cancelDeleteBtn">Cancel</button>
+                <button class="popup-btn btn-confirm" id="confirmDeleteBtn">Sure, Delete</button>
             </div>
         </div>
     </div>
 
     <script>
-        const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
-        const PROFILE_FETCH_URL = "https://script.google.com/macros/s/YOUR_PROFILE_SCRIPT_ID/exec";
-        const DELETE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_DELETE_SCRIPT_ID/exec";
+        const DELETE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
 
         let actualPassword = "";
+        let currentUserEmail = "";
 
         document.addEventListener("DOMContentLoaded", () => {
             checkUserStatus();
@@ -560,26 +535,27 @@
             const currentUser = localStorage.getItem("abutoys_current_user");
             
             if (!currentUser || currentUser === "visitor" || currentUser === "null") {
-                showAuthSection();
+                showRedirectSection();
             } else {
+                currentUserEmail = currentUser;
                 loadUserProfile(currentUser);
             }
         }
 
-        function showAuthSection() {
+        function showRedirectSection() {
             document.getElementById("loadingSection").classList.add("hidden");
             document.getElementById("profileSection").classList.add("hidden");
-            document.getElementById("authSection").classList.remove("hidden");
+            document.getElementById("redirectSection").classList.remove("hidden");
         }
 
         function showProfileSection() {
             document.getElementById("loadingSection").classList.add("hidden");
-            document.getElementById("authSection").classList.add("hidden");
+            document.getElementById("redirectSection").classList.add("hidden");
             document.getElementById("profileSection").classList.remove("hidden");
         }
 
         function showLoading() {
-            document.getElementById("authSection").classList.add("hidden");
+            document.getElementById("redirectSection").classList.add("hidden");
             document.getElementById("profileSection").classList.add("hidden");
             document.getElementById("loadingSection").classList.remove("hidden");
         }
@@ -591,7 +567,7 @@
                 displayProfile(userData);
                 showProfileSection();
             } else {
-                showAuthSection();
+                showRedirectSection();
             }
         }
 
@@ -600,130 +576,54 @@
             document.getElementById("profileName").textContent = user.fullName || "User";
             document.getElementById("profileEmail").textContent = user.email || "";
             document.getElementById("profileFullName").textContent = user.fullName || "Not provided";
+            document.getElementById("profileEmailFull").textContent = user.email || "Not provided";
             document.getElementById("profilePhone").textContent = user.phone || "Not provided";
             document.getElementById("profileAddress").textContent = user.address || "Not provided";
         }
 
         function setupEventListeners() {
-            // Login form
-            document.getElementById("loginForm")?.addEventListener("submit", handleLogin);
+            // Password toggle
+            const passwordToggle = document.getElementById("passwordToggle");
+            const passwordDisplay = document.getElementById("profilePassword");
             
-            // Signup form
-            document.getElementById("signupForm")?.addEventListener("submit", handleSignup);
-            
-            // Password eye button
-            const eyeBtn = document.getElementById("eyeBtn");
-            eyeBtn?.addEventListener("mousedown", () => {
-                document.getElementById("profilePassword").textContent = actualPassword;
-            });
-            eyeBtn?.addEventListener("mouseup", hidePassword);
-            eyeBtn?.addEventListener("mouseleave", hidePassword);
-            eyeBtn?.addEventListener("touchstart", (e) => {
-                e.preventDefault();
-                document.getElementById("profilePassword").textContent = actualPassword;
-            });
-            eyeBtn?.addEventListener("touchend", hidePassword);
-            
-            // Phone input restriction
-            document.getElementById("phone")?.addEventListener("input", (e) => {
-                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-            });
+            if (passwordToggle) {
+                passwordToggle.addEventListener("mousedown", () => {
+                    passwordDisplay.textContent = actualPassword;
+                });
+                passwordToggle.addEventListener("mouseup", hidePassword);
+                passwordToggle.addEventListener("mouseleave", hidePassword);
+                passwordToggle.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    passwordDisplay.textContent = actualPassword;
+                });
+                passwordToggle.addEventListener("touchend", hidePassword);
+            }
             
             // Logout
-            document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
+            document.getElementById("logoutBtn")?.addEventListener("click", showLogoutPopup);
+            document.getElementById("cancelLogoutBtn")?.addEventListener("click", hideLogoutPopup);
+            document.getElementById("confirmLogoutBtn")?.addEventListener("click", handleLogout);
             
             // Delete
             document.getElementById("deleteBtn")?.addEventListener("click", showDeletePopup);
-            document.getElementById("cancelBtn")?.addEventListener("click", hideDeletePopup);
-            document.getElementById("sureBtn")?.addEventListener("click", handleDeleteAccount);
+            document.getElementById("cancelDeleteBtn")?.addEventListener("click", hideDeletePopup);
+            document.getElementById("confirmDeleteBtn")?.addEventListener("click", handleDeleteAccount);
         }
 
         function hidePassword() {
             document.getElementById("profilePassword").textContent = "••••••••";
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-            const password = document.getElementById("loginPassword").value;
-            
-            // Check localStorage first
-            const userData = JSON.parse(localStorage.getItem(`abutoys_user_${email}`) || "null");
-            
-            if (userData && userData.password === password) {
-                localStorage.setItem("abutoys_current_user", email);
-                displayProfile(userData);
-                showProfileSection();
-                showMessage("Login successful! Welcome back!", "success");
-            } else {
-                showMessage("Invalid email or password", "error");
-            }
+        function showLogoutPopup() {
+            document.getElementById("logoutPopup").style.display = "flex";
         }
 
-        async function handleSignup(e) {
-            e.preventDefault();
-            
-            const phone = document.getElementById("phone").value;
-            if (phone.length !== 10) {
-                showMessage("Phone number must be exactly 10 digits!", "error");
-                return;
-            }
-
-            const userData = {
-                fullName: document.getElementById("fullName").value.trim(),
-                email: document.getElementById("email").value.trim().toLowerCase(),
-                password: document.getElementById("password").value,
-                phone: "+91" + phone,
-                address: document.getElementById("address").value.trim()
-            };
-
-            showLoading();
-
-            try {
-                const formData = new FormData();
-                formData.append("fullName", userData.fullName);
-                formData.append("email", userData.email);
-                formData.append("password", userData.password);
-                formData.append("phone", userData.phone);
-                formData.append("address", userData.address);
-
-                const response = await fetch(SIGNUP_SCRIPT_URL, {
-                    method: "POST",
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    localStorage.setItem(`abutoys_user_${userData.email}`, JSON.stringify(userData));
-                    localStorage.setItem("abutoys_current_user", userData.email);
-                    displayProfile(userData);
-                    showProfileSection();
-                    showMessage("Account created successfully!", "success");
-                } else if (result.error === "email_exists") {
-                    showAuthSection();
-                    showMessage("Email already registered! Try logging in instead.", "error");
-                } else {
-                    showAuthSection();
-                    showMessage("Signup failed. Try again later.", "error");
-                }
-            } catch (error) {
-                console.error("Signup error:", error);
-                showAuthSection();
-                showMessage("Server error. Please try again later.", "error");
-            }
-        }
-
-        function setVisitorMode() {
-            localStorage.setItem("abutoys_current_user", "visitor");
-            showMessage("Welcome Visitor! You can browse our products.", "success");
-            setTimeout(() => {
-                window.location.href = "index.html";
-            }, 1000);
+        function hideLogoutPopup() {
+            document.getElementById("logoutPopup").style.display = "none";
         }
 
         function handleLogout() {
+            hideLogoutPopup();
             localStorage.removeItem("abutoys_current_user");
             showMessage("Logged out successfully!", "success");
             setTimeout(() => {
@@ -743,20 +643,21 @@
             hideDeletePopup();
             showLoading();
             
-            const email = localStorage.getItem("abutoys_current_user");
-            
             try {
+                const formData = new FormData();
+                formData.append("action", "delete");
+                formData.append("email", currentUserEmail);
+
                 const response = await fetch(DELETE_SCRIPT_URL, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: email })
+                    body: formData
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
                     localStorage.removeItem("abutoys_current_user");
-                    localStorage.removeItem(`abutoys_user_${email}`);
+                    localStorage.removeItem(`abutoys_user_${currentUserEmail}`);
                     showMessage("Account deleted successfully", "success");
                     setTimeout(() => {
                         window.location.href = "index.html";
@@ -772,14 +673,6 @@
             }
         }
 
-        function showTab(tabName) {
-            document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
-            document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
-            
-            event.target.classList.add("active");
-            document.getElementById(tabName + "Tab").classList.add("active");
-        }
-
         function showMessage(message, type = "info") {
             const colors = {
                 success: "#4CAF50",
@@ -790,8 +683,8 @@
             const messageDiv = document.createElement("div");
             messageDiv.style.cssText = `
                 position: fixed; top: 30px; right: 30px; z-index: 20000;
-                padding: 18px 28px; border-radius: 15px; color: white;
-                background: ${colors[type]}; font-weight: 600; font-size: 1rem;
+                padding: 20px 30px; border-radius: 15px; color: white;
+                background: ${colors[type]}; font-weight: 600; font-size: 1.05rem;
                 box-shadow: 0 8px 25px rgba(0,0,0,0.3);
                 animation: slideIn 0.4s ease-out;
             `;
