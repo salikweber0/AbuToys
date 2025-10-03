@@ -35,153 +35,167 @@ class LocationManager {
     }
 
     calculateDeliveryCharge(distance) {
-    // Distance in km
-    if (distance <= 0.5) {
-        return 0; // Free - shop ke paas hai
-    } else if (distance > 0.5 && distance <= 1.5) {
-        return 15;
-    } else if (distance > 1.5 && distance <= 2.5) {
-        return 25;
-    } else if (distance > 2.5 && distance <= 3.5) {
-        return 35;
-    } else if (distance > 3.5 && distance <= 4.5) {
-        return 45;
-    } else if (distance > 4.5 && distance <= 5.5) {
-        return 55;
-    } else if (distance > 5.5 && distance <= 6.5) {
-        return 65;
-    } else if (distance > 6.5 && distance <= 7.5) {
-        return 75;
-    } else if (distance > 7.5 && distance <= 8.5) {
-        return 85;
-    } else if (distance > 8.5 && distance <= 9.5) {
-        return 95;
-    } else if (distance > 9.5 && distance <= 10.5) {
-        return 105;
-    } else if (distance > 10.5 && distance <= 11.5) {
-        return 115;
-    } else if (distance > 11.5 && distance <= 12.5) {
-        return 125;
-    } else if (distance > 12.5 && distance <= 13.5) {
-        return 135;
-    } else if (distance > 13.5 && distance <= 14.5) {
-        return 145;
-    } else if (distance > 14.5 && distance <= 15.5) {
-        return 155;
-    } else if (distance > 15.5 && distance <= 16.5) {
-        return 165;
-    } else if (distance > 16.5 && distance <= 17.5) {
-        return 175;
-    } else if (distance > 17.5 && distance <= 18.5) {
-        return 185;
-    } else if (distance > 18.5 && distance <= 19.5) {
-        return 195;
-    } else if (distance > 19.5 && distance <= 20.5) {
-        return 205;
-    } else if (distance > 20.5 && distance <= 21.5) {
-        return 215;
-    } else if (distance > 21.5 && distance <= 22.5) {
-        return 225;
-    } else if (distance > 22.5 && distance <= 23.5) {
-        return 235;
-    } else if (distance > 23.5 && distance <= 24.5) {
-        return 245;
-    } else if (distance > 24.5 && distance <= 25.5) {
-        return 255;
-    } else if (distance > 25.5 && distance <= 26.5) {
-        return 265;
-    } else if (distance > 26.5 && distance <= 27.5) {
-        return 275;
-    } else if (distance > 27.5 && distance <= 28.5) {
-        return 285;
-    } else if (distance > 28.5 && distance <= 29.5) {
-        return 295;
-    } else if (distance > 29.5 && distance <= 30.5) {
-        return 305;
-    } else if (distance > 30.5 && distance <= 31.5) {
-        return 315;
-    } else if (distance > 31.5 && distance <= 32.5) {
-        return 325;
-    } else if (distance > 32.5 && distance <= 33.5) {
-        return 335;
-    } else if (distance > 33.5 && distance <= 34.5) {
-        return 345;
-    } else if (distance > 34.5 && distance <= 35.5) {
-        return 355;
-    } else if (distance > 35.5 && distance <= 36.5) {
-        return 365;
-    } else if (distance > 36.5 && distance <= 37.5) {
-        return 375;
-    } else if (distance > 37.5 && distance <= 38.5) {
-        return 385;
-    } else if (distance > 38.5 && distance <= 39.5) {
-        return 395;
-    } else if (distance > 39.5 && distance <= 40.5) {
-        return 405;
-    } else if (distance > 40.5 && distance <= 41.5) {
-        return 415;
-    } else if (distance > 41.5 && distance <= 42.5) {
-        return 425;
-    } else if (distance > 42.5 && distance <= 43.5) {
-        return 435;
-    } else if (distance > 43.5 && distance <= 44.5) {
-        return 445;
-    } else if (distance > 44.5 && distance <= 45.5) {
-        return 455;
-    } else if (distance > 45.5 && distance <= 46.5) {
-        return 465;
-    } else if (distance > 46.5 && distance <= 47.5) {
-        return 475;
-    } else if (distance > 47.5 && distance <= 48.5) {
-        return 485;
-    } else if (distance > 48.5 && distance <= 49.5) {
-        return 495;
-    } else if (distance > 49.5 && distance <= 50.5) {
-        return 505;
-    } else if (distance > 50.5 && distance <= 51.5) {
-        return 515;
-    } else if (distance > 51.5 && distance <= 52.5) {
-        return 525;
-    } else if (distance > 52.5 && distance <= 53.5) {
-        return 535;
-    } else if (distance > 53.5 && distance <= 54.5) {
-        return 545;
-    } else if (distance > 54.5 && distance <= 55.5) {
-        return 555;
-    } else if (distance > 55.5 && distance <= 56.5) {
-        return 565;
-    } else if (distance > 56.5 && distance <= 57.5) {
-        return 575;
-    } else if (distance > 57.5 && distance <= 58.5) {
-        return 585;
-    } else if (distance > 58.5 && distance <= 59.5) {
-        return 595;
-    } else if (distance > 59.5 && distance <= 60.5) {
-        return 605;
-    } else if (distance > 60.5 && distance <= 61.5) {
-        return 615;
-    } else if (distance > 61.5 && distance <= 62.5) {
-        return 625;
-    } else if (distance > 62.5 && distance <= 63.5) {
-        return 635;
-    } else if (distance > 63.5 && distance <= 64.5) {
-        return 645;
-    } else if (distance > 64.5 && distance <= 65.5) {
-        return 655;
-    } else if (distance > 65.5 && distance <= 66.5) {
-        return 665;
-    } else if (distance > 66.5 && distance <= 67.5) {
-        return 675;
-    } else if (distance > 67.5 && distance <= 68.5) {
-        return 685;
-    } else if (distance > 68.5 && distance <= 69.5) {
-        return 695;
-    } else if (distance > 69.5 && distance <= 70) {
-        return 705;
-    } else {
-        return -1; // Out of range (70km se zyada)
+        // Distance in km
+        if (distance <= 0.5) {
+            return 0; // Free - shop ke paas hai
+        } else if (distance > 0.5 && distance <= 1.5) {
+            return 15;
+        } else if (distance > 1.5 && distance <= 2.5) {
+            return 25;
+        } else if (distance > 2.5 && distance <= 3.5) {
+            return 35;
+        } else if (distance > 3.5 && distance <= 4.5) {
+            return 45;
+        } else if (distance > 4.5 && distance <= 5.5) {
+            return 55;
+        } else if (distance > 5.5 && distance <= 6.5) {
+            return 65;
+        } else if (distance > 6.5 && distance <= 7.5) {
+            return 75;
+        } else if (distance > 7.5 && distance <= 8.5) {
+            return 85;
+        } else if (distance > 8.5 && distance <= 9.5) {
+            return 95;
+        } else if (distance > 9.5 && distance <= 10.5) {
+            return 105;
+        } else if (distance > 10.5 && distance <= 11.5) {
+            return 115;
+        } else if (distance > 11.5 && distance <= 12.5) {
+            return 125;
+        } else if (distance > 12.5 && distance <= 13.5) {
+            return 135;
+        } else if (distance > 13.5 && distance <= 14.5) {
+            return 145;
+        } else if (distance > 14.5 && distance <= 15.5) {
+            return 155;
+        } else if (distance > 15.5 && distance <= 16.5) {
+            return 165;
+        } else if (distance > 16.5 && distance <= 17.5) {
+            return 175;
+        } else if (distance > 17.5 && distance <= 18.5) {
+            return 185;
+        } else if (distance > 18.5 && distance <= 19.5) {
+            return 195;
+        } else if (distance > 19.5 && distance <= 20.5) {
+            return 205;
+        } else if (distance > 20.5 && distance <= 21.5) {
+            return 215;
+        } else if (distance > 21.5 && distance <= 22.5) {
+            return 225;
+        } else if (distance > 22.5 && distance <= 23.5) {
+            return 235;
+        } else if (distance > 23.5 && distance <= 24.5) {
+            return 245;
+        } else if (distance > 24.5 && distance <= 25.5) {
+            return 255;
+        } else if (distance > 25.5 && distance <= 26.5) {
+            return 265;
+        } else if (distance > 26.5 && distance <= 27.5) {
+            return 275;
+        } else if (distance > 27.5 && distance <= 28.5) {
+            return 285;
+        } else if (distance > 28.5 && distance <= 29.5) {
+            return 295;
+        } else if (distance > 29.5 && distance <= 30.5) {
+            return 305;
+        } else if (distance > 30.5 && distance <= 31.5) {
+            return 315;
+        } else if (distance > 31.5 && distance <= 32.5) {
+            return 325;
+        } else if (distance > 32.5 && distance <= 33.5) {
+            return 335;
+        } else if (distance > 33.5 && distance <= 34.5) {
+            return 345;
+        } else if (distance > 34.5 && distance <= 35.5) {
+            return 355;
+        } else if (distance > 35.5 && distance <= 36.5) {
+            return 365;
+        } else if (distance > 36.5 && distance <= 37.5) {
+            return 375;
+        } else if (distance > 37.5 && distance <= 38.5) {
+            return 385;
+        } else if (distance > 38.5 && distance <= 39.5) {
+            return 395;
+        } else if (distance > 39.5 && distance <= 40.5) {
+            return 405;
+        } else if (distance > 40.5 && distance <= 41.5) {
+            return 415;
+        } else if (distance > 41.5 && distance <= 42.5) {
+            return 425;
+        } else if (distance > 42.5 && distance <= 43.5) {
+            return 435;
+        } else if (distance > 43.5 && distance <= 44.5) {
+            return 445;
+        } else if (distance > 44.5 && distance <= 45.5) {
+            return 455;
+        } else if (distance > 45.5 && distance <= 46.5) {
+            return 465;
+        } else if (distance > 46.5 && distance <= 47.5) {
+            return 475;
+        } else if (distance > 47.5 && distance <= 48.5) {
+            return 485;
+        } else if (distance > 48.5 && distance <= 49.5) {
+            return 495;
+        } else if (distance > 49.5 && distance <= 50.5) {
+            return 505;
+        } else if (distance > 50.5 && distance <= 51.5) {
+            return 515;
+        } else if (distance > 51.5 && distance <= 52.5) {
+            return 525;
+        } else if (distance > 52.5 && distance <= 53.5) {
+            return 535;
+        } else if (distance > 53.5 && distance <= 54.5) {
+            return 545;
+        } else if (distance > 54.5 && distance <= 55.5) {
+            return 555;
+        } else if (distance > 55.5 && distance <= 56.5) {
+            return 565;
+        } else if (distance > 56.5 && distance <= 57.5) {
+            return 575;
+        } else if (distance > 57.5 && distance <= 58.5) {
+            return 585;
+        } else if (distance > 58.5 && distance <= 59.5) {
+            return 595;
+        } else if (distance > 59.5 && distance <= 60.5) {
+            return 605;
+        } else if (distance > 60.5 && distance <= 61.5) {
+            return 615;
+        } else if (distance > 61.5 && distance <= 62.5) {
+            return 625;
+        } else if (distance > 62.5 && distance <= 63.5) {
+            return 635;
+        } else if (distance > 63.5 && distance <= 64.5) {
+            return 645;
+        } else if (distance > 64.5 && distance <= 65.5) {
+            return 655;
+        } else if (distance > 65.5 && distance <= 66.5) {
+            return 665;
+        } else if (distance > 66.5 && distance <= 67.5) {
+            return 675;
+        } else if (distance > 67.5 && distance <= 68.5) {
+            return 685;
+        } else if (distance > 68.5 && distance <= 69.5) {
+            return 695;
+        } else if (distance > 69.5 && distance <= 70) {
+            return 705;
+        } else {
+            return -1; // Out of range (70km se zyada)
+        }
     }
-}
+
+    async checkLocationAvailability() {
+        // Pehle check karo ki Permissions API available hai
+        if ('permissions' in navigator) {
+            try {
+                const result = await navigator.permissions.query({ name: 'geolocation' });
+                return result.state; // 'granted', 'denied', or 'prompt'
+            } catch (e) {
+                // Agar Permissions API kaam nahi kare toh normal flow
+                return 'prompt';
+            }
+        }
+        return 'prompt';
+    }
 
     getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
@@ -189,16 +203,34 @@ class LocationManager {
                 reject({ code: 0, message: "Geolocation not supported" });
                 return;
             }
+            
+            // IMPORTANT: maximumAge: 0 forces fresh location request
+            // Ye ensure karta hai ki browser fresh permission maangega
             navigator.geolocation.getCurrentPosition(
                 pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
                 err => reject(err),
-                options
+                { ...options, maximumAge: 0 } // Always force fresh location
             );
         });
     }
 
     async checkLocationAndSetStatus() {
         try {
+            // Pehle permission status check karo
+            const permissionStatus = await this.checkLocationAvailability();
+            
+            if (permissionStatus === 'denied') {
+                // Agar pehle se denied hai
+                this.locationStatus = "permission_denied";
+                localStorage.setItem("abutoys_location_status", "permission_denied");
+                localStorage.setItem("abutoys_delivery_charge", "0");
+                showPopup("🚫 Location permission is blocked. Please enable location permission in your browser settings to verify delivery availability.", "warning");
+                return { location: null, distance: null, status: this.locationStatus };
+            }
+
+            // Loading message dikhao
+            showPopup("Getting your location...", "loading");
+            
             const location = await this.getCurrentLocation();
             const distance = this.calculateDistance(location.lat, location.lng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
             const deliveryCharge = this.calculateDeliveryCharge(distance);
@@ -208,14 +240,18 @@ class LocationManager {
             localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
             localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
 
+            // Loading popup hatao
+            const loadingPopup = document.getElementById("custom-popup");
+            if (loadingPopup) loadingPopup.remove();
+
             if (distance <= DELIVERY_RANGE_KM && deliveryCharge !== -1) {
                 this.locationStatus = "in_range";
                 localStorage.setItem("abutoys_location_status", "in_range");
                 
                 if (distance <= 0.5) {
-                    showPopup(`Location Verified! You are very close to our shop (${distance.toFixed(2)} km). Consider visiting us for offline purchase!`, "success");
+                    showPopup(`✅ Location Verified! You are very close to our shop (${distance.toFixed(2)} km). Consider visiting us for offline purchase!`, "success");
                 } else {
-                    showPopup(`Location Verified! Delivery charge: ₹${deliveryCharge}`, "success");
+                    showPopup(`✅ Location Verified! Delivery charge: ₹${deliveryCharge}`, "success");
                 }
 
                 setTimeout(() => {
@@ -227,7 +263,7 @@ class LocationManager {
                 this.locationStatus = "out_of_range";
                 localStorage.setItem("abutoys_location_status", "out_of_range");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup(`You are ${Math.round(distance)} km away. We do not deliver to this location.`, "warning");
+                showPopup(`⚠️ You are ${Math.round(distance)} km away. We do not deliver to this location.`, "warning");
             }
 
             return { location, distance, status: this.locationStatus, deliveryCharge };
@@ -235,21 +271,39 @@ class LocationManager {
         } catch (error) {
             console.warn("Location error:", error);
 
-            if (error && error.code === error.PERMISSION_DENIED) {
+            // Loading popup hatao
+            const loadingPopup = document.getElementById("custom-popup");
+            if (loadingPopup) loadingPopup.remove();
+
+            // Error codes:
+            // 1 = PERMISSION_DENIED (User ne deny kiya)
+            // 2 = POSITION_UNAVAILABLE (Device location OFF hai)
+            // 3 = TIMEOUT
+
+            if (error && error.code === 1) {
+                // User ne actively deny kiya browser popup mein
                 this.locationStatus = "permission_denied";
                 localStorage.setItem("abutoys_location_status", "permission_denied");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("Location permission denied. Please allow location access to verify delivery availability.", "warning");
-            } else if (error && error.code === error.TIMEOUT) {
+                showPopup("❌ Location permission denied. Please allow location access to verify delivery availability.", "warning");
+            } else if (error && error.code === 2) {
+                // Device ki location OFF hai
+                this.locationStatus = "location_unavailable";
+                localStorage.setItem("abutoys_location_status", "location_unavailable");
+                localStorage.setItem("abutoys_delivery_charge", "0");
+                showPopup("📍 Your device location is turned OFF. Please turn on your device location (GPS) and try again.", "warning");
+            } else if (error && error.code === 3) {
+                // Timeout
                 this.locationStatus = "unknown";
                 localStorage.setItem("abutoys_location_status", "unknown");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("Location request timed out. Try again or check your device settings.", "warning");
+                showPopup("⏱️ Location request timed out. Please check your GPS signal and try again.", "warning");
             } else {
+                // Koi aur error
                 this.locationStatus = "unknown";
                 localStorage.setItem("abutoys_location_status", "unknown");
                 localStorage.setItem("abutoys_delivery_charge", "0");
-                showPopup("Unable to determine your location. Please enable location services and try again.", "warning");
+                showPopup("⚠️ Unable to get your location. Please make sure location services are enabled and try again.", "warning");
             }
 
             return { location: null, distance: null, status: this.locationStatus, error };
@@ -427,8 +481,18 @@ function openWhatsApp() {
         return;
     }
 
-    if (locationStatus === "permission_denied" || locationStatus === "unknown") {
-        showPopup("WhatsApp access restricted until we can verify your location. Please enable location access.", "error");
+    if (locationStatus === "permission_denied") {
+        showPopup("📍 Please enable location permission in browser settings to access WhatsApp.", "error");
+        return;
+    }
+
+    if (locationStatus === "location_unavailable") {
+        showPopup("📍 Please turn on your device location (GPS) to access WhatsApp.", "error");
+        return;
+    }
+
+    if (locationStatus === "unknown") {
+        showPopup("⚠️ We need to verify your location first. Please enable location services.", "error");
         return;
     }
 
@@ -463,9 +527,11 @@ function showAccountModal() {
     } else if (locationStatus === "out_of_range") {
         showPopup("Account access restricted. You are outside our delivery range.", "warning");
     } else if (locationStatus === "permission_denied") {
-        showPopup("Please allow location permission to create an account and check delivery availability.", "warning");
+        showPopup("📍 Please enable location permission in browser settings to create an account.", "warning");
+    } else if (locationStatus === "location_unavailable") {
+        showPopup("📍 Please turn on your device location (GPS) to create an account.", "warning");
     } else {
-        showPopup("We cannot verify your location right now. Please try again.", "warning");
+        showPopup("⚠️ We cannot verify your location right now. Please enable location services and try again.", "warning");
     }
 }
 
@@ -482,7 +548,10 @@ function showTab(tab) {
 
 function setVisitorMode() {
     const locationStatus = locationManager.getLocationStatus();
-    if (locationStatus === "in_range" || locationStatus === "out_of_range") {
+    
+    // Visitor mode ab sabhi location status mein kaam karega
+    if (locationStatus === "in_range" || locationStatus === "out_of_range" || 
+        locationStatus === "permission_denied" || locationStatus === "location_unavailable") {
         localStorage.setItem("abutoys_current_user", "visitor");
         document.getElementById("accountModal").style.display = "none";
         userManager.currentUser = "visitor";
@@ -617,7 +686,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // =================== WELCOME & INITIAL LOCATION CHECK ===================
 function showWelcomeMessage() {
-    if (!sessionStorage.getItem("abutoys_welcomed")) {
+    // Check karo ki pehli baar visit hai ya nahi
+    const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
+    
+    if (isFirstVisit) {
         setTimeout(() => {
             const popup = document.createElement("div");
             popup.id = "welcome-popup";
@@ -640,20 +712,22 @@ function showWelcomeMessage() {
 
             document.getElementById("welcomeOkBtn").addEventListener("click", async () => {
                 popup.remove();
+                
+                // Session mein store karo ki welcome dikha diya
                 sessionStorage.setItem("abutoys_welcomed", "true");
-                sessionStorage.setItem("abutoys_home_visited", "true");
-
-
-                showPopup("Checking your location for delivery...", "loading");
-                setTimeout(async () => {
-                    const oldPopup = document.getElementById("custom-popup");
-                    if (oldPopup) oldPopup.remove();
-                    await locationManager.checkLocationAndSetStatus();
-                }, 1000);
+                
+                // Ab location check karo - ye FRESH permission maangega
+                await locationManager.checkLocationAndSetStatus();
             });
         }, 700);
     } else {
-        localStorage.setItem("abutoys_home_visited", "true");
+        // Agar pehle se session mein hai (same session mein page reload), 
+        // toh stored status use karo
+        const storedStatus = localStorage.getItem("abutoys_location_status");
+        if (storedStatus && storedStatus !== "unknown") {
+            // Already location verified hai is session mein
+            console.log("Location already checked in this session:", storedStatus);
+        }
     }
 }
 
