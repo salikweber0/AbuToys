@@ -914,7 +914,7 @@ async function loadProductsFromSheet() {
                         ${userDataManager.deliveryCharge > 0 ? `Delivery: ₹${userDataManager.deliveryCharge}` : 'Free Delivery!'}
                     </div>
                     ${userDataManager.deliveryCharge > 0 ? `
-                        <div class="total-price" style="font-size: 0.9rem; font-weight: 600; color: #4ECDC4; margin-top: 5px;">
+                        <div class="total-price" style="font-size: 17px; font-weight: 600; color: #4ECDC4; margin-top: 5px;">
                             Total: ₹${totalPrice}
                         </div>
                     ` : ''}
