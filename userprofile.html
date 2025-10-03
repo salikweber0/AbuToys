@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - AbuToys</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: #FF6B6B;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 80px auto 50px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .profile-icon {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 3.5rem;
+            color: #FF6B6B;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .profile-email {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        /* Profile Content */
+        .profile-content {
+            padding: 35px;
+        }
+
+        .info-group {
+            margin-bottom: 25px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.05rem;
+            color: #333;
+            padding: 14px 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            font-weight: 500;
+            border: 2px solid #e9ecef;
+        }
+
+        .password-group {
+            position: relative;
+        }
+
+        .password-value {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 10px;
+        }
+
+        .eye-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.3rem;
+            padding: 8px;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .eye-btn:active {
+            color: #4ECDC4;
+            transform: scale(1.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-logout {
+            background: #4ECDC4;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #3ab3a3;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Login/Signup Form */
+        .form-section {
+            padding: 35px;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section input {
+            width: 100%;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-section input:focus {
+            outline: none;
+            border-color: #4ECDC4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .phone-prefix {
+            padding: 14px 18px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .phone-input-group input {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-3px);
+        }
+
+        .visitor-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .visitor-content h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .visitor-content p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            animation: popupSlide 0.3s ease-out;
+        }
+
+        @keyframes popupSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .popup-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+        }
+
+        .popup-title {
+            font-size: 1.8rem;
+            margin-bottom: 18px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .popup-message {
+            font-size: 1.05rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .popup-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .btn-sure {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-sure:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            font-size: 3.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 60px 10px 30px;
+            }
+            
+            .back-btn {
+                top: 10px;
+                left: 10px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+    <div class="container">
+        <!-- Profile Section (when logged in) -->
+        <div id="profileSection" class="hidden">
+            <div class="profile-header">
+                <div class="profile-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2 class="profile-name" id="profileName">Loading...</h2>
+                <p class="profile-email" id="profileEmail">Loading...</p>
+            </div>
+            <div class="profile-content">
+                <div class="info-group">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value" id="profileFullName">Loading...</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value" id="profilePhone">Loading...</div>
+                </div>
+                <div class="info-group password-group">
+                    <div class="info-label">Password</div>
+                    <div class="info-value password-value">
+                        <span id="profilePassword">••••••••</span>
+                        <button class="eye-btn" id="eyeBtn" type="button">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Address</div>
+                    <div class="info-value" id="profileAddress">Loading...</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                    <button class="btn btn-delete" id="deleteBtn">
+                        <i class="fas fa-trash-alt"></i> Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login/Signup Section (when not logged in) -->
+        <div id="authSection" class="hidden">
+            <div class="profile-header">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 class="profile-name">Welcome to AbuToys</h2>
+                <p class="profile-email">Join our happy family!</p>
+            </div>
+            <div class="form-section">
+                <div class="modal-tabs">
+                    <button class="tab-button active" onclick="showTab('login')">Login</button>
+                    <button class="tab-button" onclick="showTab('signup')">Sign Up</button>
+                    <button class="tab-button" onclick="showTab('visitor')">Free Visit</button>
+                </div>
+
+                <!-- Login Tab -->
+                <div id="loginTab" class="tab-content active">
+                    <form id="loginForm">
+                        <input type="email" id="loginEmail" placeholder="Email Address" required>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login to Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Signup Tab -->
+                <div id="signupTab" class="tab-content">
+                    <form id="signupForm">
+                        <input type="text" id="fullName" placeholder="Full Name" required>
+                        <input type="email" id="email" placeholder="Email Address" required>
+                        <input type="password" id="password" placeholder="Password" required>
+                        <div class="phone-input-group">
+                            <span class="phone-prefix">+91</span>
+                            <input type="tel" id="phone" placeholder="Phone Number (10 digits)" maxlength="10" pattern="[0-9]{10}" required>
+                        </div>
+                        <input type="text" id="address" placeholder="Address" required>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Visitor Tab -->
+                <div id="visitorTab" class="tab-content">
+                    <div class="visitor-content">
+                        <h3>Explore as Visitor</h3>
+                        <p>Browse our products without creating an account. You can always sign up later to place orders!</p>
+                        <button onclick="setVisitorMode()" class="btn-secondary">
+                            <i class="fas fa-eye"></i> Continue as Visitor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingSection" class="loading-spinner">
+            <div class="spinner">🔄</div>
+            <p style="margin-top: 20px; color: #666; font-size: 1.1rem;">Loading your profile...</p>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Popup -->
+    <div class="popup-overlay" id="deletePopup">
+        <div class="popup-content">
+            <div class="popup-icon">⚠️</div>
+            <h3 class="popup-title">Delete Account?</h3>
+            <p class="popup-message">If you delete your account, then all your data will be deleted. This action cannot be undone.</p>
+            <div class="popup-buttons">
+                <button class="popup-btn btn-cancel" id="cancelBtn">Cancel</button>
+                <button class="popup-btn btn-sure" id="sureBtn">Sure, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbEngmoTmToctj42O6J0-Qq7g05JIpHRE-aFzCGd7zg6yuATa8C26pDYtkmPLnQVUK/exec";
+        const PROFILE_FETCH_URL = "https://script.google.com/macros/s/YOUR_PROFILE_SCRIPT_ID/exec";
+        const DELETE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_DELETE_SCRIPT_ID/exec";
+
+        let actualPassword = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkUserStatus();
+            setupEventListeners();
+        });
+
+        function checkUserStatus() {
+            const currentUser = localStorage.getItem("abutoys_current_user");
+            
+            if (!currentUser || currentUser === "visitor" || currentUser === "null") {
+                showAuthSection();
+            } else {
+                loadUserProfile(currentUser);
+            }
+        }
+
+        function showAuthSection() {
+            document.getElementById("loadingSection").classList.add("hidden");
+            document.getElementById("profileSection").classList.add("hidden");
+            document.getElementById("authSection").classList.remove("hidden");
+        }
+
+        function showProfileSection() {
+            document.getElementById("loadingSection").classList.add("hidden");
+            document.getElementById("authSection").classList.add("hidden");
+            document.getElementById("profileSection").classList.remove("hidden");
+        }
+
+        function showLoading() {
+            document.getElementById("authSection").classList.add("hidden");
+            document.getElementById("profileSection").classList.add("hidden");
+            document.getElementById("loadingSection").classList.remove("hidden");
+        }
+
+        function loadUserProfile(email) {
+            const userData = JSON.parse(localStorage.getItem(`abutoys_user_${email}`) || "null");
+            
+            if (userData) {
+                displayProfile(userData);
+                showProfileSection();
+            } else {
+                showAuthSection();
+            }
+        }
+
+        function displayProfile(user) {
+            actualPassword = user.password || "••••••••";
+            document.getElementById("profileName").textContent = user.fullName || "User";
+            document.getElementById("profileEmail").textContent = user.email || "";
+            document.getElementById("profileFullName").textContent = user.fullName || "Not provided";
+            document.getElementById("profilePhone").textContent = user.phone || "Not provided";
+            document.getElementById("profileAddress").textContent = user.address || "Not provided";
+        }
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById("loginForm")?.addEventListener("submit", handleLogin);
+            
+            // Signup form
+            document.getElementById("signupForm")?.addEventListener("submit", handleSignup);
+            
+            // Password eye button
+            const eyeBtn = document.getElementById("eyeBtn");
+            eyeBtn?.addEventListener("mousedown", () => {
+                document.getElementById("profilePassword").textContent = actualPassword;
+            });
+            eyeBtn?.addEventListener("mouseup", hidePassword);
+            eyeBtn?.addEventListener("mouseleave", hidePassword);
+            eyeBtn?.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                document.getElementById("profilePassword").textContent = actualPassword;
+            });
+            eyeBtn?.addEventListener("touchend", hidePassword);
+            
+            // Phone input restriction
+            document.getElementById("phone")?.addEventListener("input", (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+            });
+            
+            // Logout
+            document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
+            
+            // Delete
+            document.getElementById("deleteBtn")?.addEventListener("click", showDeletePopup);
+            document.getElementById("cancelBtn")?.addEventListener("click", hideDeletePopup);
+            document.getElementById("sureBtn")?.addEventListener("click", handleDeleteAccount);
+        }
+
+        function hidePassword() {
+            document.getElementById("profilePassword").textContent = "••••••••";
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+            const password = document.getElementById("loginPassword").value;
+            
+            // Check localStorage first
+            const userData = JSON.parse(localStorage.getItem(`abutoys_user_${email}`) || "null");
+            
+            if (userData && userData.password === password) {
+                localStorage.setItem("abutoys_current_user", email);
+                displayProfile(userData);
+                showProfileSection();
+                showMessage("Login successful! Welcome back!", "success");
+            } else {
+                showMessage("Invalid email or password", "error");
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            const phone = document.getElementById("phone").value;
+            if (phone.length !== 10) {
+                showMessage("Phone number must be exactly 10 digits!", "error");
+                return;
+            }
+
+            const userData = {
+                fullName: document.getElementById("fullName").value.trim(),
+                email: document.getElementById("email").value.trim().toLowerCase(),
+                password: document.getElementById("password").value,
+                phone: "+91" + phone,
+                address: document.getElementById("address").value.trim()
+            };
+
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append("fullName", userData.fullName);
+                formData.append("email", userData.email);
+                formData.append("password", userData.password);
+                formData.append("phone", userData.phone);
+                formData.append("address", userData.address);
+
+                const response = await fetch(SIGNUP_SCRIPT_URL, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    localStorage.setItem(`abutoys_user_${userData.email}`, JSON.stringify(userData));
+                    localStorage.setItem("abutoys_current_user", userData.email);
+                    displayProfile(userData);
+                    showProfileSection();
+                    showMessage("Account created successfully!", "success");
+                } else if (result.error === "email_exists") {
+                    showAuthSection();
+                    showMessage("Email already registered! Try logging in instead.", "error");
+                } else {
+                    showAuthSection();
+                    showMessage("Signup failed. Try again later.", "error");
+                }
+            } catch (error) {
+                console.error("Signup error:", error);
+                showAuthSection();
+                showMessage("Server error. Please try again later.", "error");
+            }
+        }
+
+        function setVisitorMode() {
+            localStorage.setItem("abutoys_current_user", "visitor");
+            showMessage("Welcome Visitor! You can browse our products.", "success");
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1000);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("abutoys_current_user");
+            showMessage("Logged out successfully!", "success");
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1000);
+        }
+
+        function showDeletePopup() {
+            document.getElementById("deletePopup").style.display = "flex";
+        }
+
+        function hideDeletePopup() {
+            document.getElementById("deletePopup").style.display = "none";
+        }
+
+        async function handleDeleteAccount() {
+            hideDeletePopup();
+            showLoading();
+            
+            const email = localStorage.getItem("abutoys_current_user");
+            
+            try {
+                const response = await fetch(DELETE_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.removeItem("abutoys_current_user");
+                    localStorage.removeItem(`abutoys_user_${email}`);
+                    showMessage("Account deleted successfully", "success");
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1500);
+                } else {
+                    showProfileSection();
+                    showMessage("Failed to delete account. Please try again.", "error");
+                }
+            } catch (error) {
+                console.error("Delete error:", error);
+                showProfileSection();
+                showMessage("Error deleting account. Please try again.", "error");
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+            
+            event.target.classList.add("active");
+            document.getElementById(tabName + "Tab").classList.add("active");
+        }
+
+        function showMessage(message, type = "info") {
+            const colors = {
+                success: "#4CAF50",
+                error: "#e74c3c",
+                info: "#2196F3"
+            };
+            
+            const messageDiv = document.createElement("div");
+            messageDiv.style.cssText = `
+                position: fixed; top: 30px; right: 30px; z-index: 20000;
+                padding: 18px 28px; border-radius: 15px; color: white;
+                background: ${colors[type]}; font-weight: 600; font-size: 1rem;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                animation: slideIn 0.4s ease-out;
+            `;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.style.animation = "slideOut 0.4s ease-out";
+                setTimeout(() => messageDiv.remove(), 400);
+            }, 3500);
+        }
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from { transform: translateX(150%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(150%); opacity: 0; }
+        }
+    </style>
+</body>
+</html>
