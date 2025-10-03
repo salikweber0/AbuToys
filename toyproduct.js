@@ -922,7 +922,7 @@ async function loadProductsFromSheet() {
             ` : '';
 
             const buttonsHTML = shouldShowPrice ? `
-                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #4ECDC4; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block;">
+                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #4ECDC4; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
                     Add to Cart
                 </button>
             ` : '';
@@ -993,6 +993,16 @@ async function loadProductsFromSheet() {
 function addProductStyles() {
     const style = document.createElement('style');
     style.textContent = `
+
+        /* Old - Only body */
+body {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* New - Everything */
+* {
+    font-family: 'Poppins', sans-serif !important;
+}
         /* Modal CSS - Must be hidden initially */
         .image-modal {
             position: fixed;
@@ -1047,6 +1057,13 @@ function addProductStyles() {
         .product-card {
             animation: fadeInUp 0.6s ease-out;
         }
+
+        .add-to-cart-btn {
+    text-align: center !important;      /* Text center */
+    display: flex !important;            /* Flexbox layout */
+    align-items: center !important;      /* Vertical center */
+    justify-content: center !important;  /* Horizontal center */
+}
 
         .add-to-cart-btn:hover {
             background: #3ab3a3 !important;
