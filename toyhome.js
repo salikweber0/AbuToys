@@ -113,8 +113,9 @@ class LocationManager {
                     showPopup(`Location Verified! Delivery charge: Rs.${deliveryCharge}`, "success");
                 }
 
+                s// Always show account modal after location verification
                 setTimeout(() => {
-                    if (!userManager.isLoggedIn() && !userManager.isFreeVisit()) {
+                    if (!userManager.isLoggedIn()) {
                         showAccountModal();
                     }
                 }, 1000);
