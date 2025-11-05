@@ -1,50 +1,4 @@
-// =================== RESTRICTION CHECK - HOME PAGE VISIT REQUIRED ===================
-document.addEventListener("DOMContentLoaded", () => {
-    const isLocalhost = window.location.hostname === "127.0.0.1" || 
-                        window.location.hostname === "localhost";
 
-    // Check if location was verified on home page
-const locationStatus = localStorage.getItem("abutoys_location_status"); 
-// 👆 location status localStorage me hi rehne do (kyunki wo location ke liye hai)
-const homeVisited = sessionStorage.getItem("abutoys_home_visited"); 
-// 👆 ye sirf current session/tab ke liye check karega
-
-
-    // Allow if localhost OR if home was visited and location verified
-    if (!isLocalhost && (!homeVisited || !locationStatus || locationStatus === "unknown")) {
-        document.body.innerHTML = `
-            <div style="
-                display:flex; 
-                justify-content:center; 
-                align-items:center; 
-                flex-direction:column; 
-                height:100vh; 
-                text-align:center;
-                font-family: 'Poppins', sans-serif;
-                background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            ">
-                <h1 style="color:#e74c3c; margin-bottom:20px;">🚫 Location Verification Required</h1>
-                <p style="font-size:1.1rem; color:#333; margin-bottom:30px;">
-                    Please visit the <b>Home Page</b> first to verify your location for delivery.
-                </p>
-                <a href="index.html" style="
-                    padding:12px 25px; 
-                    background:#FF6B6B; 
-                    color:white; 
-                    border-radius:25px; 
-                    text-decoration:none; 
-                    font-weight:600;
-                    box-shadow:0 5px 15px rgba(0,0,0,0.2);
-                    transition:all 0.3s ease;
-                " onmouseover="this.style.background='#e74c3c'" 
-                   onmouseout="this.style.background='#FF6B6B'">
-                    ⬅️ Go to Home Page
-                </a>
-            </div>
-        `;
-        throw new Error("Location verification required");
-    }
-});
 
 // =================== USER DATA MANAGER ===================
 class UserDataManager {
@@ -1150,3 +1104,4 @@ function initializeImageModal() {
         }
     });
 }
+
