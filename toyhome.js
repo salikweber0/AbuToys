@@ -714,16 +714,5 @@ function createFloatingButtons() {
     });
 }
 
-// =================== INITIALIZATION ===================
-initMobileNavigation();
-initHeroSlider();
 
-sessionStorage.setItem("abutoys_home_visited", "true");
-showWelcomeMessage();
 
-document.addEventListener("click", (e) => {
-    if (e.target.closest('a') && e.target.closest('a').href && e.target.closest('a').href.includes("wa.me")) {
-        e.preventDefault();
-        openWhatsApp();
-    }
-});
