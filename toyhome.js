@@ -19,7 +19,7 @@ const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJrDb8rfvRqa
 
 console.log("🚀 AbuToys Script Loaded");
 
-// =================== LOCATION MANAGER ===================
+// =================== UPDATED LOCATION MANAGER ===================
 class LocationManager {
     constructor() {
         try {
@@ -46,19 +46,165 @@ class LocationManager {
     }
 
     calculateDeliveryCharge(distance) {
-        if (distance <= 0.5) return 0;
-        else if (distance <= 1.5) return 15;
-        else if (distance <= 2.5) return 25;
-        else if (distance <= 3.5) return 35;
-        else if (distance <= 4.5) return 45;
-        else if (distance <= 5.5) return 55;
-        else if (distance <= 6.5) return 65;
-        else if (distance <= 7.5) return 75;
-        else if (distance <= 8.5) return 85;
-        else if (distance <= 9.5) return 95;
-        else if (distance <= 10.5) return 105;
-        else if (distance <= 70) return 105 + Math.floor((distance - 10.5)) * 10;
-        else return -1;
+        // 50 km ke bahar = No delivery
+        if (distance > 50) return -1;
+        
+        // 0 km = free delivery
+        if (distance <= 0) return 0;
+        
+        // Range-based logic
+        // 0 - 1 km = Free (0 rs)
+        if (distance <= 1) return 0;
+        
+        // 1 - 2 km = 20 rs
+        else if (distance <= 2) return 30;
+        
+        // 2 - 3 km = 30 rs
+        else if (distance <= 3) return 40;
+        
+        // 3 - 4 km = 40 rs
+        else if (distance <= 4) return 50;
+        
+        // 4 - 5 km = 50 rs
+        else if (distance <= 5) return 60;
+        
+        // 5 - 6 km = 60 rs
+        else if (distance <= 6) return 70;
+        
+        // 6 - 7 km = 70 rs
+        else if (distance <= 7) return 80;
+        
+        // 7 - 8 km = 80 rs
+        else if (distance <= 8) return 90;
+        
+        // 8 - 9 km = 90 rs
+        else if (distance <= 9) return 100;
+        
+        // 9 - 10 km = 100 rs
+        else if (distance <= 10) return 110;
+        
+        // 10 - 11 km = 110 rs
+        else if (distance <= 11) return 120;
+        
+        // 11 - 12 km = 120 rs
+        else if (distance <= 12) return 130;
+        
+        // 12 - 13 km = 130 rs
+        else if (distance <= 13) return 140;
+        
+        // 13 - 14 km = 140 rs
+        else if (distance <= 14) return 150;
+        
+        // 14 - 15 km = 150 rs
+        else if (distance <= 15) return 160;
+        
+        // 15 - 16 km = 160 rs
+        else if (distance <= 16) return 170;
+        
+        // 16 - 17 km = 170 rs
+        else if (distance <= 17) return 180;
+        
+        // 17 - 18 km = 180 rs
+        else if (distance <= 18) return 190;
+        
+        // 18 - 19 km = 190 rs
+        else if (distance <= 19) return 200;
+        
+        // 19 - 20 km = 200 rs
+        else if (distance <= 20) return 210;
+        
+        // 20 - 21 km = 210 rs
+        else if (distance <= 21) return 220;
+        
+        // 21 - 22 km = 220 rs
+        else if (distance <= 22) return 230;
+        
+        // 22 - 23 km = 230 rs
+        else if (distance <= 23) return 240;
+        
+        // 23 - 24 km = 240 rs
+        else if (distance <= 24) return 250;
+        
+        // 24 - 25 km = 250 rs
+        else if (distance <= 25) return 260;
+        
+        // 25 - 26 km = 260 rs
+        else if (distance <= 26) return 270;
+        
+        // 26 - 27 km = 270 rs
+        else if (distance <= 27) return 280;
+        
+        // 27 - 28 km = 280 rs
+        else if (distance <= 28) return 290;
+        
+        // 28 - 29 km = 290 rs
+        else if (distance <= 29) return 300;
+        
+        // 29 - 30 km = 300 rs
+        else if (distance <= 30) return 310;
+        
+        // 30 - 31 km = 310 rs
+        else if (distance <= 31) return 320;
+        
+        // 31 - 32 km = 320 rs
+        else if (distance <= 32) return 330;
+        
+        // 32 - 33 km = 330 rs
+        else if (distance <= 33) return 340;
+        
+        // 33 - 34 km = 340 rs
+        else if (distance <= 34) return 350;
+        
+        // 34 - 35 km = 350 rs
+        else if (distance <= 35) return 360;
+        
+        // 35 - 36 km = 360 rs
+        else if (distance <= 36) return 370;
+        
+        // 36 - 37 km = 370 rs
+        else if (distance <= 37) return 380;
+        
+        // 37 - 38 km = 380 rs
+        else if (distance <= 38) return 390;
+        
+        // 38 - 39 km = 390 rs
+        else if (distance <= 39) return 400;
+        
+        // 39 - 40 km = 400 rs
+        else if (distance <= 40) return 410;
+        
+        // 40 - 41 km = 410 rs
+        else if (distance <= 41) return 420;
+        
+        // 41 - 42 km = 420 rs
+        else if (distance <= 42) return 430;
+        
+        // 42 - 43 km = 430 rs
+        else if (distance <= 43) return 440;
+        
+        // 43 - 44 km = 440 rs
+        else if (distance <= 44) return 450;
+        
+        // 44 - 45 km = 450 rs
+        else if (distance <= 45) return 460;
+        
+        // 45 - 46 km = 460 rs
+        else if (distance <= 46) return 470;
+        
+        // 46 - 47 km = 470 rs
+        else if (distance <= 47) return 480;
+        
+        // 47 - 48 km = 480 rs
+        else if (distance <= 48) return 490;
+        
+        // 48 - 49 km = 490 rs
+        else if (distance <= 49) return 500;
+        
+        // 49 - 50 km = 500 rs
+        else if (distance <= 50) return 510;
+        
+        // Out of range
+        return -1;
     }
 
     async checkLocationAvailability() {
@@ -117,7 +263,7 @@ class LocationManager {
                 localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
             } catch (e) { }
 
-            if (distance <= DELIVERY_RANGE_KM && deliveryCharge !== -1) {
+            if (distance <= 50 && deliveryCharge !== -1) {
                 this.locationStatus = "in_range";
                 try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
             } else {
@@ -125,7 +271,7 @@ class LocationManager {
                 try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
             }
 
-            console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km");
+            console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
             return { location, distance, status: this.locationStatus, deliveryCharge };
 
         } catch (error) {
