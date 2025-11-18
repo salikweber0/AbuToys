@@ -1021,7 +1021,7 @@ async function loadProductsFromSheet() {
 
             // ✅ ALWAYS SHOW PRICE (Remove login check)
             const priceHTML = `
-    <div class="price-display" style="margin: 12px 0; padding: 12px; background: #FFF9E6; border-radius: 8px; text-align: center;">
+    <div class="price-display" style="margin: 12px 0; padding: 12px; background: #fcececff; border-radius: 8px; text-align: center;">
         <div style="font-size: 1.8rem; font-weight: 800; color: #FF6B6B;">
             ₹${originalPrice.toFixed(0)}
         </div>
