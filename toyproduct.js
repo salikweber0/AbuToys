@@ -778,7 +778,7 @@ function initializeFloatingButtons() {
 // ✅ NEW FUNCTION - CHECK IF USER IS LOGGED IN BEFORE WHATSAPP
 function handleWhatsAppClick() {
     const currentUser = localStorage.getItem("abutoys_current_user");
-
+    
     // Agar localStorage me data nahi hai to message show karo
     if (!currentUser || currentUser === "null" || currentUser === "" || currentUser === "visitor") {
         // Create message popup
@@ -819,7 +819,7 @@ function handleWhatsAppClick() {
                 ">Go to Home Page</button>
             </div>
         `;
-
+        
         // Add overlay
         const overlay = document.createElement('div');
         overlay.style.cssText = `
@@ -835,12 +835,12 @@ function handleWhatsAppClick() {
             overlay.remove();
             messageDiv.remove();
         });
-
+        
         document.body.appendChild(overlay);
         document.body.appendChild(messageDiv);
         return;
     }
-
+    
     // Agar data hai localStorage me to normal WhatsApp function call karo
     openWhatsApp();
 }
@@ -1005,7 +1005,7 @@ async function loadProductsFromSheet() {
 
             // ✅ PRICE LOGIC - ALWAYS SHOW (No login check)
             const originalPrice = parseFloat(item.Price || 0);
-
+            
             // Try different variations of Old Price column
             let oldPriceValue = 0;
             if (item["Old Price"]) {
@@ -1043,7 +1043,7 @@ async function loadProductsFromSheet() {
 `;
 
             const buttonsHTML = `
-                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #FF6B6B; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
+                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #f88787ff; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
                     Buy Now
                 </button>
             `;
@@ -1214,9 +1214,9 @@ body {
 }
 
         .add-to-cart-btn:hover {
-            background: #3ab3a3 !important;
+            background: #FF6B6B !important;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 5px 15px #f56666ff;
         }
 
         .showing-liked {
@@ -1495,8 +1495,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =================== VIDEO PLAYER FUNCTIONALITY ===================
-// Create video modal only once
-function initializeVideoPlayers() {
+    // Create video modal only once
+    function initializeVideoPlayers() {
     // Create video modal only once
     if (!document.getElementById('video-modal')) {
         const modal = document.createElement('div');
@@ -1571,12 +1571,12 @@ function openVideoModal(videoSrc, videoType) {
         iframe.src = videoSrc + (videoSrc.includes('?') ? '&' : '?') + 'autoplay=1&rel=0';
         iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
         iframe.allowFullscreen = true;
-
+        
         // Sahi sizing
         iframe.style.width = '100%';
         iframe.style.height = '100%';
         iframe.style.display = 'block';
-
+        
         playerWrapper.appendChild(iframe);
     } else {
         // Direct video file
@@ -1585,12 +1585,12 @@ function openVideoModal(videoSrc, videoType) {
         video.controls = true;
         video.controlsList = 'nodownload';
         video.autoplay = true;
-
+        
         video.style.width = '100%';
         video.style.height = '100%';
         video.style.objectFit = 'contain';
         video.style.display = 'block';
-
+        
         playerWrapper.appendChild(video);
     }
 
@@ -1603,24 +1603,24 @@ function openVideoModal(videoSrc, videoType) {
 // Add this function at end of toyproduct.js aur console me run kar
 function debugPriceData() {
     console.log("========== DEBUGGING PRICE DATA ==========");
-
+    
     // Check localStorage cache
     const cachedProducts = localStorage.getItem("abutoys_cached_products");
     if (cachedProducts) {
         const data = JSON.parse(cachedProducts);
-
+        
         if (data.length > 0) {
             console.log("✅ Cache found with " + data.length + " products");
             console.log("\n========== FIRST PRODUCT ==========");
             console.log(JSON.stringify(data[0], null, 2));
-
+            
             console.log("\n========== PRICE FIELDS ==========");
             console.log("Price: '" + data[0].Price + "' (Type: " + typeof data[0].Price + ")");
             console.log("Old Price: '" + data[0]["Old Price"] + "' (Type: " + typeof data[0]["Old Price"] + ")");
-
+            
             console.log("\n========== ALL KEYS ==========");
             console.log(Object.keys(data[0]).join(", "));
-
+            
             // Check if price is stored as string or number
             const price = parseFloat(data[0].Price || 0);
             const oldPrice = parseFloat(data[0]["Old Price"] || 0);
@@ -1638,22 +1638,22 @@ function debugAppsScript() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AbuToys");
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
-
+    
     console.log("========== HEADER NAMES ==========");
     headers.forEach((h, i) => {
         console.log(`${i}: "${h}" (Length: ${h.toString().length})`);
     });
-
+    
     console.log("\n========== FIRST ROW DATA ==========");
     const row = data[1];
     headers.forEach((h, i) => {
         console.log(`${h}: "${row[i]}"`);
     });
-
+    
     // Check specifically for Price columns
     const priceIndex = headers.findIndex(h => h.toString().toLowerCase().includes('price'));
     const oldPriceIndex = headers.findIndex(h => h.toString().toLowerCase().includes('old'));
-
+    
     console.log("\n========== PRICE COLUMN INDICES ==========");
     console.log("Price column at index: " + priceIndex);
     console.log("Old Price column at index: " + oldPriceIndex);
