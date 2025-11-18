@@ -12,7 +12,7 @@ try {
 
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 };
-const DELIVERY_RANGE_KM = 70;
+const DELIVERY_RANGE_KM = 30;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
 const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJrDb8rfvRqaJX44PeCsF-FENHPNx1SPP_peYh2EN6wj0kDexiEgKJGo_bpG09HXsU/exec";
@@ -46,8 +46,8 @@ class LocationManager {
     }
 
     calculateDeliveryCharge(distance) {
-        // 50 km ke bahar = No delivery
-        if (distance > 50) return -1;
+        // 30 km ke bahar = No delivery
+        if (distance > 30) return -1;
         
         // 0 km = free delivery
         if (distance <= 0) return 0;
@@ -57,31 +57,31 @@ class LocationManager {
         if (distance <= 1) return 0;
         
         // 1 - 2 km = 20 rs
-        else if (distance <= 2) return 30;
+        else if (distance <= 2) return 40;
         
         // 2 - 3 km = 30 rs
-        else if (distance <= 3) return 40;
+        else if (distance <= 3) return 60;
         
         // 3 - 4 km = 40 rs
-        else if (distance <= 4) return 50;
+        else if (distance <= 4) return 70;
         
         // 4 - 5 km = 50 rs
-        else if (distance <= 5) return 60;
+        else if (distance <= 5) return 110;
         
         // 5 - 6 km = 60 rs
-        else if (distance <= 6) return 70;
+        else if (distance <= 6) return 130;
         
         // 6 - 7 km = 70 rs
-        else if (distance <= 7) return 80;
+        else if (distance <= 7) return 150;
         
         // 7 - 8 km = 80 rs
-        else if (distance <= 8) return 90;
+        else if (distance <= 8) return 170;
         
         // 8 - 9 km = 90 rs
-        else if (distance <= 9) return 100;
+        else if (distance <= 9) return 190;
         
         // 9 - 10 km = 100 rs
-        else if (distance <= 10) return 110;
+        else if (distance <= 10) return 210;
         
         // 10 - 11 km = 110 rs
         else if (distance <= 11) return 120;
@@ -144,64 +144,64 @@ class LocationManager {
         else if (distance <= 30) return 310;
         
         // 30 - 31 km = 310 rs
-        else if (distance <= 31) return 320;
+        // else if (distance <= 31) return 320;
         
         // 31 - 32 km = 320 rs
-        else if (distance <= 32) return 330;
+        // else if (distance <= 32) return 330;
         
         // 32 - 33 km = 330 rs
-        else if (distance <= 33) return 340;
+        // else if (distance <= 33) return 340;
         
         // 33 - 34 km = 340 rs
-        else if (distance <= 34) return 350;
+        // else if (distance <= 34) return 350;
         
         // 34 - 35 km = 350 rs
-        else if (distance <= 35) return 360;
+        // else if (distance <= 35) return 360;
         
         // 35 - 36 km = 360 rs
-        else if (distance <= 36) return 370;
+        // else if (distance <= 36) return 370;
         
         // 36 - 37 km = 370 rs
-        else if (distance <= 37) return 380;
+        // else if (distance <= 37) return 380;
         
         // 37 - 38 km = 380 rs
-        else if (distance <= 38) return 390;
+        // else if (distance <= 38) return 390;
         
         // 38 - 39 km = 390 rs
-        else if (distance <= 39) return 400;
+        // else if (distance <= 39) return 400;
         
         // 39 - 40 km = 400 rs
-        else if (distance <= 40) return 410;
+        // else if (distance <= 40) return 410;
         
         // 40 - 41 km = 410 rs
-        else if (distance <= 41) return 420;
+        // else if (distance <= 41) return 420;
         
         // 41 - 42 km = 420 rs
-        else if (distance <= 42) return 430;
+        // else if (distance <= 42) return 430;
         
         // 42 - 43 km = 430 rs
-        else if (distance <= 43) return 440;
+        // else if (distance <= 43) return 440;
         
         // 43 - 44 km = 440 rs
-        else if (distance <= 44) return 450;
+        // else if (distance <= 44) return 450;
         
         // 44 - 45 km = 450 rs
-        else if (distance <= 45) return 460;
+        // else if (distance <= 45) return 460;
         
         // 45 - 46 km = 460 rs
-        else if (distance <= 46) return 470;
+        // else if (distance <= 46) return 470;
         
         // 46 - 47 km = 470 rs
-        else if (distance <= 47) return 480;
+        // else if (distance <= 47) return 480;
         
         // 47 - 48 km = 480 rs
-        else if (distance <= 48) return 490;
+        // else if (distance <= 48) return 490;
         
         // 48 - 49 km = 490 rs
-        else if (distance <= 49) return 500;
+        // else if (distance <= 49) return 500;
         
         // 49 - 50 km = 500 rs
-        else if (distance <= 50) return 510;
+        // else if (distance <= 50) return 510;
         
         // Out of range
         return -1;
@@ -564,7 +564,7 @@ function openWhatsApp() {
     const locationStatus = locationManager.getLocationStatus();
 
     if (locationStatus === 'out_of_range') {
-        showPopup("❌ Sorry! You are outside 70 km delivery area.", "warning");
+        showPopup("❌ Sorry! You are outside 30 km delivery area.", "warning");
         return;
     }
 
