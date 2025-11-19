@@ -15,7 +15,7 @@ const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 };
 const DELIVERY_RANGE_KM = 20;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
-const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJrDb8rfvRqaJX44PeCsF-FENHPNx1SPP_peYh2EN6wj0kDexiEgKJGo_bpG09HXsU/exec";
+const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfPdq5JSEN5n5vJodcCe75p94KCDo5Bo4c6fPni2lvBbeIYNyWpu7k0FlJ5x0gImwf/exec";
 
 console.log("🚀 AbuToys Script Loaded");
 
@@ -48,161 +48,161 @@ class LocationManager {
     calculateDeliveryCharge(distance) {
         // 30 km ke bahar = No delivery
         if (distance > 20) return -1;
-        
+
         // 0 km = free delivery
         if (distance <= 0) return 0;
-        
+
         // Range-based logic
         // 0 - 1 km = Free (0 rs)
         if (distance <= 1) return 0;
-        
+
         // 1 - 2 km = 20 rs
         else if (distance <= 2) return 60;
-        
+
         // 2 - 3 km = 30 rs
         else if (distance <= 3) return 70;
-        
+
         // 3 - 4 km = 40 rs
         else if (distance <= 4) return 80;
-        
+
         // 4 - 5 km = 50 rs
         else if (distance <= 5) return 120;
-        
+
         // 5 - 6 km = 60 rs
         else if (distance <= 6) return 140;
-        
+
         // 6 - 7 km = 70 rs
         else if (distance <= 7) return 160;
-        
+
         // 7 - 8 km = 80 rs
         else if (distance <= 8) return 180;
-        
+
         // 8 - 9 km = 90 rs
         else if (distance <= 9) return 210;
-        
+
         // 9 - 10 km = 100 rs
         else if (distance <= 10) return 230;
-        
+
         // 10 - 11 km = 110 rs
         else if (distance <= 11) return 250;
-        
+
         // 11 - 12 km = 120 rs
         else if (distance <= 12) return 270;
-        
+
         // 12 - 13 km = 130 rs
         else if (distance <= 13) return 290;
-        
+
         // 13 - 14 km = 140 rs
         else if (distance <= 14) return 310;
-        
+
         // 14 - 15 km = 150 rs
         else if (distance <= 15) return 330;
-        
+
         // 15 - 16 km = 160 rs
         else if (distance <= 16) return 350;
-        
+
         // 16 - 17 km = 170 rs
         else if (distance <= 17) return 370;
-        
+
         // 17 - 18 km = 180 rs
         else if (distance <= 18) return 390;
-        
+
         // 18 - 19 km = 190 rs
         else if (distance <= 19) return 410;
-        
+
         // 19 - 20 km = 200 rs
         else if (distance <= 20) return 430;
-        
+
         // 20 - 21 km = 210 rs
         // else if (distance <= 21) return 450;
-        
+
         // 21 - 22 km = 220 rs
         // else if (distance <= 22) return 230;
-        
+
         // 22 - 23 km = 230 rs
         // else if (distance <= 23) return 240;
-        
+
         // 23 - 24 km = 240 rs
         // else if (distance <= 24) return 250;
-        
+
         // 24 - 25 km = 250 rs
         // else if (distance <= 25) return 260;
-        
+
         // 25 - 26 km = 260 rs
         // else if (distance <= 26) return 270;
-        
+
         // 26 - 27 km = 270 rs
         // else if (distance <= 27) return 280;
-        
+
         // 27 - 28 km = 280 rs
         // else if (distance <= 28) return 290;
-        
+
         // 28 - 29 km = 290 rs
         // else if (distance <= 29) return 300;
-        
+
         // 29 - 30 km = 300 rs
         // else if (distance <= 30) return 310;
-        
+
         // 30 - 31 km = 310 rs
         // else if (distance <= 31) return 320;
-        
+
         // 31 - 32 km = 320 rs
         // else if (distance <= 32) return 330;
-        
+
         // 32 - 33 km = 330 rs
         // else if (distance <= 33) return 340;
-        
+
         // 33 - 34 km = 340 rs
         // else if (distance <= 34) return 350;
-        
+
         // 34 - 35 km = 350 rs
         // else if (distance <= 35) return 360;
-        
+
         // 35 - 36 km = 360 rs
         // else if (distance <= 36) return 370;
-        
+
         // 36 - 37 km = 370 rs
         // else if (distance <= 37) return 380;
-        
+
         // 37 - 38 km = 380 rs
         // else if (distance <= 38) return 390;
-        
+
         // 38 - 39 km = 390 rs
         // else if (distance <= 39) return 400;
-        
+
         // 39 - 40 km = 400 rs
         // else if (distance <= 40) return 410;
-        
+
         // 40 - 41 km = 410 rs
         // else if (distance <= 41) return 420;
-        
+
         // 41 - 42 km = 420 rs
         // else if (distance <= 42) return 430;
-        
+
         // 42 - 43 km = 430 rs
         // else if (distance <= 43) return 440;
-        
+
         // 43 - 44 km = 440 rs
         // else if (distance <= 44) return 450;
-        
+
         // 44 - 45 km = 450 rs
         // else if (distance <= 45) return 460;
-        
+
         // 45 - 46 km = 460 rs
         // else if (distance <= 46) return 470;
-        
+
         // 46 - 47 km = 470 rs
         // else if (distance <= 47) return 480;
-        
+
         // 47 - 48 km = 480 rs
         // else if (distance <= 48) return 490;
-        
+
         // 48 - 49 km = 490 rs
         // else if (distance <= 49) return 500;
-        
+
         // 49 - 50 km = 500 rs
         // else if (distance <= 50) return 510;
-        
+
         // Out of range
         return -1;
     }
@@ -240,61 +240,61 @@ class LocationManager {
     }
 
     async checkLocationAndSetStatus() {
-    try {
-        // Pehle check kar ki permission denied to nahi
-        const permissionStatus = await this.checkLocationAvailability();
-        
-        if (permissionStatus === 'denied') {
-            this.locationStatus = "permission_denied";
-            try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
-            return { location: null, distance: null, status: this.locationStatus };
-        }
-
-        // Location lelo
-        const location = await this.getCurrentLocation();
-        
-        // Distance calculate karo
-        const distance = this.calculateDistance(
-            location.lat, 
-            location.lng, 
-            SHOP_LOCATION.lat, 
-            SHOP_LOCATION.lng
-        );
-        
-        // Delivery charge lelo
-        const deliveryCharge = this.calculateDeliveryCharge(distance);
-
-        // Store karo values
-        this.userLocation = location;
-        this.distance = distance;
-        this.deliveryCharge = deliveryCharge;
-
-        // LocalStorage mein save kar
         try {
-            localStorage.setItem("abutoys_user_location", JSON.stringify(location));
-            localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
-            localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-        } catch (e) { }
+            // Pehle check kar ki permission denied to nahi
+            const permissionStatus = await this.checkLocationAvailability();
 
-        // Status set kar - agar charge -1 nahi hai to in_range
-        if (deliveryCharge !== -1) {
-            this.locationStatus = "in_range";
-            try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
-        } else {
-            this.locationStatus = "out_of_range";
-            try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
+            if (permissionStatus === 'denied') {
+                this.locationStatus = "permission_denied";
+                try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
+                return { location: null, distance: null, status: this.locationStatus };
+            }
+
+            // Location lelo
+            const location = await this.getCurrentLocation();
+
+            // Distance calculate karo
+            const distance = this.calculateDistance(
+                location.lat,
+                location.lng,
+                SHOP_LOCATION.lat,
+                SHOP_LOCATION.lng
+            );
+
+            // Delivery charge lelo
+            const deliveryCharge = this.calculateDeliveryCharge(distance);
+
+            // Store karo values
+            this.userLocation = location;
+            this.distance = distance;
+            this.deliveryCharge = deliveryCharge;
+
+            // LocalStorage mein save kar
+            try {
+                localStorage.setItem("abutoys_user_location", JSON.stringify(location));
+                localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
+                localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
+            } catch (e) { }
+
+            // Status set kar - agar charge -1 nahi hai to in_range
+            if (deliveryCharge !== -1) {
+                this.locationStatus = "in_range";
+                try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
+            } else {
+                this.locationStatus = "out_of_range";
+                try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
+            }
+
+            console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
+            return { location, distance, status: this.locationStatus, deliveryCharge };
+
+        } catch (error) {
+            console.warn("❌ Location error:", error);
+            this.locationStatus = "unknown";
+            try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
+            return { location: null, distance: null, status: this.locationStatus, error };
         }
-
-        console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
-        return { location, distance, status: this.locationStatus, deliveryCharge };
-
-    } catch (error) {
-        console.warn("❌ Location error:", error);
-        this.locationStatus = "unknown";
-        try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
-        return { location: null, distance: null, status: this.locationStatus, error };
     }
-}
 
     getLocationStatus() {
         return this.locationStatus;
@@ -544,11 +544,11 @@ async function showWelcomeMessage() {
             if (loadingPopup) loadingPopup.remove();
 
             if (res.status === 'in_range') {
-    showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
-}
-else if (res.status === 'out_of_range') {
-    showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
-}
+                showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
+            }
+            else if (res.status === 'out_of_range') {
+                showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
+            }
             else {
                 showPopup(`⚠️ Location Permission Denied\n\nPlease enable location services.`, "warning");
             }
@@ -890,4 +890,375 @@ window.addEventListener("load", () => {
         // Har baar welcome message dikhao
         showWelcomeMessage();
     }, 800);
+});
+
+
+// =================== DELETE ACCOUNT SYSTEM ===================
+function initializeDeleteAccountIcon() {
+    const deleteIcon = document.getElementById('deleteAccountIcon');
+    if (deleteIcon) {
+        deleteIcon.addEventListener('click', () => {
+            showDeleteAccountOverlay();
+        });
+    }
+}
+
+function showDeleteAccountOverlay() {
+    // Pehle check kar ki user logged in hai ya nahi
+    const currentUser = localStorage.getItem("abutoys_current_user");
+
+    if (!currentUser || currentUser === "null" || currentUser === "" || currentUser === "visitor") {
+        showPopup("❌ Please create account first to delete account!", "error");
+        return;
+    }
+
+    // Overlay create kar
+    const overlay = document.createElement('div');
+    overlay.id = 'delete-account-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10005;
+        padding: 20px;
+    `;
+
+    overlay.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease-out;
+        ">
+            <div style="font-size: 3.5rem; margin-bottom: 20px; color: #FF6B6B;">⚠️</div>
+            
+            <h2 style="
+                color: #333;
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+                font-family: 'Fredoka One', cursive;
+            ">Delete Account?</h2>
+            
+            <p style="
+                color: #666;
+                font-size: 1rem;
+                line-height: 1.6;
+                margin-bottom: 25px;
+            ">
+                ⚠️ <strong>Warning:</strong> Deleting your account will permanently remove all your data including:
+                <br><br>
+                • Account Information
+                <br>
+                • Saved Addresses
+                <br>
+                • Wishlist Items
+                <br>
+                • Password
+            </p>
+
+            <p style="
+                color: #FF6B6B;
+                font-size: 1.1rem;
+                font-weight: 700;
+                margin-bottom: 30px;
+            ">
+                This action cannot be undone! 🔒
+            </p>
+
+            <p style="
+                color: #999;
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            ">
+                Are you sure you want to delete your account?
+            </p>
+
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="cancelDeleteBtn" style="
+                    padding: 12px 30px;
+                    background: #e0e0e0;
+                    border: none;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    transition: all 0.3s ease;
+                ">
+                    ✕ Cancel
+                </button>
+                <button id="confirmDeleteBtn" style="
+                    padding: 12px 30px;
+                    background: #FF6B6B;
+                    color: white;
+                    border: none;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    transition: all 0.3s ease;
+                ">
+                    🗑️ Delete Account
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Cancel button
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+        overlay.remove();
+    });
+
+    // Delete button
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        deleteUserAccount(overlay);
+    });
+
+    // Background click se bhi close ho
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    });
+}
+
+function deleteUserAccount(overlay) {
+    // Get current user
+    const currentUser = localStorage.getItem("abutoys_current_user");
+
+    // Delete user data
+    try {
+        localStorage.removeItem(`abutoys_user_${currentUser}`);
+        localStorage.removeItem("abutoys_current_user");
+        localStorage.removeItem("abutoys_user_location");
+        localStorage.removeItem("abutoys_location_status");
+        localStorage.removeItem("abutoys_delivery_charge");
+        localStorage.removeItem("abutoys_user_distance");
+        localStorage.removeItem("abutoys_liked_products");
+        localStorage.removeItem("abutoys_cart");
+    } catch (e) {
+        console.log("Error deleting data:", e);
+    }
+
+    // Set deletion flag with timestamp
+    const deletionTime = Date.now();
+    try {
+        localStorage.setItem("abutoys_account_deleted", "true");
+        localStorage.setItem("abutoys_deletion_timestamp", deletionTime.toString());
+    } catch (e) {
+        console.log("Error setting deletion flag:", e);
+    }
+
+    // Close pehla overlay
+    overlay.remove();
+
+    // Show 30-minute overlay
+    showPostDeletionOverlay();
+}
+
+function showPostDeletionOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'post-deletion-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10006;
+        padding: 20px;
+    `;
+
+    overlay.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease-out;
+        ">
+            <div style="font-size: 3.5rem; margin-bottom: 20px;">✅</div>
+            
+            <h2 style="
+                color: #333;
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+                font-family: 'Fredoka One', cursive;
+            ">Account Deleted Successfully</h2>
+            
+            <p style="
+                color: #666;
+                font-size: 1rem;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            ">
+                Your account has been deleted from our system.
+            </p>
+
+            <p style="
+                color: #FF6B6B;
+                font-size: 1.1rem;
+                font-weight: 700;
+                margin-bottom: 20px;
+            ">
+                ⏳ You can create a new account after:
+            </p>
+
+            <div id="timerDisplay" style="
+                background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                font-size: 2rem;
+                font-weight: 800;
+                margin-bottom: 25px;
+                font-family: 'Courier New', monospace;
+                letter-spacing: 2px;
+            ">
+                30:00:00
+            </div>
+
+            <p style="
+                color: #999;
+                font-size: 0.9rem;
+                margin-bottom: 20px;
+            ">
+                (Hours : Minutes : Seconds)
+            </p>
+
+            <button onclick="window.location.href='index.html'" style="
+                padding: 12px 30px;
+                background: #4ECDC4;
+                color: white;
+                border: none;
+                border-radius: 25px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            ">
+                🏠 Go to Home
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Start timer
+    startDeletionTimer(overlay);
+}
+
+function startDeletionTimer(overlay) {
+    const deletionTimestamp = parseInt(localStorage.getItem("abutoys_deletion_timestamp") || "0");
+    const THIRTY_MINUTES = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+    function updateTimer() {
+        const now = Date.now();
+        const timePassed = now - deletionTimestamp;
+        const timeRemaining = THIRTY_MINUTES - timePassed;
+
+        if (timeRemaining <= 0) {
+            // Timer complete - remove overlay aur flag
+            try {
+                localStorage.removeItem("abutoys_account_deleted");
+                localStorage.removeItem("abutoys_deletion_timestamp");
+            } catch (e) { }
+
+            overlay.remove();
+            showPopup("✅ You can now create a new account!", "success");
+            return;
+        }
+
+        // Calculate hours, minutes, seconds
+        const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+        // Format with leading zeros
+        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        if (timerDisplay) {
+            timerDisplay.textContent = formattedTime;
+        }
+
+        // Update har second
+        setTimeout(updateTimer, 1000);
+    }
+
+    // Start immediately
+    updateTimer();
+}
+
+// Check on page load agar deletion active hai
+function checkIfAccountDeleted() {
+    const isDeleted = localStorage.getItem("abutoys_account_deleted");
+
+    if (isDeleted === "true") {
+        const deletionTimestamp = parseInt(localStorage.getItem("abutoys_deletion_timestamp") || "0");
+        const THIRTY_MINUTES = 30 * 60 * 1000;
+        const now = Date.now();
+        const timePassed = now - deletionTimestamp;
+
+        if (timePassed < THIRTY_MINUTES) {
+            // Still within 30 minutes - show overlay
+            showPostDeletionOverlay();
+        } else {
+            // 30 minutes over - clear flags
+            localStorage.removeItem("abutoys_account_deleted");
+            localStorage.removeItem("abutoys_deletion_timestamp");
+        }
+    }
+}
+
+// Add CSS animation
+function addDeleteAccountStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #deleteAccountIcon {
+            transition: all 0.3s ease;
+        }
+
+        #deleteAccountIcon:hover {
+            transform: scale(1.15);
+            color: #FF4545 !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Call in DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+    addDeleteAccountStyles();
+    initializeDeleteAccountIcon();
+    checkIfAccountDeleted();
 });
