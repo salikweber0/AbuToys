@@ -240,47 +240,61 @@ class LocationManager {
     }
 
     async checkLocationAndSetStatus() {
-        try {
-            const permissionStatus = await this.checkLocationAvailability();
-
-            if (permissionStatus === 'denied') {
-                this.locationStatus = "permission_denied";
-                try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
-                return { location: null, distance: null, status: this.locationStatus };
-            }
-
-            const location = await this.getCurrentLocation();
-            const distance = this.calculateDistance(location.lat, location.lng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
-            const deliveryCharge = this.calculateDeliveryCharge(distance);
-
-            this.userLocation = location;
-            this.distance = distance;
-            this.deliveryCharge = deliveryCharge;
-
-            try {
-                localStorage.setItem("abutoys_user_location", JSON.stringify(location));
-                localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
-                localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-            } catch (e) { }
-
-            if (distance <= 50 && deliveryCharge !== -1) {
-                this.locationStatus = "in_range";
-                try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
-            } else {
-                this.locationStatus = "out_of_range";
-                try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
-            }
-
-            console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
-            return { location, distance, status: this.locationStatus, deliveryCharge };
-
-        } catch (error) {
-            console.warn("Location error:", error);
-            this.locationStatus = "unknown";
-            try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
-            return { location: null, distance: null, status: this.locationStatus, error };
+    try {
+        // Pehle check kar ki permission denied to nahi
+        const permissionStatus = await this.checkLocationAvailability();
+        
+        if (permissionStatus === 'denied') {
+            this.locationStatus = "permission_denied";
+            try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
+            return { location: null, distance: null, status: this.locationStatus };
         }
+
+        // Location lelo
+        const location = await this.getCurrentLocation();
+        
+        // Distance calculate karo
+        const distance = this.calculateDistance(
+            location.lat, 
+            location.lng, 
+            SHOP_LOCATION.lat, 
+            SHOP_LOCATION.lng
+        );
+        
+        // Delivery charge lelo
+        const deliveryCharge = this.calculateDeliveryCharge(distance);
+
+        // Store karo values
+        this.userLocation = location;
+        this.distance = distance;
+        this.deliveryCharge = deliveryCharge;
+
+        // LocalStorage mein save kar
+        try {
+            localStorage.setItem("abutoys_user_location", JSON.stringify(location));
+            localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
+            localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
+        } catch (e) { }
+
+        // Status set kar - agar charge -1 nahi hai to in_range
+        if (deliveryCharge !== -1) {
+            this.locationStatus = "in_range";
+            try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
+        } else {
+            this.locationStatus = "out_of_range";
+            try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
+        }
+
+        console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
+        return { location, distance, status: this.locationStatus, deliveryCharge };
+
+    } catch (error) {
+        console.warn("❌ Location error:", error);
+        this.locationStatus = "unknown";
+        try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
+        return { location: null, distance: null, status: this.locationStatus, error };
     }
+}
 
     getLocationStatus() {
         return this.locationStatus;
@@ -530,11 +544,11 @@ async function showWelcomeMessage() {
             if (loadingPopup) loadingPopup.remove();
 
             if (res.status === 'in_range') {
-                showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
-            }
-            else if (res.status === 'out_of_range') {
-                showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
-            }
+    showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
+}
+else if (res.status === 'out_of_range') {
+    showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
+}
             else {
                 showPopup(`⚠️ Location Permission Denied\n\nPlease enable location services.`, "warning");
             }
