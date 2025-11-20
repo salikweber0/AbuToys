@@ -1,5 +1,3 @@
-
-
 // =================== USER DATA MANAGER ===================
 class UserDataManager {
     constructor() {
@@ -107,6 +105,9 @@ class UserDataManager {
                 this.userDistance = newUserDistance;
                 this.updateUserDisplay();
                 this.updateProductCards();
+
+                // ✅ WhatsApp button bhi update karo
+                updateWhatsAppButtonVisibility();
             }
         }, 2000);
     }
@@ -119,24 +120,26 @@ class UserDataManager {
 
     updateSingleProductCard(card) {
         const addToCartBtn = card.querySelector('.add-to-cart-btn');
-        const priceContainer = card.querySelector('.price-container');
+        const priceDisplay = card.querySelector('.price-display');
 
-        // If user is too close (within 0.5km), hide all price and cart elements
-        if (this.isTooClose()) {
-            if (addToCartBtn) addToCartBtn.style.display = 'none';
-            if (priceContainer) priceContainer.style.display = 'none';
-            return;
+        // ✅ Price sirf show karun agar:
+        // 1. User logged in ho
+        // 2. Location verified ho (in_range)
+        // 3. 20km ke andr ho
+
+        const shouldShowPrice = this.isLoggedIn() &&
+            this.isLocationVerified() &&
+            this.userDistance <= 20;
+
+        if (priceDisplay) {
+            priceDisplay.style.display = shouldShowPrice ? 'block' : 'none';
         }
 
-        // Show cart button only if logged in and location verified
+        // Cart button same logic
         const shouldShowCart = this.isLoggedIn() && this.isLocationVerified();
 
         if (addToCartBtn) {
             addToCartBtn.style.display = shouldShowCart ? 'inline-flex' : 'none';
-        }
-
-        if (priceContainer) {
-            priceContainer.style.display = shouldShowCart ? 'block' : 'none';
         }
     }
 
@@ -709,7 +712,7 @@ function initializeCartButtons() {
             e.stopPropagation();
 
             if (userDataManager.isTooClose()) {
-                userDataManager.showMessage("You're too close to our shop! Please visit us directly for purchase.", "error");
+                // userDataManager.showMessage("You're too close to our shop! Please visit us directly for purchase.", "error");
                 return;
             }
 
@@ -756,9 +759,17 @@ function initializeFloatingButtons() {
         });
     }
 
+    // ✅ WhatsApp Button - Sirf logged-in users ke liye
     if (whatsappBtn) {
         window.addEventListener('scroll', () => {
-            whatsappBtn.style.display = window.pageYOffset > 300 ? 'flex' : 'none';
+            const isLoggedIn = userDataManager.isLoggedIn();
+            const isLocationVerified = userDataManager.isLocationVerified();
+
+            if (window.pageYOffset > 300 && isLoggedIn && isLocationVerified) {
+                whatsappBtn.style.display = 'flex';
+            } else {
+                whatsappBtn.style.display = 'none';
+            }
         });
 
         whatsappBtn.addEventListener('click', () => {
@@ -778,7 +789,7 @@ function initializeFloatingButtons() {
 // ✅ NEW FUNCTION - CHECK IF USER IS LOGGED IN BEFORE WHATSAPP
 function handleWhatsAppClick() {
     const currentUser = localStorage.getItem("abutoys_current_user");
-    
+
     // Agar localStorage me data nahi hai to message show karo
     if (!currentUser || currentUser === "null" || currentUser === "" || currentUser === "visitor") {
         // Create message popup
@@ -819,7 +830,7 @@ function handleWhatsAppClick() {
                 ">Go to Home Page</button>
             </div>
         `;
-        
+
         // Add overlay
         const overlay = document.createElement('div');
         overlay.style.cssText = `
@@ -835,12 +846,12 @@ function handleWhatsAppClick() {
             overlay.remove();
             messageDiv.remove();
         });
-        
+
         document.body.appendChild(overlay);
         document.body.appendChild(messageDiv);
         return;
     }
-    
+
     // Agar data hai localStorage me to normal WhatsApp function call karo
     openWhatsApp();
 }
@@ -1005,7 +1016,7 @@ async function loadProductsFromSheet() {
 
             // ✅ PRICE LOGIC - ALWAYS SHOW (No login check)
             const originalPrice = parseFloat(item.Price || 0);
-            
+
             // Try different variations of Old Price column
             let oldPriceValue = 0;
             if (item["Old Price"]) {
@@ -1495,8 +1506,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =================== VIDEO PLAYER FUNCTIONALITY ===================
-    // Create video modal only once
-    function initializeVideoPlayers() {
+// Create video modal only once
+function initializeVideoPlayers() {
     // Create video modal only once
     if (!document.getElementById('video-modal')) {
         const modal = document.createElement('div');
@@ -1571,12 +1582,12 @@ function openVideoModal(videoSrc, videoType) {
         iframe.src = videoSrc + (videoSrc.includes('?') ? '&' : '?') + 'autoplay=1&rel=0';
         iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
         iframe.allowFullscreen = true;
-        
+
         // Sahi sizing
         iframe.style.width = '100%';
         iframe.style.height = '100%';
         iframe.style.display = 'block';
-        
+
         playerWrapper.appendChild(iframe);
     } else {
         // Direct video file
@@ -1585,12 +1596,12 @@ function openVideoModal(videoSrc, videoType) {
         video.controls = true;
         video.controlsList = 'nodownload';
         video.autoplay = true;
-        
+
         video.style.width = '100%';
         video.style.height = '100%';
         video.style.objectFit = 'contain';
         video.style.display = 'block';
-        
+
         playerWrapper.appendChild(video);
     }
 
@@ -1603,24 +1614,24 @@ function openVideoModal(videoSrc, videoType) {
 // Add this function at end of toyproduct.js aur console me run kar
 function debugPriceData() {
     console.log("========== DEBUGGING PRICE DATA ==========");
-    
+
     // Check localStorage cache
     const cachedProducts = localStorage.getItem("abutoys_cached_products");
     if (cachedProducts) {
         const data = JSON.parse(cachedProducts);
-        
+
         if (data.length > 0) {
             console.log("✅ Cache found with " + data.length + " products");
             console.log("\n========== FIRST PRODUCT ==========");
             console.log(JSON.stringify(data[0], null, 2));
-            
+
             console.log("\n========== PRICE FIELDS ==========");
             console.log("Price: '" + data[0].Price + "' (Type: " + typeof data[0].Price + ")");
             console.log("Old Price: '" + data[0]["Old Price"] + "' (Type: " + typeof data[0]["Old Price"] + ")");
-            
+
             console.log("\n========== ALL KEYS ==========");
             console.log(Object.keys(data[0]).join(", "));
-            
+
             // Check if price is stored as string or number
             const price = parseFloat(data[0].Price || 0);
             const oldPrice = parseFloat(data[0]["Old Price"] || 0);
@@ -1638,22 +1649,22 @@ function debugAppsScript() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AbuToys");
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
-    
+
     console.log("========== HEADER NAMES ==========");
     headers.forEach((h, i) => {
         console.log(`${i}: "${h}" (Length: ${h.toString().length})`);
     });
-    
+
     console.log("\n========== FIRST ROW DATA ==========");
     const row = data[1];
     headers.forEach((h, i) => {
         console.log(`${h}: "${row[i]}"`);
     });
-    
+
     // Check specifically for Price columns
     const priceIndex = headers.findIndex(h => h.toString().toLowerCase().includes('price'));
     const oldPriceIndex = headers.findIndex(h => h.toString().toLowerCase().includes('old'));
-    
+
     console.log("\n========== PRICE COLUMN INDICES ==========");
     console.log("Price column at index: " + priceIndex);
     console.log("Old Price column at index: " + oldPriceIndex);
