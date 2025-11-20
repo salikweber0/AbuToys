@@ -704,37 +704,58 @@ function initializeNavbarIcons() {
     }
 }
 
-// =================== CART BUTTON FUNCTIONALITY ===================
 function initializeCartButtons() {
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
+            // ❌ Too close to shop
             if (userDataManager.isTooClose()) {
-                // userDataManager.showMessage("You're too close to our shop! Please visit us directly for purchase.", "error");
                 return;
             }
 
+            // ❌ Login + Location required
             if (!userDataManager.isLocationVerified() || !userDataManager.isLoggedIn()) {
-                userDataManager.showMessage("Please login and verify location to add to cart!", "error");
+                userDataManager.showMessage("Please login and verify location first!", "error");
                 return;
             }
 
             const card = this.closest('.product-card');
+            const productName = card.querySelector('h3')?.textContent || '';
+            const productPrice = card.dataset.originalPrice || "0";
+            const productImage = card.querySelector('.product-img')?.src || '';
+
+            // 🛒 Pehle cart me add karo
             const productData = {
-                name: card.querySelector('h3')?.textContent || '',
-                description: card.querySelector('.product-description')?.textContent || '',
-                price: parseFloat(card.dataset.originalPrice || 0),
+                name: productName,
+                price: parseFloat(productPrice),
+                image: productImage,
                 deliveryCharge: userDataManager.deliveryCharge,
-                image: card.querySelector('.product-img')?.src || '',
-                category: card.dataset.category || 'all'
             };
 
             userDataManager.addToCart(productData);
+
+            // 🚀 Ab direct BUY NOW → WhatsApp
+            const userName = userDataManager.getCurrentUserName();
+            const finalPrice = parseFloat(productPrice) + userDataManager.deliveryCharge;
+
+            const message =
+                `BUY NOW REQUEST:\n\n` +
+                `👤 Name: ${userName}\n` +
+                `🧸 Product: ${productName}\n` +
+                `💰 Price: ₹${productPrice}\n` +
+                `🚚 Delivery: ₹${userDataManager.deliveryCharge}\n` +
+                `📦 Total: ₹${finalPrice}\n\n` +
+                `Please confirm my order.`;
+
+            const url = `https://wa.me/9879254030?text=${encodeURIComponent(message)}`;
+
+            window.open(url, "_blank");
         });
     });
 }
+
 
 // =================== FLOATING BUTTONS ===================
 function initializeFloatingButtons() {
@@ -1669,3 +1690,56 @@ function debugAppsScript() {
     console.log("Price column at index: " + priceIndex);
     console.log("Old Price column at index: " + oldPriceIndex);
 }
+
+function updateWhatsAppButtonVisibility() {
+    const whatsappBtn = document.getElementById("whatsappFloat");
+
+    const user = localStorage.getItem("abutoys_current_user");
+
+    if (!user || user === "null" || user === "visitor") {
+        whatsappBtn.style.display = "none";   // ❌ User not logged → hide
+    } else {
+        whatsappBtn.style.display = "flex";   // ✔ User logged → show
+    }
+}
+
+function updateProductPriceVisibility() {
+    const isLoggedIn = userDataManager.isLoggedIn();
+    const isLocationVerified = userDataManager.isLocationVerified();
+    const userDistance = userDataManager.userDistance;
+
+    const shouldShow = isLoggedIn && isLocationVerified && userDistance <= 20;
+
+    document.querySelectorAll(".price-display").forEach(e => {
+        e.style.display = shouldShow ? "block" : "none";
+    });
+
+    document.querySelectorAll(".product-price").forEach(e => {
+        e.style.display = shouldShow ? "block" : "none";
+    });
+
+    document.querySelectorAll(".old-price").forEach(e => {
+        e.style.display = shouldShow ? "inline-block" : "none";
+    });
+
+    document.querySelectorAll(".delivery-info").forEach(e => {
+        e.style.display = shouldShow ? "block" : "none";
+    });
+
+    document.querySelectorAll(".total-price").forEach(e => {
+        e.style.display = shouldShow ? "block" : "none";
+    });
+
+    // 🔥 BUY NOW BUTTON – inline CSS ko override karne ke liye !important lagaya
+    document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+        btn.style.setProperty("display", shouldShow ? "flex" : "none", "important");
+    });
+}
+
+
+setInterval(() => {
+    updateWhatsAppButtonVisibility();
+    updateProductPriceVisibility();
+}, 1000);
+
+
