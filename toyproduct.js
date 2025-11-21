@@ -1,4 +1,6 @@
-// =================== USER DATA MANAGER ===================
+// =================== TERI PURI JS FILE KA FIXED VERSION ===================
+
+// =================== USER DATA MANAGER (FIXED) ===================
 class UserDataManager {
     constructor() {
         this.currentUser = localStorage.getItem("abutoys_current_user");
@@ -18,15 +20,21 @@ class UserDataManager {
         this.updateUserDisplay();
         this.syncWithHomePage();
         this.showDistanceMessage();
+        // ✅ PAGE LOAD PE LIKED COUNT UPDATE KARO
+        this.updateLikedCount();
+    }
+
+    // ✅ LIKED COUNT UPDATE FUNCTION
+    updateLikedCount() {
+        const likedBox = document.getElementById("likedCountBox");
+        if (likedBox) {
+            likedBox.textContent = `❤️ Liked Products: ${this.likedProducts.length}`;
+        }
     }
 
     showDistanceMessage() {
         if (this.locationStatus === "in_range" && this.userDistance > 0) {
             const userName = this.getCurrentUserName();
-
-            // if (this.userDistance <= 0.5) {
-            //     this.showMessage(`${userName}, you are very close (${this.userDistance.toFixed(2)} km)! Visit our shop for offline purchase. Online ordering disabled.`, "success");
-            // }
         }
     }
 
@@ -105,11 +113,16 @@ class UserDataManager {
                 this.userDistance = newUserDistance;
                 this.updateUserDisplay();
                 this.updateProductCards();
-
-                // ✅ WhatsApp button bhi update karo
                 updateWhatsAppButtonVisibility();
             }
-        }, 2000);
+
+            // ✅ LIKED PRODUCTS SYNC
+            const newLikedProducts = JSON.parse(localStorage.getItem("abutoys_liked_products") || "[]");
+            if (JSON.stringify(newLikedProducts) !== JSON.stringify(this.likedProducts)) {
+                this.likedProducts = newLikedProducts;
+                this.updateLikedCount();
+            }
+        }, 1000); // ✅ 1 second me check karo
     }
 
     updateProductCards() {
@@ -122,11 +135,6 @@ class UserDataManager {
         const addToCartBtn = card.querySelector('.add-to-cart-btn');
         const priceDisplay = card.querySelector('.price-display');
 
-        // ✅ Price sirf show karun agar:
-        // 1. User logged in ho
-        // 2. Location verified ho (in_range)
-        // 3. 20km ke andr ho
-
         const shouldShowPrice = this.isLoggedIn() &&
             this.isLocationVerified() &&
             this.userDistance <= 20;
@@ -135,7 +143,6 @@ class UserDataManager {
             priceDisplay.style.display = shouldShowPrice ? 'block' : 'none';
         }
 
-        // Cart button same logic
         const shouldShowCart = this.isLoggedIn() && this.isLocationVerified();
 
         if (addToCartBtn) {
@@ -143,54 +150,13 @@ class UserDataManager {
         }
     }
 
-    // Cart functionality
-    addToCart(productData) {
-        const existingIndex = this.cart.findIndex(p => p.name === productData.name);
-
-        if (existingIndex === -1) {
-            this.cart.push({ ...productData, quantity: 1 });
-            localStorage.setItem("abutoys_cart", JSON.stringify(this.cart));
-            this.showMessage("Added to cart!", "success");
-            this.updateCartCount();
-            return true;
-        } else {
-            this.showMessage("Product already in cart!", "info");
-            return false;
-        }
-    }
-
-    updateCartCount() {
-        const cartIcon = document.getElementById('cartIcon');
-        if (cartIcon) {
-            const count = this.cart.length;
-            let badge = cartIcon.querySelector('.cart-badge');
-
-            if (count > 0) {
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.className = 'cart-badge';
-                    badge.style.cssText = `
-                        position: absolute; top: -5px; right: -5px;
-                        background: #e74c3c; color: white; border-radius: 50%;
-                        width: 18px; height: 18px; font-size: 0.7rem;
-                        display: flex; align-items: center; justify-content: center;
-                        font-weight: bold;
-                    `;
-                    cartIcon.appendChild(badge);
-                }
-                badge.textContent = count;
-            } else if (badge) {
-                badge.remove();
-            }
-        }
-    }
-
-    // Like system methods
+    // ✅ LIKE SYSTEM - FIXED
     addLikedProduct(productData) {
         const existingIndex = this.likedProducts.findIndex(p => p.name === productData.name);
         if (existingIndex === -1) {
             this.likedProducts.push(productData);
             localStorage.setItem("abutoys_liked_products", JSON.stringify(this.likedProducts));
+            this.updateLikedCount(); // ✅ COUNT UPDATE KARO
             this.showMessage("Added to liked products!", "success");
             return true;
         }
@@ -203,6 +169,7 @@ class UserDataManager {
 
         if (this.likedProducts.length < initialLength) {
             localStorage.setItem("abutoys_liked_products", JSON.stringify(this.likedProducts));
+            this.updateLikedCount(); // ✅ COUNT UPDATE KARO
             this.showMessage("Removed from liked products", "info");
             return true;
         }
@@ -242,26 +209,24 @@ class UserDataManager {
         const heartIcon = document.getElementById('heartIcon');
 
         if (!this.isShowingLiked) {
-            // Show only liked products
             this.showOnlyLikedProducts();
             this.isShowingLiked = true;
 
             if (heartIcon) {
                 heartIcon.classList.add('showing-liked');
-                heartIcon.style.color = 'red'; // ⬅️ Red when showing liked
+                heartIcon.style.color = 'red';
             }
 
             if (this.likedProducts.length === 0) {
                 this.showEmptyLikedMessage();
             }
         } else {
-            // Show all products again
             this.showAllProducts();
             this.isShowingLiked = false;
 
             if (heartIcon) {
                 heartIcon.classList.remove('showing-liked');
-                heartIcon.style.color = '#333'; // ⬅️ Black when showing all
+                heartIcon.style.color = '#333';
             }
 
             const emptyMessage = document.getElementById('empty-liked-message');
@@ -308,6 +273,456 @@ class UserDataManager {
 
 // Initialize user data manager
 const userDataManager = new UserDataManager();
+
+// =================== ORDER SYSTEM (FIXED) ===================
+class OrderManager {
+    constructor() {
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7OL7kjsonyI5Jhvp_TAYfMe-T345XpVbqfQKAKEdU6jb5DVnAvizghT413LOjQe0E/exec"; 
+        this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+        
+        // ✅ PAGE LOAD PE BADGE UPDATE KARO
+        this.updateCartBadge();
+        
+        // ✅ HAR 2 SECOND ME SYNC KARO
+        this.startSync();
+    }
+    
+    // ✅ AUTO SYNC - localStorage se orders refresh karo
+    startSync() {
+        setInterval(() => {
+            const latestOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+            
+            // Agar orders change hue hain to update karo
+            if (JSON.stringify(latestOrders) !== JSON.stringify(this.orders)) {
+                this.orders = latestOrders;
+                this.updateCartBadge();
+            }
+        }, 1000); // ✅ 1 second me check
+    }
+    
+    generateOrderCode() {
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        return `Abu${randomNum}Toys`;
+    }
+    
+    // ✅ CART BADGE - FIXED LOGIC
+    updateCartBadge() {
+        const cartIcon = document.getElementById('cartIcon');
+        if (!cartIcon) return;
+        
+        // ✅ localStorage se fresh orders fetch karo
+        const freshOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+        const pendingCount = freshOrders.filter(o => o.status !== 'Delivered').length;
+        
+        let badge = cartIcon.querySelector('.cart-badge');
+        
+        if (pendingCount > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'cart-badge';
+                badge.style.cssText = `
+                    position: absolute;
+                    top: -8px;
+                    right: -8px;
+                    background: #e74c3c;
+                    color: white;
+                    border-radius: 50%;
+                    width: 20px;
+                    height: 20px;
+                    font-size: 0.75rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    box-shadow: 0 2px 8px rgba(231,76,60,0.4);
+                `;
+                cartIcon.appendChild(badge);
+            }
+            badge.textContent = pendingCount;
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+    
+    openOrderPanel(productCard) {
+        const orderCode = this.generateOrderCode();
+        const productName = productCard.querySelector('h3')?.textContent || '';
+        const productPrice = parseFloat(productCard.dataset.originalPrice || 0);
+        const deliveryCharge = userDataManager.deliveryCharge;
+        const totalPrice = productPrice + deliveryCharge;
+        
+        const userName = userDataManager.getCurrentUserName();
+        const userEmail = userDataManager.currentUser;
+        const userData = userDataManager.getUser(userEmail);
+        const userAddress = userData?.address || '';
+        const userPassword = userData?.password || '';
+        
+        const productCardClone = productCard.cloneNode(true);
+        
+        const panel = document.createElement('div');
+        panel.id = 'order-panel';
+        panel.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 999999;
+            display: flex; align-items: center; justify-content: center;
+            overflow-y: auto; padding: 20px;
+        `;
+        
+        panel.innerHTML = `
+            <div style="background: white; border-radius: 20px; max-width: 600px; width: 100%; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto;">
+                <button onclick="document.getElementById('order-panel').remove()" style="position: absolute; top: 15px; right: 15px; background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;">×</button>
+                
+                <h2 style="text-align: center; color: #FF6B6B; font-size: 1.8rem; margin-bottom: 20px; font-family: 'Fredoka One', cursive !important;">${orderCode}</h2>
+                
+                <div id="order-product-card" style="margin-bottom: 30px; transform: scale(0.95);"></div>
+                
+                <form id="order-form" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Name:</label>
+                        <input type="text" value="${userName}" readonly style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; cursor: not-allowed;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Product:</label>
+                        <input type="text" value="${productName}" readonly style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; cursor: not-allowed;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Full Address:</label>
+                        <textarea id="order-address" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; min-height: 80px; resize: vertical;">${userAddress}</textarea>
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Order Code:</label>
+                        <input type="text" value="${orderCode}" readonly style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; cursor: not-allowed;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Password:</label>
+                        <input type="password" id="order-password" placeholder="Enter your password" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;" required>
+                    </div>
+                    <button type="submit" style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 10px;">Submit Order 🚀</button>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(panel);
+        
+        const cardContainer = document.getElementById('order-product-card');
+        cardContainer.appendChild(productCardClone);
+        
+        const form = document.getElementById('order-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const enteredPassword = document.getElementById('order-password').value;
+            const address = document.getElementById('order-address').value;
+            
+            if (enteredPassword !== userPassword) {
+                this.showPopup('❌ Password Incorrect!', 'error');
+                return;
+            }
+            
+            this.showLoadingAnimation();
+            
+            this.submitOrder({
+                orderCode, userName, productName,
+                productPrice, deliveryCharge, totalPrice,
+                address, password: enteredPassword
+            });
+        });
+    }
+    
+    showLoadingAnimation() {
+        const loader = document.createElement('div');
+        loader.id = 'order-loader';
+        loader.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999999; display: flex; flex-direction: column; align-items: center; justify-content: center;`;
+        
+        loader.innerHTML = `
+            <div style="width: 80px; height: 80px; border: 8px solid #f3f3f3; border-top: 8px solid #FF6B6B; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <p style="color: white; font-size: 1.3rem; margin-top: 20px; font-weight: 600;">Submitting Order...</p>
+        `;
+        
+        document.body.appendChild(loader);
+    }
+    
+    async submitOrder(orderData) {
+    try {
+        const response = await fetch(this.APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                orderCode: orderData.orderCode,
+                orderDate: new Date().toLocaleString(),
+                userName: orderData.userName,
+                productName: orderData.productName,
+                productPrice: orderData.productPrice,
+                deliveryCharge: orderData.deliveryCharge,
+                totalPrice: orderData.totalPrice,
+                fullAddress: orderData.address,
+                password: orderData.password,
+                userEmail: userDataManager.currentUser // ✅ EMAIL ADD KIYA
+            })
+        });
+        
+        const result = await response.json();
+        document.getElementById('order-loader')?.remove();
+        
+        if (result.success) {
+            const orderToSave = {
+                orderCode: orderData.orderCode,
+                productName: orderData.productName,
+                productPrice: orderData.productPrice,
+                deliveryCharge: orderData.deliveryCharge,
+                totalPrice: orderData.totalPrice,
+                orderDate: new Date().toLocaleString(),
+                orderTimestamp: Date.now(),
+                status: '' // ✅ EMPTY RKHENGE
+            };
+            
+            const currentOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+            currentOrders.push(orderToSave);
+            localStorage.setItem("abutoys_orders", JSON.stringify(currentOrders));
+            
+            this.orders = currentOrders;
+            this.updateCartBadge();
+            
+            document.getElementById('order-panel').remove();
+            
+            // ✅ BEAUTIFUL CONFIRMATION CARD DIKHAO
+            this.showOrderConfirmationCard(orderData);
+        } else {
+            this.showPopup('❌ Order failed! Try again.', 'error');
+        }
+    } catch (error) {
+        document.getElementById('order-loader')?.remove();
+        console.error(error);
+        this.showPopup('❌ Network error! Check internet.', 'error');
+    }
+}
+
+// ✅ BEAUTIFUL ORDER CONFIRMATION CARD
+showOrderConfirmationCard(orderData) {
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(5px);
+    `;
+    
+    const card = document.createElement('div');
+    card.style.cssText = `
+        background: white; border-radius: 20px; max-width: 500px; width: 90%;
+        padding: 40px 30px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        animation: slideInUp 0.5s ease-out;
+    `;
+    
+    card.innerHTML = `
+        <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 0.6s ease;">✅</div>
+        
+        <h1 style="color: #FF6B6B; font-size: 28px; margin-bottom: 10px; font-weight: 700; font-family: 'Fredoka One', cursive;">Order Submitted!</h1>
+        
+        <p style="color: #666; font-size: 14px; margin-bottom: 30px;">Your order has been received. Check your email for confirmation.</p>
+        
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 25px; margin-bottom: 30px; text-align: left;">
+            
+            <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px;">
+                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Order Code</p>
+                <p style="color: white; font-size: 22px; font-weight: 700; margin: 8px 0 0 0;">${orderData.orderCode}</p>
+            </div>
+            
+            <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px;">
+                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Product</p>
+                <p style="color: white; font-size: 16px; font-weight: 600; margin: 8px 0 0 0;">${orderData.productName}</p>
+            </div>
+            
+            <div>
+                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Total Amount</p>
+                <p style="color: #FFD700; font-size: 26px; font-weight: 700; margin: 8px 0 0 0;">₹${orderData.totalPrice}</p>
+            </div>
+            
+        </div>
+        
+        <div style="background: #fff3cd; border-radius: 10px; padding: 15px; margin-bottom: 25px; border-left: 4px solid #FF6B6B;">
+            <p style="color: #856404; font-size: 13px; margin: 0; font-weight: 600;">⏱️ Delivery in 48 Hours</p>
+        </div>
+        
+        <button onclick="this.closest('[style*=position: fixed]').parentElement.remove(); this.closest('[style*=position: fixed]').remove();" style="
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white; border: none; padding: 14px 40px;
+            border-radius: 25px; font-weight: 600; font-size: 16px;
+            cursor: pointer; transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            Done
+        </button>
+    `;
+    
+    backdrop.appendChild(card);
+    document.body.appendChild(backdrop);
+    
+    // Backdrop click se close
+    backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) backdrop.remove();
+    });
+}
+    
+    showPopup(message, type) {
+        const popup = document.createElement('div');
+        popup.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: ${type === 'success' ? '#4CAF50' : '#f44336'}; color: white; padding: 20px 40px; border-radius: 15px; font-size: 1.2rem; font-weight: 600; z-index: 9999999; box-shadow: 0 10px 30px rgba(0,0,0,0.3);`;
+        popup.textContent = message;
+        document.body.appendChild(popup);
+        
+        setTimeout(() => {
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 300);
+        }, 3000);
+    }
+    
+    // ✅ INSTANT CART PANEL - Loading animation ke saath
+openCartPanelInstant() {
+    const panel = document.createElement('div');
+    panel.id = 'cart-panel';
+    panel.style.cssText = `position: fixed; top: 0; right: -100%; width: 100%; max-width: 450px; height: 100%; background: white; z-index: 999999; box-shadow: -5px 0 20px rgba(0,0,0,0.3); transition: right 0.3s ease; overflow-y: auto;`;
+    
+    // ✅ LOADING STATE
+    panel.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
+                <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
+                <button onclick="document.getElementById('cart-panel').remove(); document.getElementById('cart-overlay').remove();" style="background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">×</button>
+            </div>
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="width: 80px; height: 80px; border: 8px solid #f3f3f3; border-top: 8px solid #FF6B6B; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; margin-bottom: 20px;"></div>
+                <p style="color: #666; font-size: 1.1rem; font-weight: 600;">📦 Order History Loading...</p>
+            </div>
+        </div>
+    `;
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'cart-overlay';
+    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999998; opacity: 0; transition: opacity 0.3s ease;`;
+    overlay.addEventListener('click', () => { panel.remove(); overlay.remove(); });
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(panel);
+    
+    // ✅ INSTANT OPEN WITH ANIMATION
+    setTimeout(() => { 
+        panel.style.right = '0'; 
+        overlay.style.opacity = '1'; 
+    }, 10);
+    
+    // ✅ AB FETCH KARO SHEET SE
+    this.fetchOrdersFromSheetInstant(panel);
+}
+
+// ✅ INSTANT FETCH - Animation hatao jese data aaye
+async fetchOrdersFromSheetInstant(panel) {
+    try {
+        const response = await fetch(this.APPS_SCRIPT_URL);
+        const result = await response.json();
+        
+        if (result.success) {
+            const localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+            
+            this.orders = localOrders.map(localOrder => {
+                const sheetOrder = result.orders.find(o => o['Order Code'] === localOrder.orderCode);
+                return {
+                    ...localOrder,
+                    status: sheetOrder ? (sheetOrder['Status'] || 'Pending') : 'Delivered'
+                };
+            });
+            
+            localStorage.setItem("abutoys_orders", JSON.stringify(this.orders));
+            this.updateCartBadge();
+            
+            // ✅ LOADING ANIMATION HATAO, DATA SHOW KARO
+            let ordersHTML = '';
+            
+            if (this.orders.length === 0) {
+                ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
+            } else {
+                ordersHTML = this.orders.map(order => {
+                    const timeLeft = this.getTimeLeft(order.orderTimestamp);
+                    const isDelivered = order.status === 'Delivered';
+                    
+                    return `
+                        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
+                            <h3 style="color: #FF6B6B;">${order.orderCode}</h3>
+                            <p><strong>Product:</strong> ${order.productName}</p>
+                            <p><strong>Total:</strong> ₹${order.totalPrice}</p>
+                            ${!isDelivered && timeLeft ? `<div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px;">⏰ ${timeLeft}</div>` : isDelivered ? `<div style="background: #d4edda; padding: 12px; border-radius: 8px;">✅ Delivered!</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            panel.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
+                        <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
+                        <button onclick="document.getElementById('cart-panel').remove(); document.getElementById('cart-overlay').remove();" style="background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">×</button>
+                    </div>
+                    ${ordersHTML}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Failed to fetch orders:', error);
+        panel.innerHTML = `
+            <div style="padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
+                    <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
+                    <button onclick="document.getElementById('cart-panel').remove(); document.getElementById('cart-overlay').remove();" style="background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">×</button>
+                </div>
+                <div style="text-align: center; padding: 60px 20px; background: #fff3f3; border-radius: 15px;">
+                    <p style="color: #e74c3c; font-weight: 600;">⚠️ Failed to load orders. Check internet.</p>
+                </div>
+            </div>
+        `;
+    }
+}
+    
+    getTimeLeft(timestamp) {
+        const now = Date.now();
+        const diff = (timestamp + (48 * 60 * 60 * 1000)) - now;
+        if (diff <= 0) return null;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        return `${hours}h ${minutes}m`;
+    }
+}
+
+const orderManager = new OrderManager();
+
+// ✅ CART ICON CLICK
+document.addEventListener('DOMContentLoaded', () => {
+    const cartIcon = document.getElementById('cartIcon');
+    if (cartIcon) {
+        cartIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (!userDataManager.isLoggedIn()) {
+                userDataManager.showMessage("Please login first!", "error");
+                return;
+            }
+            
+            // ✅ INSTANT PANEL KHOLO - PEHLE EMPTY, PHIR LOAD KARO
+            orderManager.openCartPanelInstant();
+        });
+    }
+});
+
+// ✅ TIMER UPDATE HAR MINUTE
+setInterval(() => {
+    orderManager.fetchOrdersFromSheet();
+    orderManager.updateCartBadge();
+    userDataManager.updateLikedCount();
+}, 60000);
+
+function updateLikedCountBox() {
+    const likedBox = document.getElementById("likedCountBox");
+    if (!likedBox) return;
+    likedBox.textContent = `❤️ Liked Products: ${userDataManager.likedProducts.length}`;
+}
 
 // If user clicked heart on home -> show liked products automatically
 window.addEventListener('load', () => {
@@ -640,6 +1055,7 @@ function initializeWishlistFunctionality() {
                 this.classList.remove('fa-solid');
                 this.classList.add('fa-regular');
                 userDataManager.removeLikedProduct(productName);
+                updateLikedCountBox();
 
                 if (userDataManager.isShowingLiked) {
                     card.style.display = 'none';
@@ -666,6 +1082,7 @@ function initializeWishlistFunctionality() {
                 };
 
                 userDataManager.addLikedProduct(productData);
+                updateLikedCountBox();
             }
 
             this.style.transform = 'scale(1.4)';
@@ -686,7 +1103,7 @@ function initializeNavbarIcons() {
     const cartIcon = document.getElementById('cartIcon');
     if (cartIcon) {
         cartIcon.addEventListener('click', () => {
-            userDataManager.showMessage("Cart feature coming soon!", "info");
+            // userDataManager.showMessage("Cart feature coming soon!", "info");
         });
     }
 
@@ -722,6 +1139,7 @@ function initializeCartButtons() {
             }
 
             const card = this.closest('.product-card');
+            orderManager.openOrderPanel(card); // ✅ ye order overlay kholega
             const productName = card.querySelector('h3')?.textContent || '';
             const productPrice = card.dataset.originalPrice || "0";
             const productImage = card.querySelector('.product-img')?.src || '';
@@ -1238,6 +1656,23 @@ body {
                 opacity: 1;
                 transform: translateY(0);
             }
+
+            // CSS me ye animations add kar - addProductStyles() function me
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
         }
 
         .product-card {
@@ -1747,5 +2182,3 @@ setInterval(() => {
     updateWhatsAppButtonVisibility();
     updateProductPriceVisibility();
 }, 1000);
-
-
