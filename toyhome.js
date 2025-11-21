@@ -1,40 +1,3 @@
-function openDeviceGpsSettings() {
-    window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
-}
-
-isGpsOn((gps) => {
-    if (gps === false) {
-        showPopup("⚠️ Your GPS is OFF!\nClick OK to turn it ON.", "warning");
-        setTimeout(() => {
-            openDeviceGpsSettings();
-        }, 1500);
-    }
-});
-
-function isGpsOn(callback) {
-    if (!navigator.geolocation) {
-        callback(false);
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        () => callback(true),
-        (error) => {
-            if (error.code === error.PERMISSION_DENIED) {
-                callback("permission_denied");
-            } else {
-                callback(false); // GPS OFF
-            }
-        },
-        { timeout: 5000 }
-    );
-}
-
-function openGpsSettingsDirect() {
-    window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
-}
-
-
 // =================== CLEAR INVALID DATA ===================
 try {
     const storedUser = localStorage.getItem("abutoys_current_user");
@@ -1299,3 +1262,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeDeleteAccountIcon();
     checkIfAccountDeleted();
 });
+
