@@ -1071,8 +1071,14 @@ async function loadProductsFromSheet() {
                 🎉 Free Delivery
             </div>
         `}
+        
+        <!-- ⭐ TOTAL PRICE LINE HERE -->
+        <div class="total-price" style="font-size: 1rem; margin-top: 6px; font-weight: 700; color: #333;">
+            Total: ₹${totalPrice}
+        </div>
     </div>
 `;
+
 
             const buttonsHTML = `
                 <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #f88787ff; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
