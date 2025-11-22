@@ -1,5 +1,3 @@
-// =================== TERI PURI JS FILE KA FIXED VERSION ===================
-
 // =================== USER DATA MANAGER (FIXED) ===================
 class UserDataManager {
     constructor() {
@@ -277,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7OL7kjsonyI5Jhvp_TAYfMe-T345XpVbqfQKAKEdU6jb5DVnAvizghT413LOjQe0E/exec"; 
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypV4TbmNCcFop86LYy38OBOfc7aTF-WWvQEa5jMz2VsoPlo_qLWYaJrHbRfP6FitPJ/exec"; 
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
         
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
@@ -496,9 +494,10 @@ class OrderManager {
     }
 }
 
-// ✅ BEAUTIFUL ORDER CONFIRMATION CARD
+// ✅ BEAUTIFUL ORDER CONFIRMATION CARD - FIXED
 showOrderConfirmationCard(orderData) {
     const backdrop = document.createElement('div');
+    backdrop.id = 'confirmation-backdrop'; // ✅ ID DIYA
     backdrop.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.7); z-index: 99999;
@@ -507,6 +506,7 @@ showOrderConfirmationCard(orderData) {
     `;
     
     const card = document.createElement('div');
+    card.id = 'confirmation-card'; // ✅ ID DIYA
     card.style.cssText = `
         background: white; border-radius: 20px; max-width: 500px; width: 90%;
         padding: 40px 30px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
@@ -543,7 +543,7 @@ showOrderConfirmationCard(orderData) {
             <p style="color: #856404; font-size: 13px; margin: 0; font-weight: 600;">⏱️ Delivery in 48 Hours</p>
         </div>
         
-        <button onclick="this.closest('[style*=position: fixed]').parentElement.remove(); this.closest('[style*=position: fixed]').remove();" style="
+        <button id="close-confirmation-btn" style="
             background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
             color: white; border: none; padding: 14px 40px;
             border-radius: 25px; font-weight: 600; font-size: 16px;
@@ -557,9 +557,27 @@ showOrderConfirmationCard(orderData) {
     backdrop.appendChild(card);
     document.body.appendChild(backdrop);
     
-    // Backdrop click se close
-    backdrop.addEventListener('click', (e) => {
-        if (e.target === backdrop) backdrop.remove();
+    // ✅ PROPER EVENT LISTENERS
+    const closeBtn = document.getElementById('close-confirmation-btn');
+    const confirmBackdrop = document.getElementById('confirmation-backdrop');
+    
+    // Button click
+    closeBtn.addEventListener('click', function() {
+        confirmBackdrop.remove();
+    });
+    
+    // Backdrop click
+    confirmBackdrop.addEventListener('click', function(e) {
+        if (e.target === confirmBackdrop) {
+            confirmBackdrop.remove();
+        }
+    });
+    
+    // ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            confirmBackdrop.remove();
+        }
     });
 }
     
@@ -613,7 +631,7 @@ openCartPanelInstant() {
     this.fetchOrdersFromSheetInstant(panel);
 }
 
-// ✅ INSTANT FETCH - Animation hatao jese data aaye
+// ✅ INSTANT FETCH - Status properly check karo
 async fetchOrdersFromSheetInstant(panel) {
     try {
         const response = await fetch(this.APPS_SCRIPT_URL);
@@ -624,9 +642,24 @@ async fetchOrdersFromSheetInstant(panel) {
             
             this.orders = localOrders.map(localOrder => {
                 const sheetOrder = result.orders.find(o => o['Order Code'] === localOrder.orderCode);
+                
+                // ✅ STATUS CHECK - "ok" ya empty dono check kar
+                let status = localOrder.status;
+                if (sheetOrder) {
+                    const sheetStatus = sheetOrder['Status'] ? sheetOrder['Status'].toString().trim().toLowerCase() : '';
+                    
+                    if (sheetStatus === 'ok') {
+                        status = 'Delivered';
+                    } else if (sheetStatus === '') {
+                        status = 'Pending';
+                    } else {
+                        status = sheetStatus;
+                    }
+                }
+                
                 return {
                     ...localOrder,
-                    status: sheetOrder ? (sheetOrder['Status'] || 'Pending') : 'Delivered'
+                    status: status
                 };
             });
             
@@ -640,15 +673,24 @@ async fetchOrdersFromSheetInstant(panel) {
                 ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
             } else {
                 ordersHTML = this.orders.map(order => {
-                    const timeLeft = this.getTimeLeft(order.orderTimestamp);
                     const isDelivered = order.status === 'Delivered';
+                    const timeLeft = !isDelivered ? this.getTimeLeft(order.orderTimestamp) : null;
                     
                     return `
                         <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
-                            <h3 style="color: #FF6B6B;">${order.orderCode}</h3>
-                            <p><strong>Product:</strong> ${order.productName}</p>
-                            <p><strong>Total:</strong> ₹${order.totalPrice}</p>
-                            ${!isDelivered && timeLeft ? `<div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px;">⏰ ${timeLeft}</div>` : isDelivered ? `<div style="background: #d4edda; padding: 12px; border-radius: 8px;">✅ Delivered!</div>` : ''}
+                            <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
+                            <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
+                            <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
+                            
+                            ${isDelivered ? 
+                                `<div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                    <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
+                                </div>` 
+                                : 
+                                `<div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                    <p style="color: #856404; margin: 0; font-weight: 600;">⏰ ${timeLeft || 'Processing...'}</p>
+                                </div>`
+                            }
                         </div>
                     `;
                 }).join('');
@@ -2182,3 +2224,12 @@ setInterval(() => {
     updateWhatsAppButtonVisibility();
     updateProductPriceVisibility();
 }, 1000);
+
+// ✅ AUTO REFRESH CART PANEL
+setInterval(() => {
+    const cartPanel = document.getElementById('cart-panel');
+    if (cartPanel) {
+        // Panel open hai to refresh kar
+        orderManager.fetchOrdersFromSheetInstant(cartPanel);
+    }
+}, 5000); // ✅ 5 SECOND ME CHECK KARO
