@@ -15,7 +15,7 @@ const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 };
 const DELIVERY_RANGE_KM = 20;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
-const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEra0r_3B6Ytq6u2YQpmJrNSoiB7KuABsX-CzDsJNttz-UjmS4yyLVfUebUnvCRold/exec";
+const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwOM8-Q2SXuzFESlsJc1yOOiNGJCaZIzmlMNk6rJkCwssER7UYXE00WiYaaeWsBE-odQ/exec";
 
 console.log("🚀 AbuToys Script Loaded");
 
@@ -333,78 +333,100 @@ class UserManager {
     }
 
     async register(userData) {
-        try {
-            showPopup("⏳ Creating your account...", "loading");
-            const email = userData.email.toLowerCase().trim();
+    try {
+        showPopup("⏳ Creating your account...", "loading");
+        const email = userData.email.toLowerCase().trim();
 
-            const existingUser = this.getUser(email);
-            if (existingUser) {
-                showPopup("❌ Email already registered!", "error");
-                return false;
-            }
-
-            const formData = new FormData();
-            formData.append('action', 'register');
-            formData.append('fullName', userData.fullName);
-            formData.append('email', email);
-            formData.append('password', userData.password);
-            formData.append('phone', userData.phone.replace('+91', ''));
-            formData.append('address', userData.address);
-
-            console.log("📤 Sending registration data...", userData);
-
-            const response = await fetch(SIGNUP_SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            });
-
-            console.log("📥 Response status:", response.status);
-
-            let result;
-            try {
-                result = await response.json();
-            } catch (e) {
-                const text = await response.text();
-                console.error("❌ Parse error. Response:", text);
-                showPopup("❌ Server error! Try again later.", "error");
-                return false;
-            }
-
-            console.log("✅ Server response:", result);
-
-            if (result.success) {
-                // localStorage me save karo
-                try {
-                    localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
-                } catch (e) { }
-                this.setCurrentUser(email);
-
-                // Form close karo
-                closeAccountModal();
-
-                // Success message
-                showPopup("✅ Account created successfully!\n📧 Check your email for confirmation.", "success");
-                console.log("✅ User registered:", userData.fullName);
-
-                // Floating buttons update karo
-                updateFloatingButtons();
-
-                return true;
-            } else {
-                if (result.message === "email_exists") {
-                    showPopup("❌ Email already registered!", "error");
-                } else {
-                    showPopup("❌ " + (result.message || "Registration failed"), "error");
-                }
-                return false;
-            }
-
-        } catch (error) {
-            console.error("❌ Registration error:", error);
-            showPopup("❌ Network error! Check your connection.", "error");
+        const existingUser = this.getUser(email);
+        if (existingUser) {
+            showPopup("❌ Email already registered!", "error");
             return false;
         }
+
+        // ✅ URLSearchParams use karo instead of FormData
+        const params = new URLSearchParams();
+        params.append('action', 'register');
+        params.append('fullName', userData.fullName);
+        params.append('email', email);
+        params.append('password', userData.password);
+        params.append('phone', userData.phone.replace('+91', ''));
+        params.append('address', userData.address);
+
+        console.log("📤 Sending registration data...", userData);
+
+        // ✅ GET request use karo with query params (Apps Script ke liye better)
+        const url = `${SIGNUP_SCRIPT_URL}?${params.toString()}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            redirect: 'follow'
+        });
+
+        console.log("📥 Response status:", response.status);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let result;
+        const contentType = response.headers.get("content-type");
+        
+        if (contentType && contentType.includes("application/json")) {
+            result = await response.json();
+        } else {
+            const text = await response.text();
+            console.log("📄 Raw response:", text);
+            
+            // Try to extract JSON from HTML response
+            try {
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    result = JSON.parse(jsonMatch[0]);
+                } else {
+                    throw new Error("No JSON found in response");
+                }
+            } catch (e) {
+                console.error("❌ Parse error. Response:", text);
+                showPopup("❌ Server error! Please try again.", "error");
+                return false;
+            }
+        }
+
+        console.log("✅ Server response:", result);
+
+        if (result.success) {
+            // localStorage me save karo
+            try {
+                localStorage.setItem(`abutoys_user_${email}`, JSON.stringify(userData));
+            } catch (e) { }
+            this.setCurrentUser(email);
+
+            // Form close karo
+            closeAccountModal();
+
+            // Success message
+            showPopup("✅ Account created successfully!\n📧 Check your email for confirmation.", "success");
+            console.log("✅ User registered:", userData.fullName);
+
+            // Floating buttons update karo
+            updateFloatingButtons();
+
+            return true;
+        } else {
+            if (result.message === "email_exists") {
+                showPopup("❌ Email already registered!", "error");
+            } else {
+                showPopup("❌ " + (result.message || "Registration failed"), "error");
+            }
+            return false;
+        }
+
+    } catch (error) {
+        console.error("❌ Registration error:", error);
+        showPopup("❌ Network error! Check your connection.", "error");
+        return false;
     }
+}
 
     updateUserDisplay() {
         const userNameDisplay = document.getElementById("userNameDisplay");
