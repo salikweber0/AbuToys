@@ -356,167 +356,104 @@ class OrderManager {
     const userPassword = userData?.password || '';
     
     const productCardClone = productCard.cloneNode(true);
-    // ✅ CARD KO CLEAN KARO - Sirf first image, no arrows, no Buy button
-    const firstImage = productCardClone.querySelector('.product-img:first-child');
+    
+    // Card cleaning code (already correct)
     const allImages = productCardClone.querySelectorAll('.product-img');
+    const videoContainers = productCardClone.querySelectorAll('.video-container');
     const arrows = productCardClone.querySelectorAll('.img-nav');
     const buyButton = productCardClone.querySelector('.add-to-cart-btn');
     const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
+    const productOverlay = productCardClone.querySelector('.product-overlay');
     
-    // Sirf first image rakho, baaki sab hide karo
-    allImages.forEach((img, index) => {
-        if (index !== 0) img.style.display = 'none';
-    });
+    allImages.forEach((img, index) => { if (index !== 0) img.remove(); });
+    videoContainers.forEach((video, index) => { if (index !== 0) video.remove(); });
+    arrows.forEach(arrow => arrow.remove());
+    if (buyButton) buyButton.remove();
+    if (wishlistIcon) wishlistIcon.remove();
+    if (productOverlay) productOverlay.remove();
     
-    // Arrows, Buy button, aur wishlist icon hide karo
-    arrows.forEach(arrow => arrow.style.display = 'none');
-    if (buyButton) buyButton.style.display = 'none';
-    if (wishlistIcon) wishlistIcon.style.display = 'none';
-    
-    // ✅ CARD KO FULL WIDTH BANAO
     productCardClone.style.width = '100%';
     productCardClone.style.maxWidth = '100%';
     productCardClone.style.margin = '0';
-    productCardClone.style.transform = 'scale(1)';
+    productCardClone.style.transform = 'none';
     
     const panel = document.createElement('div');
     panel.id = 'order-panel';
     panel.style.cssText = `
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%;
-        background: rgba(0,0,0,0.95); 
-        z-index: 999999;
-        display: flex; 
-        align-items: center; 
-        justify-content: center;
-        padding: 20px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); z-index: 999999;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch;
     `;
     
     panel.innerHTML = `
-        <div style="
-            background: white; 
-            border-radius: 20px; 
-            max-width: 600px; 
-            width: 100%; 
-            padding: 30px; 
-            position: relative; 
-            max-height: 90vh; 
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        ">
-            <button onclick="document.getElementById('order-panel').remove()" style="
-                position: sticky;
-                top: 0;
-                right: 0;
-                float: right;
-                background: #ff6b6b; 
-                color: white; 
-                border: none; 
-                border-radius: 50%; 
-                width: 40px; 
-                height: 40px; 
-                cursor: pointer; 
-                font-size: 20px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center;
-                z-index: 10;
-                margin-bottom: 10px;
+        <div style="background: white; border-radius: 20px; max-width: 600px; width: 100%; 
+            padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+            
+            <button onclick="closeOrderPanel()" style="
+                position: sticky; top: 0; right: 0; float: right;
+                background: #ff6b6b; color: white; border: none; border-radius: 50%; 
+                width: 40px; height: 40px; cursor: pointer; font-size: 20px; 
+                display: flex; align-items: center; justify-content: center;
+                z-index: 10; margin-bottom: 10px;
             ">×</button>
             
-            <h2 style="
-                text-align: center; 
-                color: #FF6B6B; 
-                font-size: 1.8rem; 
-                margin-bottom: 20px; 
-                font-family: 'Fredoka One', cursive !important;
-                clear: both;
-            ">${orderCode}</h2>
+            <h2 style="text-align: center; color: #FF6B6B; font-size: 1.8rem; 
+                margin-bottom: 20px; font-family: 'Fredoka One', cursive !important; clear: both;">
+                ${orderCode}
+            </h2>
             
             <div id="order-product-card" style="margin-bottom: 30px; width: 100%; padding: 0;"></div>
             
             <form id="order-form" style="display: flex; flex-direction: column; gap: 15px;">
                 <div>
                     <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Name:</label>
-                    <input type="text" value="${userName}" readonly style="
-                        width: 100%; 
-                        padding: 12px; 
-                        border: 2px solid #e0e0e0; 
-                        border-radius: 10px; 
-                        background: #f5f5f5; 
-                        cursor: not-allowed;
-                        box-sizing: border-box;
-                    ">
+                    <input type="text" value="${userName}" readonly style="width: 100%; padding: 12px; 
+                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; 
+                        cursor: not-allowed; box-sizing: border-box;">
                 </div>
                 <div>
                     <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Product:</label>
-                    <input type="text" value="${productName}" readonly style="
-                        width: 100%; 
-                        padding: 12px; 
-                        border: 2px solid #e0e0e0; 
-                        border-radius: 10px; 
-                        background: #f5f5f5; 
-                        cursor: not-allowed;
-                        box-sizing: border-box;
-                    ">
+                    <input type="text" value="${productName}" readonly style="width: 100%; padding: 12px; 
+                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; 
+                        cursor: not-allowed; box-sizing: border-box;">
                 </div>
                 <div>
                     <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Full Address:</label>
-                    <textarea id="order-address" style="
-                        width: 100%; 
-                        padding: 12px; 
-                        border: 2px solid #e0e0e0; 
-                        border-radius: 10px; 
-                        min-height: 80px; 
-                        resize: vertical;
-                        box-sizing: border-box;
-                    ">${userAddress}</textarea>
+                    <textarea id="order-address" style="width: 100%; padding: 12px; 
+                        border: 2px solid #e0e0e0; border-radius: 10px; min-height: 80px; 
+                        resize: vertical; box-sizing: border-box;">${userAddress}</textarea>
                 </div>
                 <div>
                     <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Order Code:</label>
-                    <input type="text" value="${orderCode}" readonly style="
-                        width: 100%; 
-                        padding: 12px; 
-                        border: 2px solid #e0e0e0; 
-                        border-radius: 10px; 
-                        background: #f5f5f5; 
-                        cursor: not-allowed;
-                        box-sizing: border-box;
-                    ">
+                    <input type="text" value="${orderCode}" readonly style="width: 100%; padding: 12px; 
+                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; 
+                        cursor: not-allowed; box-sizing: border-box;">
                 </div>
                 <div>
                     <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Password:</label>
-                    <input type="password" id="order-password" placeholder="Enter your password" style="
-                        width: 100%; 
-                        padding: 12px; 
-                        border: 2px solid #e0e0e0; 
-                        border-radius: 10px;
-                        box-sizing: border-box;
-                    " required>
+                    <input type="password" id="order-password" placeholder="Enter your password" 
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; 
+                        border-radius: 10px; box-sizing: border-box;" required>
                 </div>
-                <button type="submit" style="
-                    background: linear-gradient(45deg, #FF6B6B, #4ECDC4); 
-                    color: white; 
-                    border: none; 
-                    padding: 15px; 
-                    border-radius: 10px; 
-                    font-size: 1.1rem; 
-                    font-weight: 600; 
-                    cursor: pointer; 
-                    margin-top: 10px;
-                    touch-action: manipulation;
-                    -webkit-tap-highlight-color: transparent;
-                ">Submit Order 🚀</button>
+                <button type="submit" style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); 
+                    color: white; border: none; padding: 15px; border-radius: 10px; 
+                    font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 10px;
+                    touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                    Submit Order 🚀
+                </button>
             </form>
         </div>
     `;
     
     document.body.appendChild(panel);
+    
+    // ✅ CLOSE FUNCTION - PEHLE DEFINE KARO (Form submit se PEHLE)
+    window.closeOrderPanel = function() {
+        const panel = document.getElementById('order-panel');
+        if (panel) panel.remove();
+        document.body.style.overflow = ''; // Scroll enable
+    };
     
     // Product card add karo
     const cardContainer = document.getElementById('order-product-card');
@@ -544,7 +481,7 @@ class OrderManager {
         });
     });
     
-    // ✅ MOBILE KE LIYE - Body scroll lock karo
+    // Body scroll lock
     document.body.style.overflow = 'hidden';
 }
     
@@ -601,7 +538,10 @@ class OrderManager {
             this.orders = currentOrders;
             this.updateCartBadge();
             
-            document.getElementById('order-panel').remove();
+            closeOrderPanel(); // ✅ YE USE KARO instead of direct remove()
+            
+            // ✅ BEAUTIFUL CONFIRMATION CARD DIKHAO
+            this.showOrderConfirmationCard(orderData);
             
             // ✅ BEAUTIFUL CONFIRMATION CARD DIKHAO
             this.showOrderConfirmationCard(orderData);
@@ -1618,8 +1558,12 @@ async function loadProductsFromSheet() {
             const deliveryCharge = userDataManager.deliveryCharge || 0;
             const totalPrice = originalPrice + deliveryCharge;
 
-            // ✅ ALWAYS SHOW PRICE (Remove login check)
-            const priceHTML = `
+            // ✅ PRICE SIRF LOGGED IN + LOCATION VERIFIED USER KO DIKHAO
+const shouldShowPrice = userDataManager.isLoggedIn() && 
+                        userDataManager.isLocationVerified() && 
+                        userDataManager.userDistance <= 20;
+
+const priceHTML = shouldShowPrice ? `
     <div class="price-display" style="margin: 12px 0; padding: 12px; background: #fcececff; border-radius: 8px; text-align: center;">
         <div style="font-size: 1.8rem; font-weight: 800; color: #FF6B6B;">
             ₹${originalPrice.toFixed(0)}
@@ -1639,19 +1583,26 @@ async function loadProductsFromSheet() {
             </div>
         `}
         
-        <!-- ⭐ TOTAL PRICE LINE HERE -->
         <div class="total-price" style="font-size: 1rem; margin-top: 6px; font-weight: 700; color: #333;">
             Total: ₹${totalPrice}
         </div>
     </div>
+` : `
+    <div style="padding: 15px; background: #fff3cd; border-radius: 8px; text-align: center; margin: 12px 0;">
+        <p style="color: #856404; margin: 0; font-weight: 600;">🔒 Login & Verify Location to See Price</p>
+    </div>
 `;
 
 
-            const buttonsHTML = `
-                <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #f88787ff; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
-                    Buy Now
-                </button>
-            `;
+            const buttonsHTML = shouldShowPrice ? `
+    <button class="btn add-to-cart-btn" data-product-name="${item.Name || 'Product'}" style="background: #f88787ff; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
+        Buy Now
+    </button>
+` : `
+    <button onclick="window.location.href='index.html'" style="background: #4ECDC4; padding: 10px 20px; border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; width: 100%; text-align: center; display: block; font-family: 'Poppins', sans-serif !important;">
+        Login to Buy
+    </button>
+`;
 
             card.innerHTML = `
                 <div class="product-image-container">
