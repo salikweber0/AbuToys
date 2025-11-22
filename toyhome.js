@@ -15,11 +15,11 @@ const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 };
 const DELIVERY_RANGE_KM = 20;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
-const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfPdq5JSEN5n5vJodcCe75p94KCDo5Bo4c6fPni2lvBbeIYNyWpu7k0FlJ5x0gImwf/exec";
+const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEra0r_3B6Ytq6u2YQpmJrNSoiB7KuABsX-CzDsJNttz-UjmS4yyLVfUebUnvCRold/exec";
 
 console.log("🚀 AbuToys Script Loaded");
 
-// =================== UPDATED LOCATION MANAGER ===================
+// =================== IMPROVED LOCATION MANAGER ===================
 class LocationManager {
     constructor() {
         try {
@@ -46,192 +46,47 @@ class LocationManager {
     }
 
     calculateDeliveryCharge(distance) {
-        // 30 km ke bahar = No delivery
         if (distance > 20) return -1;
-
-        // 0 km = free delivery
         if (distance <= 0) return 0;
-
-        // Range-based logic
-        // 0 - 1 km = Free (0 rs)
         if (distance <= 1) return 0;
-
-        // 1 - 2 km = 20 rs
         else if (distance <= 2) return 60;
-
-        // 2 - 3 km = 30 rs
         else if (distance <= 3) return 70;
-
-        // 3 - 4 km = 40 rs
         else if (distance <= 4) return 80;
-
-        // 4 - 5 km = 50 rs
         else if (distance <= 5) return 120;
-
-        // 5 - 6 km = 60 rs
         else if (distance <= 6) return 140;
-
-        // 6 - 7 km = 70 rs
         else if (distance <= 7) return 160;
-
-        // 7 - 8 km = 80 rs
         else if (distance <= 8) return 180;
-
-        // 8 - 9 km = 90 rs
         else if (distance <= 9) return 210;
-
-        // 9 - 10 km = 100 rs
         else if (distance <= 10) return 230;
-
-        // 10 - 11 km = 110 rs
         else if (distance <= 11) return 250;
-
-        // 11 - 12 km = 120 rs
         else if (distance <= 12) return 270;
-
-        // 12 - 13 km = 130 rs
         else if (distance <= 13) return 290;
-
-        // 13 - 14 km = 140 rs
         else if (distance <= 14) return 310;
-
-        // 14 - 15 km = 150 rs
         else if (distance <= 15) return 330;
-
-        // 15 - 16 km = 160 rs
         else if (distance <= 16) return 350;
-
-        // 16 - 17 km = 170 rs
         else if (distance <= 17) return 370;
-
-        // 17 - 18 km = 180 rs
         else if (distance <= 18) return 390;
-
-        // 18 - 19 km = 190 rs
         else if (distance <= 19) return 410;
-
-        // 19 - 20 km = 200 rs
         else if (distance <= 20) return 430;
-
-        // 20 - 21 km = 210 rs
-        // else if (distance <= 21) return 450;
-
-        // 21 - 22 km = 220 rs
-        // else if (distance <= 22) return 230;
-
-        // 22 - 23 km = 230 rs
-        // else if (distance <= 23) return 240;
-
-        // 23 - 24 km = 240 rs
-        // else if (distance <= 24) return 250;
-
-        // 24 - 25 km = 250 rs
-        // else if (distance <= 25) return 260;
-
-        // 25 - 26 km = 260 rs
-        // else if (distance <= 26) return 270;
-
-        // 26 - 27 km = 270 rs
-        // else if (distance <= 27) return 280;
-
-        // 27 - 28 km = 280 rs
-        // else if (distance <= 28) return 290;
-
-        // 28 - 29 km = 290 rs
-        // else if (distance <= 29) return 300;
-
-        // 29 - 30 km = 300 rs
-        // else if (distance <= 30) return 310;
-
-        // 30 - 31 km = 310 rs
-        // else if (distance <= 31) return 320;
-
-        // 31 - 32 km = 320 rs
-        // else if (distance <= 32) return 330;
-
-        // 32 - 33 km = 330 rs
-        // else if (distance <= 33) return 340;
-
-        // 33 - 34 km = 340 rs
-        // else if (distance <= 34) return 350;
-
-        // 34 - 35 km = 350 rs
-        // else if (distance <= 35) return 360;
-
-        // 35 - 36 km = 360 rs
-        // else if (distance <= 36) return 370;
-
-        // 36 - 37 km = 370 rs
-        // else if (distance <= 37) return 380;
-
-        // 37 - 38 km = 380 rs
-        // else if (distance <= 38) return 390;
-
-        // 38 - 39 km = 390 rs
-        // else if (distance <= 39) return 400;
-
-        // 39 - 40 km = 400 rs
-        // else if (distance <= 40) return 410;
-
-        // 40 - 41 km = 410 rs
-        // else if (distance <= 41) return 420;
-
-        // 41 - 42 km = 420 rs
-        // else if (distance <= 42) return 430;
-
-        // 42 - 43 km = 430 rs
-        // else if (distance <= 43) return 440;
-
-        // 43 - 44 km = 440 rs
-        // else if (distance <= 44) return 450;
-
-        // 44 - 45 km = 450 rs
-        // else if (distance <= 45) return 460;
-
-        // 45 - 46 km = 460 rs
-        // else if (distance <= 46) return 470;
-
-        // 46 - 47 km = 470 rs
-        // else if (distance <= 47) return 480;
-
-        // 47 - 48 km = 480 rs
-        // else if (distance <= 48) return 490;
-
-        // 48 - 49 km = 490 rs
-        // else if (distance <= 49) return 500;
-
-        // 49 - 50 km = 500 rs
-        // else if (distance <= 50) return 510;
-
-        // Out of range
         return -1;
     }
 
-    async checkLocationAvailability() {
-        if ('permissions' in navigator) {
-            try {
-                const result = await navigator.permissions.query({ name: 'geolocation' });
-                return result.state;
-            } catch (e) {
-                return 'prompt';
-            }
-        }
-        return 'prompt';
-    }
-
-    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
+    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
                 reject({ code: 0, message: "Geolocation not supported" });
                 return;
             }
+
+            console.log("📍 Requesting location...");
+
             navigator.geolocation.getCurrentPosition(
                 pos => {
-                    console.log("📍 Location:", pos.coords.latitude, pos.coords.longitude);
+                    console.log("✅ Location received:", pos.coords.latitude, pos.coords.longitude);
                     resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
                 },
                 err => {
-                    console.warn("⚠️ Location error:", err);
+                    console.error("❌ Location error:", err.code, err.message);
                     reject(err);
                 },
                 options
@@ -241,17 +96,12 @@ class LocationManager {
 
     async checkLocationAndSetStatus() {
         try {
-            // Pehle check kar ki permission denied to nahi
-            const permissionStatus = await this.checkLocationAvailability();
+            console.log("🔍 Starting location check...");
 
-            if (permissionStatus === 'denied') {
-                this.locationStatus = "permission_denied";
-                try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
-                return { location: null, distance: null, status: this.locationStatus };
-            }
-
-            // Location lelo
+            // Direct location request - browser khud permission manage karega
             const location = await this.getCurrentLocation();
+
+            console.log("✅ Got location:", location);
 
             // Distance calculate karo
             const distance = this.calculateDistance(
@@ -261,38 +111,87 @@ class LocationManager {
                 SHOP_LOCATION.lng
             );
 
-            // Delivery charge lelo
+            console.log("📏 Distance calculated:", distance.toFixed(2), "km");
+
+            // Delivery charge calculate karo
             const deliveryCharge = this.calculateDeliveryCharge(distance);
 
-            // Store karo values
+            // Store values
             this.userLocation = location;
             this.distance = distance;
             this.deliveryCharge = deliveryCharge;
 
-            // LocalStorage mein save kar
+            // LocalStorage mein save karo
             try {
                 localStorage.setItem("abutoys_user_location", JSON.stringify(location));
                 localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
                 localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-            } catch (e) { }
+            } catch (e) {
+                console.warn("Storage error:", e);
+            }
 
-            // Status set kar - agar charge -1 nahi hai to in_range
+            // Status set karo
             if (deliveryCharge !== -1) {
                 this.locationStatus = "in_range";
                 try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
+                console.log("✅ IN RANGE - Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
             } else {
                 this.locationStatus = "out_of_range";
                 try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
+                console.log("⚠️ OUT OF RANGE - Distance:", distance.toFixed(2), "km");
             }
 
-            console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
-            return { location, distance, status: this.locationStatus, deliveryCharge };
+            return {
+                success: true,
+                location,
+                distance,
+                status: this.locationStatus,
+                deliveryCharge
+            };
 
         } catch (error) {
-            console.warn("❌ Location error:", error);
+            console.error("❌ Location check failed:", error);
+
+            // Error code check karo
+            if (error.code === 1) {
+                // Permission denied
+                this.locationStatus = "permission_denied";
+                try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
+
+                return {
+                    success: false,
+                    status: "permission_denied",
+                    error: "Permission denied by user",
+                    errorCode: error.code
+                };
+            } else if (error.code === 2) {
+                // Position unavailable
+                return {
+                    success: false,
+                    status: "position_unavailable",
+                    error: "Location unavailable",
+                    errorCode: error.code
+                };
+            } else if (error.code === 3) {
+                // Timeout
+                return {
+                    success: false,
+                    status: "timeout",
+                    error: "Location request timeout",
+                    errorCode: error.code
+                };
+            }
+
+            // Unknown error
             this.locationStatus = "unknown";
             try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
-            return { location: null, distance: null, status: this.locationStatus, error };
+
+            return {
+                success: false,
+                status: "unknown",
+                error: error.message || "Unknown error",
+                errorCode: error.code
+            };
         }
     }
 
@@ -535,35 +434,53 @@ async function showWelcomeMessage() {
     console.log("👋 Showing welcome for:", userName);
 
     showCustomWelcomePopup(userName, async () => {
-        showPopup("🌍 Checking your location...", "loading");
+        // Loading popup dikha
+        showPopup("🌍 Getting your location...\n\nPlease allow location access when browser asks.", "loading");
+
+        // Thoda wait kar taaki user loading dekh sake
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         try {
+            console.log("🎯 Starting location check...");
             const res = await locationManager.checkLocationAndSetStatus();
 
+            // Loading popup remove kar
             const loadingPopup = document.getElementById("custom-popup");
             if (loadingPopup) loadingPopup.remove();
 
-            if (res.status === 'in_range') {
-                showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
+            console.log("📊 Location result:", res);
+
+            if (res.success && res.status === 'in_range') {
+                showPopup(`✅ Location Verified!\n\n📍 Distance: ${res.distance.toFixed(2)} km\n💰 Delivery Charge: Rs.${res.deliveryCharge}\n\nYou can now purchase items!`, "success");
             }
-            else if (res.status === 'out_of_range') {
-                showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
+            else if (res.success && res.status === 'out_of_range') {
+                showPopup(`⚠️ Sorry!\n\nYou are ${res.distance.toFixed(2)} km away.\n\nWe deliver within ${DELIVERY_RANGE_KM} km only.`, "warning");
+            }
+            else if (res.status === 'permission_denied') {
+                showPopup(`❌ Location Permission Denied\n\nPlease enable location in your browser settings:\n\n1. Click 🔒 icon in address bar\n2. Allow location access\n3. Refresh the page`, "error");
+            }
+            else if (res.status === 'position_unavailable') {
+                showPopup(`⚠️ Location Unavailable\n\nCouldn't get your location.\nPlease check your GPS/Network.`, "warning");
+            }
+            else if (res.status === 'timeout') {
+                showPopup(`⏱️ Location Request Timeout\n\nTaking too long to get location.\nPlease try again.`, "warning");
             }
             else {
-                showPopup(`⚠️ Location Permission Denied\n\nPlease enable location services.`, "warning");
+                showPopup(`⚠️ Location Error\n\nCouldn't verify your location.\nPlease try again later.`, "warning");
             }
 
-            // Sirf agar logged in nahi hai to form dikhao
+            // Agar logged in nahi hai to form dikha
             if (!userManager.isLoggedIn()) {
                 setTimeout(() => {
                     showAccountModal();
-                }, 1500);
+                }, 2000);
             }
 
         } catch (err) {
-            console.error("Location error:", err);
+            console.error("❌ Unexpected error:", err);
             const loadingPopup = document.getElementById("custom-popup");
             if (loadingPopup) loadingPopup.remove();
+            showPopup("❌ Something went wrong!\n\nPlease refresh and try again.", "error");
         }
     });
 }
@@ -1262,4 +1179,3 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeDeleteAccountIcon();
     checkIfAccountDeleted();
 });
-
