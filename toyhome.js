@@ -207,17 +207,74 @@ class LocationManager {
         return -1;
     }
 
-    async checkLocationAvailability() {
-        if ('permissions' in navigator) {
-            try {
-                const result = await navigator.permissions.query({ name: 'geolocation' });
-                return result.state;
-            } catch (e) {
-                return 'prompt';
-            }
+    async checkLocationAndSetStatus() {
+    try {
+        showPopup("🌍 Getting your location...", "loading");
+        
+        // Seedha location try kar - permission check mat kar pehle
+        const location = await this.getCurrentLocation();
+
+        // Distance calculate karo
+        const distance = this.calculateDistance(
+            location.lat,
+            location.lng,
+            SHOP_LOCATION.lat,
+            SHOP_LOCATION.lng
+        );
+
+        // Delivery charge lelo
+        const deliveryCharge = this.calculateDeliveryCharge(distance);
+
+        // Store karo values
+        this.userLocation = location;
+        this.distance = distance;
+        this.deliveryCharge = deliveryCharge;
+
+        // LocalStorage mein save kar
+        try {
+            localStorage.setItem("abutoys_user_location", JSON.stringify(location));
+            localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
+            localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
+        } catch (e) { }
+
+        // Status set kar
+        if (deliveryCharge !== -1) {
+            this.locationStatus = "in_range";
+            try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
+        } else {
+            this.locationStatus = "out_of_range";
+            try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
         }
-        return 'prompt';
+
+        console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
+        
+        // Loading popup remove kar
+        const loadingPopup = document.getElementById("custom-popup");
+        if (loadingPopup) loadingPopup.remove();
+        
+        return { location, distance, status: this.locationStatus, deliveryCharge };
+
+    } catch (error) {
+        console.warn("❌ Location error:", error);
+        
+        // Loading popup remove kar
+        const loadingPopup = document.getElementById("custom-popup");
+        if (loadingPopup) loadingPopup.remove();
+        
+        // Error code check kar
+        if (error.code === 1) {
+            // Permission denied
+            this.locationStatus = "permission_denied";
+            try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
+        } else {
+            // Other errors
+            this.locationStatus = "unknown";
+            try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
+        }
+        
+        return { location: null, distance: null, status: this.locationStatus, error };
     }
+}
 
     getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
@@ -535,35 +592,27 @@ async function showWelcomeMessage() {
     console.log("👋 Showing welcome for:", userName);
 
     showCustomWelcomePopup(userName, async () => {
-        showPopup("🌍 Checking your location...", "loading");
+        const res = await locationManager.checkLocationAndSetStatus();
 
-        try {
-            const res = await locationManager.checkLocationAndSetStatus();
+        // Result ke base pe message dikhao
+        if (res.status === 'in_range') {
+            showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
+        }
+        else if (res.status === 'out_of_range') {
+            showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
+        }
+        else if (res.status === 'permission_denied') {
+            showPopup(`⚠️ Location Access Denied!\n\nPlease enable location in browser settings:\n1. Click lock icon 🔒 in address bar\n2. Allow location access\n3. Refresh page`, "error");
+        }
+        else {
+            showPopup(`⚠️ Cannot detect location\n\nPlease check your GPS/internet`, "warning");
+        }
 
-            const loadingPopup = document.getElementById("custom-popup");
-            if (loadingPopup) loadingPopup.remove();
-
-            if (res.status === 'in_range') {
-                showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
-            }
-            else if (res.status === 'out_of_range') {
-                showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
-            }
-            else {
-                showPopup(`⚠️ Location Permission Denied\n\nPlease enable location services.`, "warning");
-            }
-
-            // Sirf agar logged in nahi hai to form dikhao
-            if (!userManager.isLoggedIn()) {
-                setTimeout(() => {
-                    showAccountModal();
-                }, 1500);
-            }
-
-        } catch (err) {
-            console.error("Location error:", err);
-            const loadingPopup = document.getElementById("custom-popup");
-            if (loadingPopup) loadingPopup.remove();
+        // Sirf agar logged in nahi hai to form dikhao
+        if (!userManager.isLoggedIn()) {
+            setTimeout(() => {
+                showAccountModal();
+            }, 2000);
         }
     });
 }
