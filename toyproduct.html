@@ -20,18 +20,18 @@
 
     <script>
         // Security: Disable right click and inspect
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', function (e) {
-            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S
-            if (e.keyCode === 123 ||
-                (e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
-                (e.ctrlKey && e.shiftKey && e.keyCode === 67) ||
-                (e.ctrlKey && e.keyCode === 85) ||
-                (e.ctrlKey && e.keyCode === 83)) {
-                e.preventDefault();
-                return false;
-            }
-        });
+        // document.addEventListener('contextmenu', e => e.preventDefault());
+        // document.addEventListener('keydown', function (e) {
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S
+        //     if (e.keyCode === 123 ||
+        //         (e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
+        //         (e.ctrlKey && e.shiftKey && e.keyCode === 67) ||
+        //         (e.ctrlKey && e.keyCode === 85) ||
+        //         (e.ctrlKey && e.keyCode === 83)) {
+        //         e.preventDefault();
+        //         return false;
+        //     }
+        // });
     </script>
 </head>
 
@@ -92,6 +92,17 @@
             </div>
         </div>
     </section>
+
+    <div id="likedCountBox" style="
+    text-align:center;
+    font-size:1.2rem;
+    margin-top:10px;
+    font-weight:600;
+    color:#e63946;
+">
+        ❤️ Liked Products: 0
+    </div>
+
 
     <!-- Products Grid -->
     <section class="products-section">
