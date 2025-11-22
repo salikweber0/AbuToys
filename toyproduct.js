@@ -356,6 +356,28 @@ class OrderManager {
     const userPassword = userData?.password || '';
     
     const productCardClone = productCard.cloneNode(true);
+    // ✅ CARD KO CLEAN KARO - Sirf first image, no arrows, no Buy button
+    const firstImage = productCardClone.querySelector('.product-img:first-child');
+    const allImages = productCardClone.querySelectorAll('.product-img');
+    const arrows = productCardClone.querySelectorAll('.img-nav');
+    const buyButton = productCardClone.querySelector('.add-to-cart-btn');
+    const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
+    
+    // Sirf first image rakho, baaki sab hide karo
+    allImages.forEach((img, index) => {
+        if (index !== 0) img.style.display = 'none';
+    });
+    
+    // Arrows, Buy button, aur wishlist icon hide karo
+    arrows.forEach(arrow => arrow.style.display = 'none');
+    if (buyButton) buyButton.style.display = 'none';
+    if (wishlistIcon) wishlistIcon.style.display = 'none';
+    
+    // ✅ CARD KO FULL WIDTH BANAO
+    productCardClone.style.width = '100%';
+    productCardClone.style.maxWidth = '100%';
+    productCardClone.style.margin = '0';
+    productCardClone.style.transform = 'scale(1)';
     
     const panel = document.createElement('div');
     panel.id = 'order-panel';
@@ -416,7 +438,7 @@ class OrderManager {
                 clear: both;
             ">${orderCode}</h2>
             
-            <div id="order-product-card" style="margin-bottom: 30px; transform: scale(0.95);"></div>
+            <div id="order-product-card" style="margin-bottom: 30px; width: 100%; padding: 0;"></div>
             
             <form id="order-form" style="display: flex; flex-direction: column; gap: 15px;">
                 <div>
@@ -1284,12 +1306,6 @@ function handleBuyNowClick(e) {
     e.stopPropagation();
 
     console.log("🔥 Buy Now clicked!");
-
-    // ❌ Too close to shop
-    if (userDataManager.isTooClose()) {
-        userDataManager.showMessage("You are too close to shop! Direct visit karo.", "warning");
-        return;
-    }
 
     // ❌ Login + Location required
     if (!userDataManager.isLocationVerified() || !userDataManager.isLoggedIn()) {
