@@ -71,178 +71,141 @@ class LocationManager {
         return -1;
     }
 
-    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject({ code: 0, message: "Geolocation not supported" });
-                return;
-            }
-
-            console.log("📍 Requesting location with options:", options);
-
-            let timeoutId = setTimeout(() => {
-                reject({ code: 3, message: "Location request timeout" });
-            }, options.timeout + 1000);
-
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    clearTimeout(timeoutId);
-                    console.log("✅ Location received:", pos.coords.latitude, pos.coords.longitude);
-                    resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-                },
-                err => {
-                    clearTimeout(timeoutId);
-                    console.error("❌ Location error:", err.code, err.message);
-
-                    if (err.code === 1) {
-                        console.log("🚫 User denied permission");
-                    } else if (err.code === 2) {
-                        console.log("📡 Position unavailable");
-                    } else if (err.code === 3) {
-                        console.log("⏱️ Request timeout");
-                    }
-
-                    reject(err);
-                },
-                options
-            );
-        });
-    }
-
-    async checkLocationAndSetStatus() {
-        try {
-            console.log("📍 Starting location check...");
-            const location = await this.getCurrentLocation();
-            console.log("✅ Got location:", location);
-
-            const distance = this.calculateDistance(
-                location.lat,
-                location.lng,
-                SHOP_LOCATION.lat,
-                SHOP_LOCATION.lng
-            );
-
-            console.log("📍 Distance calculated:", distance.toFixed(2), "km");
-            const deliveryCharge = this.calculateDeliveryCharge(distance);
-
-            this.userLocation = location;
-            this.distance = distance;
-            this.deliveryCharge = deliveryCharge;
-
-            try {
-                localStorage.setItem("abutoys_user_location", JSON.stringify(location));
-                localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
-                localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-            } catch (e) {
-                console.warn("Storage error:", e);
-            }
-
-            if (deliveryCharge !== -1) {
-                this.locationStatus = "in_range";
-                try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
-                console.log("✅ IN RANGE - Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
-            } else {
-                this.locationStatus = "out_of_range";
-                try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
-                console.log("⚠️ OUT OF RANGE - Distance:", distance.toFixed(2), "km");
-            }
-
-            return {
-                success: true,
-                location,
-                distance,
-                status: this.locationStatus,
-                deliveryCharge
-            };
-
-        } catch (error) {
-            console.error("❌ Location check failed:", error);
-
-            if (error.code === 1) {
-                this.locationStatus = "permission_denied";
-                try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
-
-                return {
-                    success: false,
-                    status: "permission_denied",
-                    error: "Permission denied by user",
-                    errorCode: error.code
-                };
-            } else if (error.code === 2) {
-                return {
-                    success: false,
-                    status: "position_unavailable",
-                    error: "Location unavailable",
-                    errorCode: error.code
-                };
-            } else if (error.code === 3) {
-                return {
-                    success: false,
-                    status: "timeout",
-                    error: "Location request timeout",
-                    errorCode: error.code
-                };
-            }
-
-            this.locationStatus = "unknown";
-            try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
-
-            return {
-                success: false,
-                status: "unknown",
-                error: error.message || "Unknown error",
-                errorCode: error.code
-            };
+    // ✅ NEW FAST LOCATION REQUEST
+async requestLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject({ code: 0, message: "GPS not available" });
+            return;
         }
-    }
 
-    getLocationStatus() {
-        return this.locationStatus;
-    }
+        // ✅ FAST MODE - No high accuracy for speed
+        const options = {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 30000
+        };
+
+        console.log("📍 Requesting location (fast mode)...");
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                console.log("✅ Got location:", pos.coords.latitude, pos.coords.longitude);
+                resolve({
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude
+                });
+            },
+            (err) => {
+                console.error("❌ Location error:", err.code, err.message);
+                reject(err);
+            },
+            options
+        );
+    });
 }
 
-// ✅ CREATE LOCATION BUTTON
+    // ✅ NEW SIMPLE VERIFY FUNCTION
+async verifyLocation() {
+    try {
+        console.log("📍 Starting verification...");
+        const location = await this.requestLocation();
+
+        const distance = this.calculateDistance(
+            location.lat, location.lng,
+            SHOP_LOCATION.lat, SHOP_LOCATION.lng
+        );
+
+        console.log("📏 Distance:", distance.toFixed(2), "km");
+
+        const charge = this.calculateDeliveryCharge(distance);
+
+        this.userLocation = location;
+        this.distance = distance;
+        this.deliveryCharge = charge;
+
+        // Save to localStorage
+        try {
+            localStorage.setItem("abutoys_user_location", JSON.stringify(location));
+            localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
+            localStorage.setItem("abutoys_delivery_charge", charge.toString());
+        } catch (e) {
+            console.warn("Storage error:", e);
+        }
+
+        if (charge !== -1) {
+            this.locationStatus = "in_range";
+            try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) {}
+            console.log("✅ IN RANGE - Charge:", charge);
+            return { success: true, distance, charge, status: "in_range" };
+        } else {
+            this.locationStatus = "out_of_range";
+            try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) {}
+            console.log("⚠️ OUT OF RANGE");
+            return { success: true, distance, charge: 0, status: "out_of_range" };
+        }
+
+    } catch (error) {
+        console.error("❌ Verification failed:", error);
+
+        if (error.code === 1) {
+            this.locationStatus = "denied";
+            try { localStorage.setItem("abutoys_location_status", "denied"); } catch (e) {}
+            return { success: false, status: "denied" };
+        } else if (error.code === 3) {
+            return { success: false, status: "timeout" };
+        } else if (error.code === 2) {
+            return { success: false, status: "unavailable" };
+        } else {
+            return { success: false, status: "error" };
+        }
+    }
+}
+}
+
+// ✅ FLOATING LOCATION BUTTON
 function createLocationButton() {
-    const locBtn = document.createElement("div");
-    locBtn.id = "floatingLocationBtn";
-    locBtn.innerHTML = `<i class="fas fa-map-marker-alt"></i>`;
-    locBtn.style.cssText = `
-        position: fixed; 
-        bottom: 180px; 
-        right: 20px;
-        background: linear-gradient(45deg, #667eea, #764ba2); 
-        color: white; 
-        border-radius: 50%;
-        width: 60px; 
-        height: 60px; 
-        display: flex;
-        align-items: center; 
-        justify-content: center;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-        cursor: pointer; 
-        z-index: 999; 
-        font-size: 28px;
-        transition: all 0.3s ease;
+    const btn = document.createElement("div");
+    btn.id = "floatingLocationBtn";
+    btn.innerHTML = `<i class="fas fa-map-marker-alt"></i>`;
+    btn.style.cssText = `
+        position: fixed; bottom: 180px; right: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white; border-radius: 50%; width: 60px; height: 60px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+        cursor: pointer; z-index: 999; font-size: 28px;
+        transition: all 0.3s;
     `;
 
-    locBtn.addEventListener("click", async () => {
-        showPopup("🌍 Checking location...", "loading");
+    btn.addEventListener("mouseenter", () => {
+        btn.style.transform = "scale(1.1)";
+    });
 
-        const res = await locationManager.checkLocationAndSetStatus();
+    btn.addEventListener("mouseleave", () => {
+        btn.style.transform = "scale(1)";
+    });
 
-        const loadingPopup = document.getElementById("custom-popup");
-        if (loadingPopup) loadingPopup.remove();
+    btn.addEventListener("click", async () => {
+        showPopup("📍 Checking location...", "loading");
 
-        if (res.success && res.status === 'in_range') {
-            showPopup(`✅ Location Verified!\n\n📍 ${res.distance.toFixed(2)} km\n💰 Rs.${res.deliveryCharge} delivery`, "success");
-        } else if (res.status === 'permission_denied') {
-            showPopup(`❌ Permission Denied\n\nEnable location in browser settings`, "error");
+        const result = await locationManager.verifyLocation();
+
+        const loading = document.getElementById("custom-popup");
+        if (loading) loading.remove();
+
+        if (result.success && result.status === "in_range") {
+            showPopup(`✅ Verified!\n\n📍 ${result.distance.toFixed(2)} km\n💰 ₹${result.charge}`, "success");
+        } else if (result.status === "denied") {
+            showPopup(`❌ Permission Denied\n\nEnable in browser settings`, "error");
+        } else if (result.status === "timeout") {
+            showPopup(`⏱️ Timeout\n\nGPS taking too long`, "warning");
         } else {
-            showPopup(`⚠️ ${res.error || 'Location error'}`, "warning");
+            showPopup(`⚠️ Location unavailable`, "warning");
         }
     });
 
-    document.body.appendChild(locBtn);
+    document.body.appendChild(btn);
 }
 
 // =================== USER MANAGER ===================
@@ -460,11 +423,11 @@ function showCustomWelcomePopup(userName, onOKClick) {
     });
 }
 
+// ✅ NEW SIMPLE WELCOME
 async function showWelcomeMessage() {
-    const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
-
-    if (!isFirstVisit) {
-        console.log("ℹ️ Not first visit, skipping welcome");
+    const welcomed = sessionStorage.getItem("abutoys_welcomed");
+    if (welcomed) {
+        console.log("Already welcomed, skipping");
         return;
     }
 
@@ -478,79 +441,67 @@ async function showWelcomeMessage() {
 
     console.log("👋 Showing welcome for:", userName);
 
-    showCustomWelcomePopup(userName, async () => {
-        // ✅ Check permission status first
-        const permissionStatus = await checkLocationPermission();
-        
-        if (permissionStatus === 'denied') {
-            showPopup(`⚠️ Location Access Blocked!\n\nPlease enable location manually:\n\n1. Click 🔒 lock icon in browser\n2. Find "Location" permission\n3. Change to "Allow"\n4. Refresh the page`, "error");
-            
-            if (!userManager.isLoggedIn()) {
-                setTimeout(() => showAccountModal(), 2000);
-            }
-            return;
+    const popup = document.createElement("div");
+    popup.id = "welcome-popup";
+    popup.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex; align-items: center;
+        justify-content: center; z-index: 10001; padding: 20px;
+    `;
+
+    popup.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white; padding: 2rem; border-radius: 20px;
+            max-width: 450px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        ">
+            <h2 style="font-size: 1.8rem; margin-bottom: 1rem; font-family: 'Fredoka One', cursive;">
+                🧸 Welcome ${userName}!
+            </h2>
+            <p style="font-size: 1rem; margin-bottom: 1.5rem; opacity: 0.9;">
+                Let's verify your location for delivery availability
+            </p>
+            <button id="verify-location-btn" style="
+                padding: 12px 30px; border: none; border-radius: 25px;
+                background: white; color: #FF6B6B; cursor: pointer;
+                font-weight: bold; font-size: 1rem; transition: all 0.3s;
+            ">
+                📍 Check Location
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    document.getElementById("verify-location-btn").addEventListener("click", async () => {
+        popup.remove();
+
+        showPopup("📍 Getting your location...\n\nThis may take 5-10 seconds", "loading");
+
+        const result = await locationManager.verifyLocation();
+
+        const loading = document.getElementById("custom-popup");
+        if (loading) loading.remove();
+
+        if (result.success && result.status === "in_range") {
+            showPopup(`✅ Location Verified!\n\n📍 Distance: ${result.distance.toFixed(2)} km\n💰 Delivery: ₹${result.charge}`, "success");
+        } else if (result.success && result.status === "out_of_range") {
+            showPopup(`⚠️ Sorry!\n\nYou are ${result.distance.toFixed(2)} km away.\n\nWe deliver within 20 km only.`, "warning");
+        } else if (result.status === "denied") {
+            showPopup(`❌ Location Denied\n\nTo enable:\n\n1. Tap 🔒 in address bar\n2. Allow Location\n3. Refresh page`, "error");
+        } else if (result.status === "timeout") {
+            showPopup(`⏱️ Timeout!\n\nGPS is taking too long.\n\nCheck GPS settings and try again.`, "warning");
+        } else if (result.status === "unavailable") {
+            showPopup(`📡 GPS Unavailable\n\nTurn on GPS and try again.`, "warning");
+        } else {
+            showPopup(`⚠️ Location Error\n\nPlease try again later.`, "warning");
         }
 
-        showPopup("🌍 Getting your location...\n\nPlease allow location access when browser asks.", "loading");
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        try {
-            console.log("🎯 Starting location check...");
-            const res = await locationManager.checkLocationAndSetStatus();
-
-            const loadingPopup = document.getElementById("custom-popup");
-            if (loadingPopup) loadingPopup.remove();
-
-            console.log("📊 Location result:", res);
-
-            if (res.success && res.status === 'in_range') {
-                showPopup(`✅ Location Verified!\n\n📍 Distance: ${res.distance.toFixed(2)} km\n💰 Delivery Charge: Rs.${res.deliveryCharge}\n\nYou can now purchase items!`, "success");
-            }
-            else if (res.success && res.status === 'out_of_range') {
-                showPopup(`⚠️ Sorry!\n\nYou are ${res.distance.toFixed(2)} km away.\n\nWe deliver within ${DELIVERY_RANGE_KM} km only.`, "warning");
-            }
-            else if (res.status === 'permission_denied') {
-                showPopup(`❌ Location Permission Denied\n\nTo enable:\n\n1. Tap address bar\n2. Tap 🔒 icon\n3. Enable Location\n4. Refresh`, "error");
-            }
-            else if (res.status === 'position_unavailable') {
-                showPopup(`⚠️ Location Unavailable\n\n• Turn on GPS\n• Check internet\n• Try again`, "warning");
-            }
-            else if (res.status === 'timeout') {
-                showPopup(`⏱️ Timeout\n\nTaking too long.\nTry again.`, "warning");
-            }
-            else {
-                showPopup(`⚠️ Location Error\n\nTry again later.`, "warning");
-            }
-
-            if (!userManager.isLoggedIn()) {
-                setTimeout(() => showAccountModal(), 2000);
-            }
-
-        } catch (err) {
-            console.error("❌ Unexpected error:", err);
-            const loadingPopup = document.getElementById("custom-popup");
-            if (loadingPopup) loadingPopup.remove();
-            showPopup("❌ Something went wrong!\n\nRefresh and try again.", "error");
+        // Show signup form if not logged in
+        if (!userManager.isLoggedIn()) {
+            setTimeout(() => showAccountModal(), 2000);
         }
     });
-}
-
-// ✅ CHECK IF LOCATION PERMISSION ALREADY DENIED
-async function checkLocationPermission() {
-    try {
-        // Modern browsers - Permissions API
-        if (navigator.permissions && navigator.permissions.query) {
-            const result = await navigator.permissions.query({ name: 'geolocation' });
-            console.log("📍 Permission status:", result.state);
-            return result.state; // 'granted', 'denied', 'prompt'
-        }
-
-        // Fallback - assume prompt if API not available
-        return 'prompt';
-    } catch (e) {
-        console.warn("⚠️ Permissions API not available:", e);
-        return 'prompt';
-    }
 }
 
 // =================== WHATSAPP ===================
@@ -783,19 +734,20 @@ document.addEventListener("DOMContentLoaded", () => {
         signupForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const fullName = document.getElementById("fullName").value.trim();
-            const email = document.getElementById("email").value.trim().toLowerCase();
-            const password = document.getElementById("password").value.trim();
-            const phone = document.getElementById("phone").value.trim();
-            const address = document.getElementById("address").value.trim();
+            const fullName = document.getElementById("fullName")?.value?.trim();
+            const email = document.getElementById("email")?.value?.trim().toLowerCase();
+            const password = document.getElementById("password")?.value?.trim();
+            const phone = document.getElementById("phone")?.value?.trim();
+            const address = document.getElementById("address")?.value?.trim();
 
+            // ✅ Check if elements exist
             if (!fullName || !email || !password || !phone || !address) {
                 showPopup("❌ Please fill all fields!", "error");
                 return;
             }
 
             if (phone.length !== 10) {
-                showPopup("❌ Phone number must be 10 digits!", "error");
+                showPopup("❌ Phone must be 10 digits!", "error");
                 return;
             }
 
@@ -807,18 +759,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 address
             };
 
-            // UserManager ka register function call karo
             const success = await userManager.register(userData);
 
             if (success) {
-                // Form reset karo
                 signupForm.reset();
             }
         });
-    } else {
-        console.error("❌ signupForm not found in DOM");
     }
-
 
 
     // ========= CART ICON ==========
