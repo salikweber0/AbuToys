@@ -71,22 +71,37 @@ class LocationManager {
         return -1;
     }
 
-    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }) {
+    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
                 reject({ code: 0, message: "Geolocation not supported" });
                 return;
             }
 
-            console.log("📍 Requesting location...");
+            console.log("📍 Requesting location with options:", options);
+
+            let timeoutId = setTimeout(() => {
+                reject({ code: 3, message: "Location request timeout" });
+            }, options.timeout + 1000);
 
             navigator.geolocation.getCurrentPosition(
                 pos => {
+                    clearTimeout(timeoutId);
                     console.log("✅ Location received:", pos.coords.latitude, pos.coords.longitude);
                     resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
                 },
                 err => {
+                    clearTimeout(timeoutId);
                     console.error("❌ Location error:", err.code, err.message);
+
+                    if (err.code === 1) {
+                        console.log("🚫 User denied permission");
+                    } else if (err.code === 2) {
+                        console.log("📡 Position unavailable");
+                    } else if (err.code === 3) {
+                        console.log("⏱️ Request timeout");
+                    }
+
                     reject(err);
                 },
                 options
@@ -96,14 +111,10 @@ class LocationManager {
 
     async checkLocationAndSetStatus() {
         try {
-            console.log("🔍 Starting location check...");
-
-            // Direct location request - browser khud permission manage karega
+            console.log("📍 Starting location check...");
             const location = await this.getCurrentLocation();
-
             console.log("✅ Got location:", location);
 
-            // Distance calculate karo
             const distance = this.calculateDistance(
                 location.lat,
                 location.lng,
@@ -111,17 +122,13 @@ class LocationManager {
                 SHOP_LOCATION.lng
             );
 
-            console.log("📏 Distance calculated:", distance.toFixed(2), "km");
-
-            // Delivery charge calculate karo
+            console.log("📍 Distance calculated:", distance.toFixed(2), "km");
             const deliveryCharge = this.calculateDeliveryCharge(distance);
 
-            // Store values
             this.userLocation = location;
             this.distance = distance;
             this.deliveryCharge = deliveryCharge;
 
-            // LocalStorage mein save karo
             try {
                 localStorage.setItem("abutoys_user_location", JSON.stringify(location));
                 localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
@@ -130,7 +137,6 @@ class LocationManager {
                 console.warn("Storage error:", e);
             }
 
-            // Status set karo
             if (deliveryCharge !== -1) {
                 this.locationStatus = "in_range";
                 try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
@@ -152,9 +158,7 @@ class LocationManager {
         } catch (error) {
             console.error("❌ Location check failed:", error);
 
-            // Error code check karo
             if (error.code === 1) {
-                // Permission denied
                 this.locationStatus = "permission_denied";
                 try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
 
@@ -165,7 +169,6 @@ class LocationManager {
                     errorCode: error.code
                 };
             } else if (error.code === 2) {
-                // Position unavailable
                 return {
                     success: false,
                     status: "position_unavailable",
@@ -173,7 +176,6 @@ class LocationManager {
                     errorCode: error.code
                 };
             } else if (error.code === 3) {
-                // Timeout
                 return {
                     success: false,
                     status: "timeout",
@@ -182,7 +184,6 @@ class LocationManager {
                 };
             }
 
-            // Unknown error
             this.locationStatus = "unknown";
             try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
 
@@ -198,6 +199,50 @@ class LocationManager {
     getLocationStatus() {
         return this.locationStatus;
     }
+}
+
+// ✅ CREATE LOCATION BUTTON
+function createLocationButton() {
+    const locBtn = document.createElement("div");
+    locBtn.id = "floatingLocationBtn";
+    locBtn.innerHTML = `<i class="fas fa-map-marker-alt"></i>`;
+    locBtn.style.cssText = `
+        position: fixed; 
+        bottom: 180px; 
+        right: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2); 
+        color: white; 
+        border-radius: 50%;
+        width: 60px; 
+        height: 60px; 
+        display: flex;
+        align-items: center; 
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        cursor: pointer; 
+        z-index: 999; 
+        font-size: 28px;
+        transition: all 0.3s ease;
+    `;
+
+    locBtn.addEventListener("click", async () => {
+        showPopup("🌍 Checking location...", "loading");
+
+        const res = await locationManager.checkLocationAndSetStatus();
+
+        const loadingPopup = document.getElementById("custom-popup");
+        if (loadingPopup) loadingPopup.remove();
+
+        if (res.success && res.status === 'in_range') {
+            showPopup(`✅ Location Verified!\n\n📍 ${res.distance.toFixed(2)} km\n💰 Rs.${res.deliveryCharge} delivery`, "success");
+        } else if (res.status === 'permission_denied') {
+            showPopup(`❌ Permission Denied\n\nEnable location in browser settings`, "error");
+        } else {
+            showPopup(`⚠️ ${res.error || 'Location error'}`, "warning");
+        }
+    });
+
+    document.body.appendChild(locBtn);
 }
 
 // =================== USER MANAGER ===================
@@ -434,10 +479,23 @@ async function showWelcomeMessage() {
     console.log("👋 Showing welcome for:", userName);
 
     showCustomWelcomePopup(userName, async () => {
+        // ✅ FIRST - Check if permission already denied
+        const permissionStatus = await checkLocationPermission();
+
+        if (permissionStatus === 'denied') {
+            showPopup(`⚠️ Location Access Blocked!\n\nPlease enable location manually:\n\n1. Click 🔒 lock icon in browser\n2. Find "Location" permission\n3. Change to "Allow"\n4. Refresh the page`, "error");
+
+            // User ko form dikha if not logged in
+            if (!userManager.isLoggedIn()) {
+                setTimeout(() => showAccountModal(), 2000);
+            }
+            return;
+        }
+
         // Loading popup dikha
         showPopup("🌍 Getting your location...\n\nPlease allow location access when browser asks.", "loading");
 
-        // Thoda wait kar taaki user loading dekh sake
+        // Thoda wait kar
         await new Promise(resolve => setTimeout(resolve, 500));
 
         try {
@@ -457,23 +515,21 @@ async function showWelcomeMessage() {
                 showPopup(`⚠️ Sorry!\n\nYou are ${res.distance.toFixed(2)} km away.\n\nWe deliver within ${DELIVERY_RANGE_KM} km only.`, "warning");
             }
             else if (res.status === 'permission_denied') {
-                showPopup(`❌ Location Permission Denied\n\nPlease enable location in your browser settings:\n\n1. Click 🔒 icon in address bar\n2. Allow location access\n3. Refresh the page`, "error");
+                showPopup(`❌ Location Permission Denied\n\nTo enable location:\n\n1. Tap address bar\n2. Tap 🔒 lock icon\n3. Enable Location\n4. Refresh page`, "error");
             }
             else if (res.status === 'position_unavailable') {
-                showPopup(`⚠️ Location Unavailable\n\nCouldn't get your location.\nPlease check your GPS/Network.`, "warning");
+                showPopup(`⚠️ Location Unavailable\n\nPlease:\n• Turn on GPS\n• Check internet connection\n• Try again`, "warning");
             }
             else if (res.status === 'timeout') {
-                showPopup(`⏱️ Location Request Timeout\n\nTaking too long to get location.\nPlease try again.`, "warning");
+                showPopup(`⏱️ Location Request Timeout\n\nTaking too long.\nPlease try again.`, "warning");
             }
             else {
-                showPopup(`⚠️ Location Error\n\nCouldn't verify your location.\nPlease try again later.`, "warning");
+                showPopup(`⚠️ Location Error\n\nCouldn't verify location.\nPlease try again later.`, "warning");
             }
 
-            // Agar logged in nahi hai to form dikha
+            // Form dikha if not logged in
             if (!userManager.isLoggedIn()) {
-                setTimeout(() => {
-                    showAccountModal();
-                }, 2000);
+                setTimeout(() => showAccountModal(), 2000);
             }
 
         } catch (err) {
@@ -483,6 +539,24 @@ async function showWelcomeMessage() {
             showPopup("❌ Something went wrong!\n\nPlease refresh and try again.", "error");
         }
     });
+}
+
+// ✅ CHECK IF LOCATION PERMISSION ALREADY DENIED
+async function checkLocationPermission() {
+    try {
+        // Modern browsers - Permissions API
+        if (navigator.permissions && navigator.permissions.query) {
+            const result = await navigator.permissions.query({ name: 'geolocation' });
+            console.log("📍 Permission status:", result.state);
+            return result.state; // 'granted', 'denied', 'prompt'
+        }
+
+        // Fallback - assume prompt if API not available
+        return 'prompt';
+    } catch (e) {
+        console.warn("⚠️ Permissions API not available:", e);
+        return 'prompt';
+    }
 }
 
 // =================== WHATSAPP ===================
@@ -802,9 +876,9 @@ window.addEventListener("load", () => {
         initHeroSlider();
         createFloatingButtons();
         createFloatingRegisterButton();
+        createLocationButton(); // ✅ YE ADD KARO
         updateFloatingButtons();
 
-        // Har baar welcome message dikhao
         showWelcomeMessage();
     }, 800);
 });
