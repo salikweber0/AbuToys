@@ -479,30 +479,25 @@ async function showWelcomeMessage() {
     console.log("👋 Showing welcome for:", userName);
 
     showCustomWelcomePopup(userName, async () => {
-        // ✅ FIRST - Check if permission already denied
+        // ✅ Check permission status first
         const permissionStatus = await checkLocationPermission();
-
+        
         if (permissionStatus === 'denied') {
             showPopup(`⚠️ Location Access Blocked!\n\nPlease enable location manually:\n\n1. Click 🔒 lock icon in browser\n2. Find "Location" permission\n3. Change to "Allow"\n4. Refresh the page`, "error");
-
-            // User ko form dikha if not logged in
+            
             if (!userManager.isLoggedIn()) {
                 setTimeout(() => showAccountModal(), 2000);
             }
             return;
         }
 
-        // Loading popup dikha
         showPopup("🌍 Getting your location...\n\nPlease allow location access when browser asks.", "loading");
-
-        // Thoda wait kar
         await new Promise(resolve => setTimeout(resolve, 500));
 
         try {
             console.log("🎯 Starting location check...");
             const res = await locationManager.checkLocationAndSetStatus();
 
-            // Loading popup remove kar
             const loadingPopup = document.getElementById("custom-popup");
             if (loadingPopup) loadingPopup.remove();
 
@@ -515,19 +510,18 @@ async function showWelcomeMessage() {
                 showPopup(`⚠️ Sorry!\n\nYou are ${res.distance.toFixed(2)} km away.\n\nWe deliver within ${DELIVERY_RANGE_KM} km only.`, "warning");
             }
             else if (res.status === 'permission_denied') {
-                showPopup(`❌ Location Permission Denied\n\nTo enable location:\n\n1. Tap address bar\n2. Tap 🔒 lock icon\n3. Enable Location\n4. Refresh page`, "error");
+                showPopup(`❌ Location Permission Denied\n\nTo enable:\n\n1. Tap address bar\n2. Tap 🔒 icon\n3. Enable Location\n4. Refresh`, "error");
             }
             else if (res.status === 'position_unavailable') {
-                showPopup(`⚠️ Location Unavailable\n\nPlease:\n• Turn on GPS\n• Check internet connection\n• Try again`, "warning");
+                showPopup(`⚠️ Location Unavailable\n\n• Turn on GPS\n• Check internet\n• Try again`, "warning");
             }
             else if (res.status === 'timeout') {
-                showPopup(`⏱️ Location Request Timeout\n\nTaking too long.\nPlease try again.`, "warning");
+                showPopup(`⏱️ Timeout\n\nTaking too long.\nTry again.`, "warning");
             }
             else {
-                showPopup(`⚠️ Location Error\n\nCouldn't verify location.\nPlease try again later.`, "warning");
+                showPopup(`⚠️ Location Error\n\nTry again later.`, "warning");
             }
 
-            // Form dikha if not logged in
             if (!userManager.isLoggedIn()) {
                 setTimeout(() => showAccountModal(), 2000);
             }
@@ -536,7 +530,7 @@ async function showWelcomeMessage() {
             console.error("❌ Unexpected error:", err);
             const loadingPopup = document.getElementById("custom-popup");
             if (loadingPopup) loadingPopup.remove();
-            showPopup("❌ Something went wrong!\n\nPlease refresh and try again.", "error");
+            showPopup("❌ Something went wrong!\n\nRefresh and try again.", "error");
         }
     });
 }
