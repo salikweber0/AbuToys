@@ -207,49 +207,15 @@ class LocationManager {
         return -1;
     }
 
-    async checkLocationAndSetStatus() {
-    try {
-        showPopup("🌍 Getting your location...", "loading");
-        
-        const location = await this.getCurrentLocation();
-        const distance = this.calculateDistance(location.lat, location.lng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
-        const deliveryCharge = this.calculateDeliveryCharge(distance);
-
-        this.userLocation = location;
-        this.distance = distance;
-        this.deliveryCharge = deliveryCharge;
-
-        localStorage.setItem("abutoys_user_location", JSON.stringify(location));
-        localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
-        localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-
-        if (deliveryCharge !== -1) {
-            this.locationStatus = "in_range";
-            localStorage.setItem("abutoys_location_status", "in_range");
-        } else {
-            this.locationStatus = "out_of_range";
-            localStorage.setItem("abutoys_location_status", "out_of_range");
-        }
-
-        document.getElementById("custom-popup")?.remove();
-
-        return { location, distance, status: this.locationStatus, deliveryCharge };
-
-    } catch (error) {
-        document.getElementById("custom-popup")?.remove();
-
-        if (error.code === 1) {
-            this.locationStatus = "permission_denied";
-            localStorage.setItem("abutoys_location_status", "permission_denied");
-        } else {
-            this.locationStatus = "unknown";
-            localStorage.setItem("abutoys_location_status", "unknown");
-        }
-
-        return { location: null, distance: null, status: this.locationStatus, error };
+    checkLocationAvailability() {
+    if (!navigator.permissions) {
+        return "prompt"; // Older browsers
     }
-}
 
+    return navigator.permissions.query({ name: "geolocation" })
+        .then(res => res.state)
+        .catch(() => "prompt");
+}
 
     getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
