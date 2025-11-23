@@ -1,3 +1,52 @@
+function showLocationLoader() {
+    const old = document.getElementById("location-loader");
+    if (old) old.remove();
+
+    const wrap = document.createElement("div");
+    wrap.id = "location-loader";
+    wrap.style.cssText = `
+        position: fixed;
+        top:0; left:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.7);
+        display:flex; align-items:center; justify-content:center;
+        z-index:10002;
+    `;
+
+    wrap.innerHTML = `
+        <div style="text-align:center;">
+            <div style="
+                border: 6px solid #fff;
+                border-top: 6px solid #4ECDC4;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: auto;
+            "></div>
+            <p style="color:white; margin-top:15px; font-size:1.1rem;">
+                Verifying your location…
+            </p>
+        </div>
+    `;
+
+    document.body.appendChild(wrap);
+}
+
+function hideLocationLoader() {
+    const el = document.getElementById("location-loader");
+    if (el) el.remove();
+}
+
+// Add CSS (spinner animation)
+const style = document.createElement("style");
+style.textContent = `
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}`;
+document.head.appendChild(style);
+
+
 // =================== CLEAR INVALID DATA ===================
 try {
     const storedUser = localStorage.getItem("abutoys_current_user");
@@ -510,7 +559,11 @@ function showCustomWelcomePopup(userName, onOKClick) {
     document.body.appendChild(popup);
     document.getElementById("welcome-ok-btn").addEventListener("click", () => {
         popup.remove();
-        if (onOKClick) onOKClick();
+showLocationLoader();   // 🔥 NEW LINE (animation starts)
+setTimeout(() => {
+    if (onOKClick) onOKClick();
+}, 300); // small delay so loader shows smoothly
+
     });
 }
 
@@ -534,6 +587,8 @@ async function showWelcomeMessage() {
 
     showCustomWelcomePopup(userName, async () => {
         const res = await locationManager.checkLocationAndSetStatus();
+        hideLocationLoader(); // 🔥 Stop animation here
+
 
         // Result ke base pe message dikhao
         if (res.status === 'in_range') {
@@ -1252,3 +1307,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeDeleteAccountIcon();
     checkIfAccountDeleted();
 });
+
+// Allow using product page order history from home page
+function openOrderHistoryFromHome() {
+    window.location.href = "toyproduct.html?orders=1";
+}
