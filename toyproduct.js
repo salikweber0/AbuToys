@@ -542,9 +542,6 @@ class OrderManager {
             
             // ✅ BEAUTIFUL CONFIRMATION CARD DIKHAO
             this.showOrderConfirmationCard(orderData);
-            
-            // ✅ BEAUTIFUL CONFIRMATION CARD DIKHAO
-            this.showOrderConfirmationCard(orderData);
         } else {
             this.showPopup('❌ Order failed! Try again.', 'error');
         }
@@ -623,9 +620,11 @@ showOrderConfirmationCard(orderData) {
     const confirmBackdrop = document.getElementById('confirmation-backdrop');
     
     // Button click
-    closeBtn.addEventListener('click', function() {
-        confirmBackdrop.remove();
-    });
+closeBtn.addEventListener('click', function() {
+    const backdrop = document.getElementById('confirmation-backdrop');
+    if (backdrop) backdrop.remove();
+});
+
     
     // Backdrop click
     confirmBackdrop.addEventListener('click', function(e) {
