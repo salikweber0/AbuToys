@@ -211,70 +211,45 @@ class LocationManager {
     try {
         showPopup("🌍 Getting your location...", "loading");
         
-        // Seedha location try kar - permission check mat kar pehle
         const location = await this.getCurrentLocation();
-
-        // Distance calculate karo
-        const distance = this.calculateDistance(
-            location.lat,
-            location.lng,
-            SHOP_LOCATION.lat,
-            SHOP_LOCATION.lng
-        );
-
-        // Delivery charge lelo
+        const distance = this.calculateDistance(location.lat, location.lng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
         const deliveryCharge = this.calculateDeliveryCharge(distance);
 
-        // Store karo values
         this.userLocation = location;
         this.distance = distance;
         this.deliveryCharge = deliveryCharge;
 
-        // LocalStorage mein save kar
-        try {
-            localStorage.setItem("abutoys_user_location", JSON.stringify(location));
-            localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
-            localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-        } catch (e) { }
+        localStorage.setItem("abutoys_user_location", JSON.stringify(location));
+        localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
+        localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
 
-        // Status set kar
         if (deliveryCharge !== -1) {
             this.locationStatus = "in_range";
-            try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
+            localStorage.setItem("abutoys_location_status", "in_range");
         } else {
             this.locationStatus = "out_of_range";
-            try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
+            localStorage.setItem("abutoys_location_status", "out_of_range");
         }
 
-        console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
-        
-        // Loading popup remove kar
-        const loadingPopup = document.getElementById("custom-popup");
-        if (loadingPopup) loadingPopup.remove();
-        
+        document.getElementById("custom-popup")?.remove();
+
         return { location, distance, status: this.locationStatus, deliveryCharge };
 
     } catch (error) {
-        console.warn("❌ Location error:", error);
-        
-        // Loading popup remove kar
-        const loadingPopup = document.getElementById("custom-popup");
-        if (loadingPopup) loadingPopup.remove();
-        
-        // Error code check kar
+        document.getElementById("custom-popup")?.remove();
+
         if (error.code === 1) {
-            // Permission denied
             this.locationStatus = "permission_denied";
-            try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
+            localStorage.setItem("abutoys_location_status", "permission_denied");
         } else {
-            // Other errors
             this.locationStatus = "unknown";
-            try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
+            localStorage.setItem("abutoys_location_status", "unknown");
         }
-        
+
         return { location: null, distance: null, status: this.locationStatus, error };
     }
 }
+
 
     getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
