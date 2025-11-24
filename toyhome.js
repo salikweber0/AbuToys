@@ -127,19 +127,84 @@ async function verifyUserLocation() {
     }
 }
 
+// ------------------ LOCATION VERIFICATION HELPERS (FIXED) ------------------
 async function startLocationVerification() {
-    const result = await verifyUserLocation();
+    // start and return the verification result so callers can use it
+    try {
+        const result = await verifyUserLocation();
 
-    if (result.status === "in_range") {
-        showPopup(`✅ Location Verified!\nDistance: ${result.distance.toFixed(2)} km\nCharge: ₹${result.charge}`, "success");
-    }
-    else if (result.status === "out_of_range") {
-        showPopup(`❌ You are ${Math.round(result.distance)} km away.\nDelivery not available!`, "error");
-    }
-    else {
-        showPopup("⚠️ Cannot detect location.\nPlease enable GPS & internet.", "warning");
+        // Normalize statuses (verifyUserLocation returns in_range / out_of_range / unknown)
+        if (result && result.status === "in_range") {
+            showPopup(`✅ Location Verified!\nDistance: ${Number(result.distance).toFixed(2)} km\nCharge: ₹${result.charge}`, "success");
+        } else if (result && result.status === "out_of_range") {
+            showPopup(`❌ You are ${Math.round(result.distance)} km away.\nDelivery not available!`, "error");
+        } else if (result && result.status === "permission_denied") {
+            showPopup("⚠️ Location Access Denied! Please enable location permissions.", "error");
+        } else {
+            showPopup("⚠️ Cannot detect location.\nPlease enable GPS & internet.", "warning");
+        }
+
+        // always return the raw result object so the caller can make decisions
+        return result;
+    } catch (err) {
+        // In case anything throws, ensure loader is hidden and return unknown
+        hideLocationLoader();
+        localStorage.setItem("abutoys_location_status", "unknown");
+        return { status: "unknown" };
     }
 }
+
+async function showWelcomeMessage() {
+    const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
+
+    if (!isFirstVisit) {
+        console.log("ℹ️ Not first visit, skipping welcome");
+        return;
+    }
+
+    sessionStorage.setItem("abutoys_welcomed", "true");
+
+    let userName = "Guest";
+    if (userManager.isLoggedIn()) {
+        const user = userManager.getUser(userManager.currentUser);
+        if (user) userName = user.fullName;
+    }
+
+    console.log("👋 Showing welcome for:", userName);
+
+    showCustomWelcomePopup(userName, async () => {
+        // show loader immediately so user sees something while we ask for permission
+        showLocationLoader();
+
+        // get the verification result (startLocationVerification now RETURNS it)
+        const res = await startLocationVerification();
+
+        // ensure loader hidden (verifyUserLocation also hides, but double-safety is fine)
+        hideLocationLoader();
+
+        // Use normalized keys returned by verifyUserLocation
+        if (res && res.status === 'in_range') {
+            showPopup(`✅ Location Verified!\n\nDistance: ${Number(res.distance).toFixed(2)} km\nDelivery Charge: ₹${res.charge}`, "success");
+        }
+        else if (res && res.status === 'out_of_range') {
+            showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
+        }
+        else if (res && res.status === 'permission_denied') {
+            showPopup(`⚠️ Location Access Denied!\n\nPlease enable location in browser settings:\n1. Click lock icon 🔒 in address bar\n2. Allow location access\n3. Refresh page`, "error");
+        }
+        else {
+            showPopup(`⚠️ Cannot detect location\n\nPlease check your GPS/internet`, "warning");
+        }
+
+        // If not logged in, show signup modal after a small delay
+        if (!userManager.isLoggedIn()) {
+            setTimeout(() => {
+                showAccountModal();
+            }, 1500);
+        }
+    });
+}
+
 
 /* ========== CALCULATE DISTANCE ========== */
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -390,51 +455,51 @@ function showCustomWelcomePopup(userName, onOKClick) {
     });
 }
 
-async function showWelcomeMessage() {
-    const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
+// async function showWelcomeMessage() {
+//     const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
 
-    if (!isFirstVisit) {
-        console.log("ℹ️ Not first visit, skipping welcome");
-        return;
-    }
+//     if (!isFirstVisit) {
+//         console.log("ℹ️ Not first visit, skipping welcome");
+//         return;
+//     }
 
-    sessionStorage.setItem("abutoys_welcomed", "true");
+//     sessionStorage.setItem("abutoys_welcomed", "true");
 
-    let userName = "Guest";
-    if (userManager.isLoggedIn()) {
-        const user = userManager.getUser(userManager.currentUser);
-        if (user) userName = user.fullName;
-    }
+//     let userName = "Guest";
+//     if (userManager.isLoggedIn()) {
+//         const user = userManager.getUser(userManager.currentUser);
+//         if (user) userName = user.fullName;
+//     }
 
-    console.log("👋 Showing welcome for:", userName);
+//     console.log("👋 Showing welcome for:", userName);
 
-    showCustomWelcomePopup(userName, async () => {
-        const res = await startLocationVerification();
-        hideLocationLoader(); // 🔥 Stop animation here
+//     showCustomWelcomePopup(userName, async () => {
+//         const res = await startLocationVerification();
+//         hideLocationLoader(); // 🔥 Stop animation here
 
 
-        // Result ke base pe message dikhao
-        if (res.status === 'in_range') {
-            showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
-        }
-        else if (res.status === 'out_of_range') {
-            showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
-        }
-        else if (res.status === 'permission_denied') {
-            showPopup(`⚠️ Location Access Denied!\n\nPlease enable location in browser settings:\n1. Click lock icon 🔒 in address bar\n2. Allow location access\n3. Refresh page`, "error");
-        }
-        else {
-            showPopup(`⚠️ Cannot detect location\n\nPlease check your GPS/internet`, "warning");
-        }
+//         // Result ke base pe message dikhao
+//         if (res.status === 'in_range') {
+//             showPopup(`✅ Location Verified!\n\nDelivery Charge: Rs.${res.deliveryCharge}\n\nYou can purchase items!`, "success");
+//         }
+//         else if (res.status === 'out_of_range') {
+//             showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
+//         }
+//         else if (res.status === 'permission_denied') {
+//             showPopup(`⚠️ Location Access Denied!\n\nPlease enable location in browser settings:\n1. Click lock icon 🔒 in address bar\n2. Allow location access\n3. Refresh page`, "error");
+//         }
+//         else {
+//             showPopup(`⚠️ Cannot detect location\n\nPlease check your GPS/internet`, "warning");
+//         }
 
-        // Sirf agar logged in nahi hai to form dikhao
-        if (!userManager.isLoggedIn()) {
-            setTimeout(() => {
-                showAccountModal();
-            }, 2000);
-        }
-    });
-}
+//         // Sirf agar logged in nahi hai to form dikhao
+//         if (!userManager.isLoggedIn()) {
+//             setTimeout(() => {
+//                 showAccountModal();
+//             }, 2000);
+//         }
+//     });
+// }
 
 // =================== WHATSAPP ===================
 function openWhatsApp() {
