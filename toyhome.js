@@ -68,293 +68,109 @@ const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwOM8-Q2SXuz
 
 console.log("🚀 AbuToys Script Loaded");
 
-// =================== UPDATED LOCATION MANAGER ===================
-class LocationManager {
-    constructor() {
-        try {
-            this.userLocation = JSON.parse(localStorage.getItem("abutoys_user_location") || "null");
-            this.locationStatus = localStorage.getItem("abutoys_location_status") || "unknown";
-        } catch (e) {
-            this.userLocation = null;
-            this.locationStatus = "unknown";
-        }
-        this.distance = null;
-        this.deliveryCharge = null;
-    }
+/* ================= NEW SUPER-STABLE LOCATION SYSTEM ================= */
 
-    calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const toRad = deg => deg * (Math.PI / 180);
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
+async function verifyUserLocation() {
+    showLocationLoader();
 
-    calculateDeliveryCharge(distance) {
-        // 30 km ke bahar = No delivery
-        if (distance > 20) return -1;
-
-        // 0 km = free delivery
-        if (distance <= 0) return 0;
-
-        // Range-based logic
-        // 0 - 1 km = Free (0 rs)
-        if (distance <= 1) return 0;
-
-        // 1 - 2 km = 20 rs
-        else if (distance <= 2) return 60;
-
-        // 2 - 3 km = 30 rs
-        else if (distance <= 3) return 70;
-
-        // 3 - 4 km = 40 rs
-        else if (distance <= 4) return 80;
-
-        // 4 - 5 km = 50 rs
-        else if (distance <= 5) return 120;
-
-        // 5 - 6 km = 60 rs
-        else if (distance <= 6) return 140;
-
-        // 6 - 7 km = 70 rs
-        else if (distance <= 7) return 160;
-
-        // 7 - 8 km = 80 rs
-        else if (distance <= 8) return 180;
-
-        // 8 - 9 km = 90 rs
-        else if (distance <= 9) return 210;
-
-        // 9 - 10 km = 100 rs
-        else if (distance <= 10) return 230;
-
-        // 10 - 11 km = 110 rs
-        else if (distance <= 11) return 250;
-
-        // 11 - 12 km = 120 rs
-        else if (distance <= 12) return 270;
-
-        // 12 - 13 km = 130 rs
-        else if (distance <= 13) return 290;
-
-        // 13 - 14 km = 140 rs
-        else if (distance <= 14) return 310;
-
-        // 14 - 15 km = 150 rs
-        else if (distance <= 15) return 330;
-
-        // 15 - 16 km = 160 rs
-        else if (distance <= 16) return 350;
-
-        // 16 - 17 km = 170 rs
-        else if (distance <= 17) return 370;
-
-        // 17 - 18 km = 180 rs
-        else if (distance <= 18) return 390;
-
-        // 18 - 19 km = 190 rs
-        else if (distance <= 19) return 410;
-
-        // 19 - 20 km = 200 rs
-        else if (distance <= 20) return 430;
-
-        // 20 - 21 km = 210 rs
-        // else if (distance <= 21) return 450;
-
-        // 21 - 22 km = 220 rs
-        // else if (distance <= 22) return 230;
-
-        // 22 - 23 km = 230 rs
-        // else if (distance <= 23) return 240;
-
-        // 23 - 24 km = 240 rs
-        // else if (distance <= 24) return 250;
-
-        // 24 - 25 km = 250 rs
-        // else if (distance <= 25) return 260;
-
-        // 25 - 26 km = 260 rs
-        // else if (distance <= 26) return 270;
-
-        // 26 - 27 km = 270 rs
-        // else if (distance <= 27) return 280;
-
-        // 27 - 28 km = 280 rs
-        // else if (distance <= 28) return 290;
-
-        // 28 - 29 km = 290 rs
-        // else if (distance <= 29) return 300;
-
-        // 29 - 30 km = 300 rs
-        // else if (distance <= 30) return 310;
-
-        // 30 - 31 km = 310 rs
-        // else if (distance <= 31) return 320;
-
-        // 31 - 32 km = 320 rs
-        // else if (distance <= 32) return 330;
-
-        // 32 - 33 km = 330 rs
-        // else if (distance <= 33) return 340;
-
-        // 33 - 34 km = 340 rs
-        // else if (distance <= 34) return 350;
-
-        // 34 - 35 km = 350 rs
-        // else if (distance <= 35) return 360;
-
-        // 35 - 36 km = 360 rs
-        // else if (distance <= 36) return 370;
-
-        // 36 - 37 km = 370 rs
-        // else if (distance <= 37) return 380;
-
-        // 37 - 38 km = 380 rs
-        // else if (distance <= 38) return 390;
-
-        // 38 - 39 km = 390 rs
-        // else if (distance <= 39) return 400;
-
-        // 39 - 40 km = 400 rs
-        // else if (distance <= 40) return 410;
-
-        // 40 - 41 km = 410 rs
-        // else if (distance <= 41) return 420;
-
-        // 41 - 42 km = 420 rs
-        // else if (distance <= 42) return 430;
-
-        // 42 - 43 km = 430 rs
-        // else if (distance <= 43) return 440;
-
-        // 43 - 44 km = 440 rs
-        // else if (distance <= 44) return 450;
-
-        // 44 - 45 km = 450 rs
-        // else if (distance <= 45) return 460;
-
-        // 45 - 46 km = 460 rs
-        // else if (distance <= 46) return 470;
-
-        // 46 - 47 km = 470 rs
-        // else if (distance <= 47) return 480;
-
-        // 47 - 48 km = 480 rs
-        // else if (distance <= 48) return 490;
-
-        // 48 - 49 km = 490 rs
-        // else if (distance <= 49) return 500;
-
-        // 49 - 50 km = 500 rs
-        // else if (distance <= 50) return 510;
-
-        // Out of range
-        return -1;
-    }
-
-    checkLocationAvailability() {
-        if (!navigator.permissions) {
-            return "prompt"; // Older browsers
-        }
-
-        return navigator.permissions.query({ name: "geolocation" })
-            .then(res => res.state)
-            .catch(() => "prompt");
-    }
-
-    getCurrentLocation() {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject({ code: 0, message: "Geolocation not supported" });
-            return;
-        }
-
-        // ⚠️ SPECIAL FIX FOR WEBVIEW
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            },
-            err => {
-                // WebView often fails first attempt → retry after 1s
-                setTimeout(() => {
-                    navigator.geolocation.getCurrentPosition(
-                        pos2 => resolve({ lat: pos2.coords.latitude, lng: pos2.coords.longitude }),
-                        err2 => reject(err2),
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                    );
-                }, 1200);
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
-    });
-}
-
-
-    async checkLocationAndSetStatus() {
-        try {
-            // Pehle check kar ki permission denied to nahi
-            const permissionStatus = await this.checkLocationAvailability();
-
-            if (permissionStatus === 'denied') {
-                this.locationStatus = "permission_denied";
-                try { localStorage.setItem("abutoys_location_status", "permission_denied"); } catch (e) { }
-                return { location: null, distance: null, status: this.locationStatus };
+    try {
+        const coords = await new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject("NO_GEO");
+                return;
             }
 
-            // Location lelo
-            const location = await this.getCurrentLocation();
-
-            // Distance calculate karo
-            const distance = this.calculateDistance(
-                location.lat,
-                location.lng,
-                SHOP_LOCATION.lat,
-                SHOP_LOCATION.lng
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve(pos.coords),
+                err => {
+                    // WebView slow → retry once
+                    setTimeout(() => {
+                        navigator.geolocation.getCurrentPosition(
+                            pos2 => resolve(pos2.coords),
+                            err2 => reject("DENIED_OR_FAIL"),
+                            { enableHighAccuracy: true, timeout: 15000 }
+                        );
+                    }, 1000);
+                },
+                { enableHighAccuracy: true, timeout: 15000 }
             );
+        });
 
-            // Delivery charge lelo
-            const deliveryCharge = this.calculateDeliveryCharge(distance);
+        const userLat = coords.latitude;
+        const userLng = coords.longitude;
 
-            // Store karo values
-            this.userLocation = location;
-            this.distance = distance;
-            this.deliveryCharge = deliveryCharge;
+        // Distance calculate
+        const dist = calculateDistance(userLat, userLng, 23.0370322, 72.5822496);
 
-            // LocalStorage mein save kar
-            try {
-                localStorage.setItem("abutoys_user_location", JSON.stringify(location));
-                localStorage.setItem("abutoys_user_distance", distance.toFixed(2));
-                localStorage.setItem("abutoys_delivery_charge", deliveryCharge.toString());
-            } catch (e) { }
+        // Status save
+        localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
+        localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
 
-            // Status set kar - agar charge -1 nahi hai to in_range
-            if (deliveryCharge !== -1) {
-                this.locationStatus = "in_range";
-                try { localStorage.setItem("abutoys_location_status", "in_range"); } catch (e) { }
-            } else {
-                this.locationStatus = "out_of_range";
-                try { localStorage.setItem("abutoys_location_status", "out_of_range"); } catch (e) { }
-            }
+        let charge = getDeliveryCharge(dist);
+        localStorage.setItem("abutoys_delivery_charge", charge);
 
-            console.log("✅ Location Status:", this.locationStatus, "Distance:", distance.toFixed(2), "km, Charge: Rs." + deliveryCharge);
-            return { location, distance, status: this.locationStatus, deliveryCharge };
-
-        } catch (error) {
-            console.warn("❌ Location error:", error);
-            this.locationStatus = "unknown";
-            try { localStorage.setItem("abutoys_location_status", "unknown"); } catch (e) { }
-            return { location: null, distance: null, status: this.locationStatus, error };
+        if (charge === -1) {
+            localStorage.setItem("abutoys_location_status", "out_of_range");
+            hideLocationLoader();
+            return { status: "out_of_range", distance: dist, charge };
         }
-    }
 
-    getLocationStatus() {
-        return this.locationStatus;
+        localStorage.setItem("abutoys_location_status", "in_range");
+        hideLocationLoader();
+        return { status: "in_range", distance: dist, charge };
+
+    } catch (e) {
+        hideLocationLoader();
+        localStorage.setItem("abutoys_location_status", "unknown");
+
+        return { status: "unknown" };
     }
 }
+
+async function startLocationVerification() {
+    const result = await verifyUserLocation();
+
+    if (result.status === "in_range") {
+        showPopup(`✅ Location Verified!\nDistance: ${result.distance.toFixed(2)} km\nCharge: ₹${result.charge}`, "success");
+    }
+    else if (result.status === "out_of_range") {
+        showPopup(`❌ You are ${Math.round(result.distance)} km away.\nDelivery not available!`, "error");
+    }
+    else {
+        showPopup("⚠️ Cannot detect location.\nPlease enable GPS & internet.", "warning");
+    }
+}
+
+/* ========== CALCULATE DISTANCE ========== */
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI/180;
+    const dLon = (lon2 - lon1) * Math.PI/180;
+    const a =
+        Math.sin(dLat/2)*Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI/180) *
+        Math.cos(lat2 * Math.PI/180) *
+        Math.sin(dLon/2)*Math.sin(dLon/2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* ========== DELIVERY CHARGE ========== */
+function getDeliveryCharge(d) {
+    if (d > 20) return -1;
+    if (d <= 1) return 0;
+    if (d <= 2) return 60;
+    if (d <= 3) return 70;
+    if (d <= 4) return 80;
+    if (d <= 5) return 120;
+    if (d <= 6) return 140;
+    if (d <= 7) return 160;
+    if (d <= 8) return 180;
+    if (d <= 9) return 210;
+    if (d <= 10) return 230;
+    return 430;
+}
+
 
 // =================== USER MANAGER ===================
 class UserManager {
@@ -494,7 +310,6 @@ class UserManager {
 }
 
 // =================== INITIALIZE ===================
-const locationManager = new LocationManager();
 const userManager = new UserManager();
 
 // =================== POPUP SYSTEM ===================
@@ -594,7 +409,7 @@ async function showWelcomeMessage() {
     console.log("👋 Showing welcome for:", userName);
 
     showCustomWelcomePopup(userName, async () => {
-        const res = await locationManager.checkLocationAndSetStatus();
+        const res = await startLocationVerification();
         hideLocationLoader(); // 🔥 Stop animation here
 
 
@@ -1451,7 +1266,7 @@ function openLocationPopup() {
         btn.addEventListener("click", async () => {
             popup.remove();
             showLocationLoader();
-            const res = await locationManager.checkLocationAndSetStatus();
+            const res = await startLocationVerification();
             hideLocationLoader();
 
             if (res.status === "in_range") {
