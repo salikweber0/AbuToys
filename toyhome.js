@@ -68,105 +68,162 @@ const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwOM8-Q2SXuz
 
 console.log("🚀 AbuToys Script Loaded");
 
+// ---------- HELPER: Detect if inside an in-app WebView ----------
+function isInWebView() {
+    const ua = navigator.userAgent || "";
+    // crude but works in many cases
+    const standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    if (standalone) return false;
+    // common webview signals
+    return /wv|WebView|FBAN|FBAV|Instagram|Line|FB_IAB|Twitter|Pinterest/i.test(ua);
+}
+
+// ---------- WRAPPER: Try geolocation, if denied or WebView show fallback ----------
+async function verifyOrFallback() {
+    // show loader quickly
+    try { showLocationLoader(); } catch(e){console.warn("no loader fn", e);}
+
+    // If we're likely inside a WebView, skip native geo attempts and show fallback hint
+    if (isInWebView()) {
+        console.warn("Running inside WebView, geolocation often blocked.");
+        hideLocationLoader();
+        showLocationDeniedInstructions(true); // true => show WebView specific hint
+        return { status: "permission_denied", fallback: true };
+    }
+
+    // Try the robust debug verifier first (it returns normalized statuses)
+    let res;
+    if (typeof verifyUserLocation_debug === "function") {
+        res = await verifyUserLocation_debug();
+    } else if (typeof verifyUserLocation === "function") {
+        res = await verifyUserLocation();
+    } else {
+        // fallback if neither present
+        try { hideLocationLoader(); } catch(e){}
+        showPopup("⚠️ Location feature temporarily unavailable", "warning");
+        return { status: "unknown" };
+    }
+
+    if (res && res.status === "in_range") {
+        // success, UI will handle it
+        return res;
+    }
+
+    // denied or unknown -> show instructions and fallback UI
+    hideLocationLoader();
+    if (res && res.status === "permission_denied") {
+        showLocationDeniedInstructions(false); // false => browser-specific instructions
+    } else {
+        // unknown/out_of_range
+        showManualLocationModal();
+    }
+    return res || { status: "unknown" };
+}
+
+// ---------- UI: Show instructions when permission denied ----------
+function showLocationDeniedInstructions(isWebView) {
+    const msg = isWebView
+      ? `It looks like you're inside an app's browser (in-app). Geolocation is often disabled there.\n\nOpen this link in Chrome/Safari (tap the three dots → Open in browser) and try again.`
+      : `Location permission is blocked for this site.\n\nChrome: tap lock icon → Site settings → Location → Allow.\n\nAfter allowing, refresh the page.`;
+    showPopup(msg, "error");
+}
+
+// ---------- UI: Manual location modal (simple) ----------
+function showManualLocationModal() {
+    // create a simple modal overlay if not exists
+    if (document.getElementById("abutoys-manual-loc-modal")) {
+        document.getElementById("abutoys-manual-loc-modal").style.display = "flex";
+        return;
+    }
+
+    const modal = document.createElement("div");
+    modal.id = "abutoys-manual-loc-modal";
+    modal.style = `
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,0.6);z-index:9999;padding:16px;
+    `;
+    modal.innerHTML = `
+      <div style="width:100%;max-width:420px;background:#fff;border-radius:10px;padding:18px;text-align:left;">
+        <h3 style="margin:0 0 8px">Enter your pincode or location</h3>
+        <p style="margin:0 0 12px;font-size:13px;color:#333">If browser blocked location, enter your pincode or city so we can check delivery availability.</p>
+        <input id="abutoys_manual_pincode" placeholder="Pincode or city name" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px" />
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="abutoys_manual_cancel" style="padding:8px 12px;border-radius:6px;background:#eee;border:0">Cancel</button>
+          <button id="abutoys_manual_submit" style="padding:8px 12px;border-radius:6px;background:#007bff;color:#fff;border:0">Submit</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById("abutoys_manual_cancel").onclick = () => {
+        modal.style.display = "none";
+    };
+    document.getElementById("abutoys_manual_submit").onclick = () => {
+        const val = (document.getElementById("abutoys_manual_pincode").value || "").trim();
+        if (!val) {
+            alert("Please enter pincode or city.");
+            return;
+        }
+        // handle manual value: try to geocode or use pincode mapping
+        handleManualLocationValue(val);
+        modal.style.display = "none";
+    };
+}
+
+// ---------- Handler: what to do when user enters manual fallback ----------
+async function handleManualLocationValue(val) {
+    // naive: if numeric assume pincode -> map to approximate lat/lng if you have dataset
+    // For now, just store the manual entry and continue the flow as 'manual' so user can place order
+    localStorage.setItem("abutoys_manual_location", val);
+    localStorage.setItem("abutoys_location_status", "manual");
+    showPopup("Manual location saved. You can continue ordering.", "success");
+
+    // continue the usual UI flow (e.g., show account modal or products)
+    if (!userManager.isLoggedIn()) {
+        setTimeout(() => showAccountModal(), 700);
+    } else {
+        // run whatever success handler you have
+        // e.g., loadProductsForLocation()
+        if (typeof loadProductsForLocation === "function") loadProductsForLocation();
+    }
+}
+
+
 /* ================= NEW SUPER-STABLE LOCATION SYSTEM ================= */
 
-// ---------- REPLACEMENT: verifyUserLocation (more robust, uses Permissions API) ----------
 async function verifyUserLocation() {
-    // show loader immediately
     showLocationLoader();
 
-    // helper to hide loader and return normalized result
-    const finish = (obj) => {
-        try { hideLocationLoader(); } catch (e) { console.warn("hide loader error", e); }
-        // persist for UI/other code if needed
-        if (obj && obj.status) localStorage.setItem("abutoys_location_status", obj.status);
-        return obj;
-    };
-
-    // If geolocation API not available (insecure origin or old browser)
-    if (!navigator.geolocation) {
-        console.warn("No geolocation API");
-        return finish({ status: "no_geo" });
-    }
-
-    // If Permissions API available, check the current state first
-    if (navigator.permissions && navigator.permissions.query) {
-        try {
-            const perm = await navigator.permissions.query({ name: "geolocation" });
-            console.log("Geolocation permission state:", perm.state);
-            if (perm.state === "denied") {
-                // User has denied permanently — tell them exactly how to re-enable
-                return finish({ status: "permission_denied" });
+    try {
+        const coords = await new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject("NO_GEO");
+                return;
             }
-            // if 'granted' -> proceed; if 'prompt' -> we'll request
-        } catch (err) {
-            console.warn("Permissions API error (non-fatal):", err);
-            // continue to request geolocation (some browsers throw)
-        }
-    }
-
-    // Promise wrapper for getCurrentPosition with its own timeout
-    const getPosition = (opts = {}) => {
-        return new Promise((resolve, reject) => {
-            let done = false;
-            const timer = setTimeout(() => {
-                if (done) return;
-                done = true;
-                reject({ code: 3, message: "Position timeout" }); // mimic PositionError.code 3
-            }, opts._timeout || 15000); // default 15s
 
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    if (done) return;
-                    done = true;
-                    clearTimeout(timer);
-                    resolve(pos.coords);
+                pos => resolve(pos.coords),
+                err => {
+                    // WebView slow → retry once
+                    setTimeout(() => {
+                        navigator.geolocation.getCurrentPosition(
+                            pos2 => resolve(pos2.coords),
+                            err2 => reject("DENIED_OR_FAIL"),
+                            { enableHighAccuracy: true, timeout: 15000 }
+                        );
+                    }, 1000);
                 },
-                (err) => {
-                    if (done) return;
-                    done = true;
-                    clearTimeout(timer);
-                    reject(err);
-                },
-                {
-                    enableHighAccuracy: !!opts.enableHighAccuracy,
-                    maximumAge: opts.maximumAge || 0,
-                    timeout: opts.timeout || 14000
-                }
+                { enableHighAccuracy: true, timeout: 15000 }
             );
         });
-    };
 
-    try {
-        // Try once, if fails with certain transient errors we can retry once quickly
-        let coords;
-        try {
-            coords = await getPosition({ enableHighAccuracy: true, timeout: 14000 });
-        } catch (firstErr) {
-            console.warn("First geolocation attempt failed:", firstErr);
+        const userLat = coords.latitude;
+        const userLng = coords.longitude;
 
-            // If permission denied, stop and return quickly
-            if (firstErr.code === firstErr.PERMISSION_DENIED || firstErr.code === 1 || (firstErr.message && /permission/i.test(firstErr.message))) {
-                return finish({ status: "permission_denied" });
-            }
-
-            // Retry once for transient failures (e.g., WebView slow)
-            try {
-                coords = await getPosition({ enableHighAccuracy: false, timeout: 8000 });
-            } catch (secondErr) {
-                console.warn("Second geolocation attempt failed:", secondErr);
-                if (secondErr.code === 1) { // PERMISSION_DENIED
-                    return finish({ status: "permission_denied" });
-                }
-                return finish({ status: "unknown" });
-            }
-        }
-
-        // success: compute distance and charge
-        const userLat = Number(coords.latitude);
-        const userLng = Number(coords.longitude);
-
+        // Distance calculate
         const dist = calculateDistance(userLat, userLng, 23.0370322, 72.5822496);
+
+        // Status save
         localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
         localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
 
@@ -175,20 +232,19 @@ async function verifyUserLocation() {
 
         if (charge === -1) {
             localStorage.setItem("abutoys_location_status", "out_of_range");
-            return finish({ status: "out_of_range", distance: dist, charge });
+            hideLocationLoader();
+            return { status: "out_of_range", distance: dist, charge };
         }
 
         localStorage.setItem("abutoys_location_status", "in_range");
-        return finish({ status: "in_range", distance: dist, charge });
+        hideLocationLoader();
+        return { status: "in_range", distance: dist, charge };
 
     } catch (e) {
-        console.error("verifyUserLocation final catch:", e);
-        // Normalize permission denied vs unknown
-        const isPermission = (e && (e.code === 1 || (e.message && /permission/i.test(e.message))));
-        if (isPermission) {
-            return finish({ status: "permission_denied" });
-        }
-        return finish({ status: "unknown" });
+        hideLocationLoader();
+        localStorage.setItem("abutoys_location_status", "unknown");
+
+        return { status: "unknown" };
     }
 }
 
