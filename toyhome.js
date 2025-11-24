@@ -257,54 +257,73 @@ class LocationManager {
     }
 
     checkLocationAvailability() {
-        if (!navigator.permissions) {
-            return "prompt"; // Older browsers
-        }
-
-        return navigator.permissions.query({ name: "geolocation" })
-            .then(res => res.state)
-            .catch(() => "prompt");
-    }
+    return "prompt"; // No permission API on mobile browsers
+}
 
    getCurrentLocation() {
     return new Promise((resolve, reject) => {
+
         if (!navigator.geolocation) {
             reject({ code: 0, message: "Geolocation not supported" });
             return;
         }
 
-        // Primary FAST attempt
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            },
-            err => {
-                console.warn("Primary GPS failed, trying fallback...", err);
+        let resolved = false;
 
-                // Fallback: low accuracy + extra time
+        // Failsafe timeout (force stop after 12 seconds)
+        const globalTimeout = setTimeout(() => {
+            if (!resolved) {
+                reject({ code: 408, message: "Timeout" });
+            }
+        }, 12000);
+
+        // Quick first attempt
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(globalTimeout);
+                    resolve({
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude
+                    });
+                }
+            },
+            (err) => {
+                // Fallback #2 — low accuracy
                 navigator.geolocation.getCurrentPosition(
-                    pos2 => {
-                        resolve({ lat: pos2.coords.latitude, lng: pos2.coords.longitude });
+                    (pos2) => {
+                        if (!resolved) {
+                            resolved = true;
+                            clearTimeout(globalTimeout);
+                            resolve({
+                                lat: pos2.coords.latitude,
+                                lng: pos2.coords.longitude
+                            });
+                        }
                     },
-                    finalErr => {
-                        reject(finalErr);
+                    (finalErr) => {
+                        if (!resolved) {
+                            resolved = true;
+                            clearTimeout(globalTimeout);
+                            reject(finalErr);
+                        }
                     },
                     {
                         enableHighAccuracy: false,
-                        timeout: 30000,
-                        maximumAge: Infinity
+                        timeout: 10000,
+                        maximumAge: 5000
                     }
                 );
             },
             {
                 enableHighAccuracy: true,
-                timeout: 10000,     // FAST
+                timeout: 5000,
                 maximumAge: 0
             }
         );
     });
 }
-
 
     async checkLocationAndSetStatus() {
         try {
