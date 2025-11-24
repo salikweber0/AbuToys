@@ -266,25 +266,33 @@ class LocationManager {
             .catch(() => "prompt");
     }
 
-    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject({ code: 0, message: "Geolocation not supported" });
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    console.log("📍 Location:", pos.coords.latitude, pos.coords.longitude);
-                    resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-                },
-                err => {
-                    console.warn("⚠️ Location error:", err);
-                    reject(err);
-                },
-                options
-            );
-        });
-    }
+    getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject({ code: 0, message: "Geolocation not supported" });
+            return;
+        }
+
+        // ⚠️ SPECIAL FIX FOR WEBVIEW
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            },
+            err => {
+                // WebView often fails first attempt → retry after 1s
+                setTimeout(() => {
+                    navigator.geolocation.getCurrentPosition(
+                        pos2 => resolve({ lat: pos2.coords.latitude, lng: pos2.coords.longitude }),
+                        err2 => reject(err2),
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
+                }, 1200);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    });
+}
+
 
     async checkLocationAndSetStatus() {
         try {
