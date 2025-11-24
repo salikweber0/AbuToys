@@ -70,39 +70,103 @@ console.log("🚀 AbuToys Script Loaded");
 
 /* ================= NEW SUPER-STABLE LOCATION SYSTEM ================= */
 
+// ---------- REPLACEMENT: verifyUserLocation (more robust, uses Permissions API) ----------
 async function verifyUserLocation() {
+    // show loader immediately
     showLocationLoader();
 
-    try {
-        const coords = await new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject("NO_GEO");
-                return;
+    // helper to hide loader and return normalized result
+    const finish = (obj) => {
+        try { hideLocationLoader(); } catch (e) { console.warn("hide loader error", e); }
+        // persist for UI/other code if needed
+        if (obj && obj.status) localStorage.setItem("abutoys_location_status", obj.status);
+        return obj;
+    };
+
+    // If geolocation API not available (insecure origin or old browser)
+    if (!navigator.geolocation) {
+        console.warn("No geolocation API");
+        return finish({ status: "no_geo" });
+    }
+
+    // If Permissions API available, check the current state first
+    if (navigator.permissions && navigator.permissions.query) {
+        try {
+            const perm = await navigator.permissions.query({ name: "geolocation" });
+            console.log("Geolocation permission state:", perm.state);
+            if (perm.state === "denied") {
+                // User has denied permanently — tell them exactly how to re-enable
+                return finish({ status: "permission_denied" });
             }
+            // if 'granted' -> proceed; if 'prompt' -> we'll request
+        } catch (err) {
+            console.warn("Permissions API error (non-fatal):", err);
+            // continue to request geolocation (some browsers throw)
+        }
+    }
+
+    // Promise wrapper for getCurrentPosition with its own timeout
+    const getPosition = (opts = {}) => {
+        return new Promise((resolve, reject) => {
+            let done = false;
+            const timer = setTimeout(() => {
+                if (done) return;
+                done = true;
+                reject({ code: 3, message: "Position timeout" }); // mimic PositionError.code 3
+            }, opts._timeout || 15000); // default 15s
 
             navigator.geolocation.getCurrentPosition(
-                pos => resolve(pos.coords),
-                err => {
-                    // WebView slow → retry once
-                    setTimeout(() => {
-                        navigator.geolocation.getCurrentPosition(
-                            pos2 => resolve(pos2.coords),
-                            err2 => reject("DENIED_OR_FAIL"),
-                            { enableHighAccuracy: true, timeout: 15000 }
-                        );
-                    }, 1000);
+                (pos) => {
+                    if (done) return;
+                    done = true;
+                    clearTimeout(timer);
+                    resolve(pos.coords);
                 },
-                { enableHighAccuracy: true, timeout: 15000 }
+                (err) => {
+                    if (done) return;
+                    done = true;
+                    clearTimeout(timer);
+                    reject(err);
+                },
+                {
+                    enableHighAccuracy: !!opts.enableHighAccuracy,
+                    maximumAge: opts.maximumAge || 0,
+                    timeout: opts.timeout || 14000
+                }
             );
         });
+    };
 
-        const userLat = coords.latitude;
-        const userLng = coords.longitude;
+    try {
+        // Try once, if fails with certain transient errors we can retry once quickly
+        let coords;
+        try {
+            coords = await getPosition({ enableHighAccuracy: true, timeout: 14000 });
+        } catch (firstErr) {
+            console.warn("First geolocation attempt failed:", firstErr);
 
-        // Distance calculate
+            // If permission denied, stop and return quickly
+            if (firstErr.code === firstErr.PERMISSION_DENIED || firstErr.code === 1 || (firstErr.message && /permission/i.test(firstErr.message))) {
+                return finish({ status: "permission_denied" });
+            }
+
+            // Retry once for transient failures (e.g., WebView slow)
+            try {
+                coords = await getPosition({ enableHighAccuracy: false, timeout: 8000 });
+            } catch (secondErr) {
+                console.warn("Second geolocation attempt failed:", secondErr);
+                if (secondErr.code === 1) { // PERMISSION_DENIED
+                    return finish({ status: "permission_denied" });
+                }
+                return finish({ status: "unknown" });
+            }
+        }
+
+        // success: compute distance and charge
+        const userLat = Number(coords.latitude);
+        const userLng = Number(coords.longitude);
+
         const dist = calculateDistance(userLat, userLng, 23.0370322, 72.5822496);
-
-        // Status save
         localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
         localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
 
@@ -111,19 +175,20 @@ async function verifyUserLocation() {
 
         if (charge === -1) {
             localStorage.setItem("abutoys_location_status", "out_of_range");
-            hideLocationLoader();
-            return { status: "out_of_range", distance: dist, charge };
+            return finish({ status: "out_of_range", distance: dist, charge });
         }
 
         localStorage.setItem("abutoys_location_status", "in_range");
-        hideLocationLoader();
-        return { status: "in_range", distance: dist, charge };
+        return finish({ status: "in_range", distance: dist, charge });
 
     } catch (e) {
-        hideLocationLoader();
-        localStorage.setItem("abutoys_location_status", "unknown");
-
-        return { status: "unknown" };
+        console.error("verifyUserLocation final catch:", e);
+        // Normalize permission denied vs unknown
+        const isPermission = (e && (e.code === 1 || (e.message && /permission/i.test(e.message))));
+        if (isPermission) {
+            return finish({ status: "permission_denied" });
+        }
+        return finish({ status: "unknown" });
     }
 }
 
