@@ -60,7 +60,7 @@ try {
 }
 
 // =================== CONFIG ===================
-const SHOP_LOCATION = { lat: 23.0370158, lng: 72.5820909 };
+const SHOP_LOCATION = { lat: 23.0370322, lng: 72.5822496 }; // use this if you want exact map pin
 const DELIVERY_RANGE_KM = 20;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
@@ -257,14 +257,14 @@ class LocationManager {
     }
 
     checkLocationAvailability() {
-    if (!navigator.permissions) {
-        return "prompt"; // Older browsers
-    }
+        if (!navigator.permissions) {
+            return "prompt"; // Older browsers
+        }
 
-    return navigator.permissions.query({ name: "geolocation" })
-        .then(res => res.state)
-        .catch(() => "prompt");
-}
+        return navigator.permissions.query({ name: "geolocation" })
+            .then(res => res.state)
+            .catch(() => "prompt");
+    }
 
     getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
         return new Promise((resolve, reject) => {
@@ -559,10 +559,10 @@ function showCustomWelcomePopup(userName, onOKClick) {
     document.body.appendChild(popup);
     document.getElementById("welcome-ok-btn").addEventListener("click", () => {
         popup.remove();
-showLocationLoader();   // 🔥 NEW LINE (animation starts)
-setTimeout(() => {
-    if (onOKClick) onOKClick();
-}, 300); // small delay so loader shows smoothly
+        showLocationLoader();   // 🔥 NEW LINE (animation starts)
+        setTimeout(() => {
+            if (onOKClick) onOKClick();
+        }, 300); // small delay so loader shows smoothly
 
     });
 }
@@ -1312,3 +1312,179 @@ document.addEventListener("DOMContentLoaded", () => {
 function openOrderHistoryFromHome() {
     window.location.href = "toyproduct.html?orders=1";
 }
+
+/* ===================== FLOATING LOCATION BUTTON ===================== */
+
+function createFloatingLocationButton() {
+    const locBtn = document.createElement("div");
+    locBtn.id = "floatingLocationBtn";
+
+    locBtn.innerHTML = `<i class="fas fa-map-marker-alt"></i>`;
+
+    locBtn.style.cssText = `
+        position: fixed;
+        bottom: 25px;
+        left: 20px;
+        width: 60px;
+        height: 60px;
+        background: #ff4757;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        z-index: 999;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        transition: 0.3s ease;
+    `;
+
+    // Hover animation
+    locBtn.addEventListener("mouseenter", () => {
+        locBtn.style.transform = "scale(1.1)";
+    });
+
+    locBtn.addEventListener("mouseleave", () => {
+        locBtn.style.transform = "scale(1)";
+    });
+
+    // Click open popup
+    locBtn.addEventListener("click", () => {
+        openLocationPopup();
+    });
+
+    document.body.appendChild(locBtn);
+}
+
+
+/* ===================== LOCATION POPUP ===================== */
+
+function openLocationPopup() {
+    const status = localStorage.getItem("abutoys_location_status");
+
+    // Already open? → close it on second click
+    const oldPopup = document.getElementById("locationPopup");
+    if (oldPopup) {
+        oldPopup.remove();
+        return; // no new popup
+    }
+
+    const popup = document.createElement("div");
+    popup.id = "locationPopup";
+
+    popup.style.cssText = `
+        position: fixed;
+        bottom: 95px;
+        left: 20px;
+        background: white;
+        padding: 18px;
+        width: 320px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        z-index: 2000;
+        animation: popIn 0.3s ease;
+        font-family: sans-serif;
+    `;
+
+    let html = "";
+
+    if (status === "permission_denied") {
+        html = `
+            <h3 style="margin:0; font-size:18px; color:#d63031;">❌ Location Denied</h3>
+            <p style="margin:8px 0; font-size:15px;">
+                You denied location access.<br>
+                <b>You can't purchase any item.</b>
+            </p>
+        `;
+    }
+    else if (status === "in_range") {
+        const charge = localStorage.getItem("abutoys_delivery_charge");
+        html = `
+            <h3 style="margin:0; font-size:18px; color:#2ecc71;">✅ Location Verified</h3>
+            <p style="margin:8px 0; font-size:15px;">
+                Delivery Available!<br>
+                <b>Delivery Charge: ₹${charge}</b>
+            </p>
+        `;
+    }
+    else if (status === "out_of_range") {
+        html = `
+            <h3 style="margin:0; font-size:18px; color:#e67e22;">⚠️ Out of Range</h3>
+            <p style="margin:8px 0; font-size:15px;">
+                Sorry! You are outside the 20km delivery area.
+            </p>
+        `;
+    }
+    else {
+        html = `
+            <h3 style="margin:0; font-size:18px; color:#0984e3;">📍 Location Unknown</h3>
+            <p style="margin:8px 0; font-size:15px;">
+                Click below to verify your location.
+            </p>
+            <button id="verifyLocationBtn" style="
+                padding:10px 18px;
+                background:#0984e3;
+                color:white;
+                border:none;
+                border-radius:8px;
+                cursor:pointer;
+                font-weight:bold;
+            ">Verify Now</button>
+        `;
+    }
+
+    popup.innerHTML = html;
+    document.body.appendChild(popup);
+
+    // Click → verify location  
+    const btn = document.getElementById("verifyLocationBtn");
+    if (btn) {
+        btn.addEventListener("click", async () => {
+            popup.remove();
+            showLocationLoader();
+            const res = await locationManager.checkLocationAndSetStatus();
+            hideLocationLoader();
+
+            if (res.status === "in_range") {
+                showPopup("✅ Location Verified!", "success");
+            } else if (res.status === "out_of_range") {
+                showPopup("❌ You are outside 20km area!", "error");
+            } else {
+                showPopup("⚠️ Cannot verify location", "warning");
+            }
+        });
+    }
+
+    // CLICK ANYWHERE OUTSIDE → CLOSE  
+    setTimeout(() => enablePopupCloseOnOutsideClick(popup), 50);
+}
+
+/* ============ POPUP ANIMATION CSS ============ */
+const floatCss = document.createElement("style");
+floatCss.textContent = `
+@keyframes popIn {
+    from { transform: translateY(10px); opacity:0; }
+    to { transform: translateY(0px); opacity:1; }
+}
+`;
+document.head.appendChild(floatCss);
+
+function enablePopupCloseOnOutsideClick(popup) {
+    function outsideClick(e) {
+        const locBtn = document.getElementById("floatingLocationBtn");
+
+        if (!popup.contains(e.target) && e.target !== locBtn) {
+            popup.remove();
+            document.removeEventListener("click", outsideClick);
+        }
+    }
+    document.addEventListener("click", outsideClick);
+}
+
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        createFloatingLocationButton();   // ⭐ New Floating Button
+    }, 1000);
+});
+
