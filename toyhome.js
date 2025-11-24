@@ -266,25 +266,45 @@ class LocationManager {
             .catch(() => "prompt");
     }
 
-    getCurrentLocation(options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }) {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject({ code: 0, message: "Geolocation not supported" });
-                return;
+   getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject({ code: 0, message: "Geolocation not supported" });
+            return;
+        }
+
+        // Primary FAST attempt
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            },
+            err => {
+                console.warn("Primary GPS failed, trying fallback...", err);
+
+                // Fallback: low accuracy + extra time
+                navigator.geolocation.getCurrentPosition(
+                    pos2 => {
+                        resolve({ lat: pos2.coords.latitude, lng: pos2.coords.longitude });
+                    },
+                    finalErr => {
+                        reject(finalErr);
+                    },
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 30000,
+                        maximumAge: Infinity
+                    }
+                );
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,     // FAST
+                maximumAge: 0
             }
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    console.log("📍 Location:", pos.coords.latitude, pos.coords.longitude);
-                    resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-                },
-                err => {
-                    console.warn("⚠️ Location error:", err);
-                    reject(err);
-                },
-                options
-            );
-        });
-    }
+        );
+    });
+}
+
 
     async checkLocationAndSetStatus() {
         try {
