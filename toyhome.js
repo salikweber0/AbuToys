@@ -189,45 +189,62 @@ async function handleManualLocationValue(val) {
 }
 
 
-/* ================= NEW SUPER-STABLE LOCATION SYSTEM ================= */
-
+// ====== Replace the existing verifyUserLocation() with this improved version ======
 async function verifyUserLocation() {
     showLocationLoader();
 
     try {
-        const coords = await new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject("NO_GEO");
-                return;
-            }
+        // 1) check basic support
+        if (!navigator.geolocation) {
+            hideLocationLoader();
+            localStorage.setItem("abutoys_location_status", "no_geo");
+            return { status: "no_geo" };
+        }
 
+        // 2) Check Permissions API if available
+        try {
+            if (navigator.permissions && navigator.permissions.query) {
+                const p = await navigator.permissions.query({ name: 'geolocation' });
+                if (p && p.state === 'denied') {
+                    hideLocationLoader();
+                    localStorage.setItem("abutoys_location_status", "permission_denied");
+                    return { status: "permission_denied" };
+                }
+                // optional: listen for change (not required)
+            }
+        } catch (permErr) {
+            // ignore permission API failures and continue to request position
+            console.warn("Permissions API not available or failed:", permErr);
+        }
+
+        // 3) Try to get position (single robust attempt)
+        const coords = await new Promise((resolve, reject) => {
+            let handled = false;
             navigator.geolocation.getCurrentPosition(
-                pos => resolve(pos.coords),
-                err => {
-                    // WebView slow → retry once
-                    setTimeout(() => {
-                        navigator.geolocation.getCurrentPosition(
-                            pos2 => resolve(pos2.coords),
-                            err2 => reject("DENIED_OR_FAIL"),
-                            { enableHighAccuracy: true, timeout: 15000 }
-                        );
-                    }, 1000);
-                },
-                { enableHighAccuracy: true, timeout: 15000 }
+                (pos) => { if (!handled) { handled = true; resolve(pos.coords); } },
+                (err) => { if (!handled) { handled = true; reject(err); } },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
+
+            // safety fallback timeout (in case provider hangs)
+            setTimeout(() => {
+                if (!handled) {
+                    handled = true;
+                    reject({ code: 999, message: "geolocation_timeout" });
+                }
+            }, 23000);
         });
 
+        // 4) compute distance and charge (uses SHOP_LOCATION constant above)
         const userLat = coords.latitude;
         const userLng = coords.longitude;
 
-        // Distance calculate
-        const dist = calculateDistance(userLat, userLng, 23.0370322, 72.5822496);
+        const dist = calculateDistance(userLat, userLng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
 
-        // Status save
         localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
         localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
 
-        let charge = getDeliveryCharge(dist);
+        const charge = getDeliveryCharge(dist);
         localStorage.setItem("abutoys_delivery_charge", charge);
 
         if (charge === -1) {
@@ -240,13 +257,46 @@ async function verifyUserLocation() {
         hideLocationLoader();
         return { status: "in_range", distance: dist, charge };
 
-    } catch (e) {
-        hideLocationLoader();
-        localStorage.setItem("abutoys_location_status", "unknown");
+    } catch (err) {
+        // Detailed error handling
+        console.warn("verifyUserLocation error:", err);
 
-        return { status: "unknown" };
+        hideLocationLoader();
+
+        // navigator.geolocation errors: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
+        if (err && (err.code === 1 || err.code === 999 || err.name === "PermissionDeniedError")) {
+            localStorage.setItem("abutoys_location_status", "permission_denied");
+            return { status: "permission_denied" };
+        } else if (err && err.code === 2) {
+            localStorage.setItem("abutoys_location_status", "unknown");
+            return { status: "unknown" }; // position unavailable
+        } else if (err && err.code === 3) {
+            localStorage.setItem("abutoys_location_status", "unknown");
+            return { status: "unknown" }; // timeout
+        } else {
+            // fallback: check if inside webview -> show webview hint
+            if (isInWebView()) {
+                localStorage.setItem("abutoys_location_status", "permission_denied");
+                showLocationDeniedInstructions(true);
+                return { status: "permission_denied", fallback: true };
+            }
+
+            localStorage.setItem("abutoys_location_status", "unknown");
+            return { status: "unknown" };
+        }
     }
 }
+
+(async function checkGeoPermissionOnLoad(){
+  if (!navigator.permissions) return;
+  try {
+    const p = await navigator.permissions.query({name:'geolocation'});
+    if (p.state === 'denied') {
+      // show simple banner or popup
+      showPopup("Location is blocked for this site. Tap the lock icon in the address bar → Site settings → Location → Allow, then refresh.", "error");
+    }
+  } catch(e){}
+})();
 
 // ------------------ LOCATION VERIFICATION HELPERS (FIXED) ------------------
 async function startLocationVerification() {
