@@ -321,7 +321,7 @@ async function startLocationVerification() {
 
         // Normalize statuses (verifyUserLocation returns in_range / out_of_range / unknown)
         if (result && result.status === "in_range") {
-            showPopup(`✅ Location Verified!\nDistance: ${Number(result.distance).toFixed(2)} km\nCharge: ₹${result.charge}`, "success");
+            showPopup(`✅ Location Verified!\nDistance Charge: \n₹${result.charge}`, "success");
         } else if (result && result.status === "out_of_range") {
             showPopup(`❌ You are ${Math.round(result.distance)} km away.\nDelivery not available!`, "error");
         } else if (result && result.status === "permission_denied") {
@@ -376,7 +376,7 @@ async function showWelcomeMessage() {
             showPopup(`❌ Sorry!\n\nYou are ${Math.round(res.distance)} km away.\n\nWe don't deliver there.`, "warning");
         }
         else if (res && res.status === 'permission_denied') {
-            showPopup(`⚠️ Location Access Denied!\n\nPlease enable location in browser settings:\n1. Click lock icon 🔒 in address bar\n2. Allow location access\n3. Refresh page`, "error");
+            showPopup(`⚠️ Location Access Denied!\n\nPlease enable your location.`, "error");
         }
         else {
             showPopup(`⚠️ Cannot detect location\n\nPlease check your GPS/internet`, "warning");
