@@ -687,27 +687,135 @@ function showCustomWelcomePopup(userName, onOKClick) {
 //     });
 // }
 
-// =================== WHATSAPP ===================
+/* ====== WhatsApp with location-check & prefilled message (replace old openWhatsApp) ====== */
+
+function openWhatsAppDirect() {
+    // get name from localStorage (fallback to userManager if available)
+    let displayName = "Guest";
+    try {
+        const cur = localStorage.getItem("abutoys_current_user");
+        if (cur && cur !== "null") {
+            const stored = localStorage.getItem(`abutoys_user_${cur}`);
+            if (stored) {
+                const u = JSON.parse(stored);
+                if (u && u.fullName) displayName = u.fullName;
+            }
+        } else if (typeof userManager !== "undefined" && userManager.getCurrentUserName) {
+            displayName = userManager.getCurrentUserName() || displayName;
+        }
+    } catch (e) {
+        console.warn("Error reading user name:", e);
+    }
+
+    // Message exactly as requested
+    const message = `Hii 🧸 AbuToys, My name is "${displayName}"`;
+    const encodedMessage = encodeURIComponent(message);
+
+    // open whatsapp (use target _blank)
+    window.open(`https://wa.me/9879254030?text=${encodedMessage}`, "_blank");
+}
+
+function showLocationRequiredForWhatsAppPopup() {
+    // If there is already our popup, don't duplicate
+    if (document.getElementById("whatsapp-location-required-popup")) return;
+
+    const overlay = document.createElement("div");
+    overlay.id = "whatsapp-location-required-popup";
+    overlay.style.cssText = `
+        position: fixed; inset: 0; display:flex; align-items:center; justify-content:center;
+        background: rgba(0,0,0,0.6); z-index:10010; padding:16px;
+    `;
+    overlay.innerHTML = `
+        <div style="max-width:420px; width:100%; background:#fff; border-radius:12px; padding:18px; text-align:left; box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+            <h3 style="margin:0 0 8px; font-size:18px;">⚠️ Location Unverified</h3>
+            <p style="margin:0 0 12px; color:#444; font-size:15px;">
+                Sorry — your location is unverified. Please enable your location to use the WhatsApp function.
+            </p>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="whatsapp-loc-cancel" style="padding:8px 12px; background:#eee; border:0; border-radius:8px; cursor:pointer;">Cancel</button>
+                <button id="whatsapp-loc-verify" style="padding:8px 12px; background:#25d366; color:#fff; border:0; border-radius:8px; cursor:pointer;">Verify Now</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("whatsapp-loc-cancel").addEventListener("click", () => {
+        overlay.remove();
+    });
+
+    document.getElementById("whatsapp-loc-verify").addEventListener("click", async () => {
+        overlay.remove();
+        try { showLocationLoader(); } catch(e){/* ignore */ }
+        // startLocationVerification returns the normalized result (we used that earlier)
+        const res = await startLocationVerification();
+        try { hideLocationLoader(); } catch(e){/* ignore */ }
+
+        // If location now verified -> open direct
+        if (res && res.status === "in_range") {
+            showPopup("✅ Location verified. Opening WhatsApp...", "success");
+            // small delay so user sees popup
+            setTimeout(() => openWhatsAppDirect(), 350);
+        } else if (res && res.status === "permission_denied") {
+            showPopup("⚠️ Location permission denied. Please enable GPS/permissions and try again.", "error");
+        } else {
+            showPopup("⚠️ Could not verify location. Try again.", "warning");
+        }
+    });
+}
+
 function openWhatsApp() {
-    if (!userManager.isLoggedIn()) {
+    // If user not logged in, ask them to sign up (keep previous behavior)
+    if (typeof userManager !== "undefined" && !userManager.isLoggedIn()) {
         showPopup("❌ Please sign up first!", "warning");
         return;
     }
 
-    const locationStatus = locationManager.getLocationStatus();
+    const status = localStorage.getItem("abutoys_location_status"); // possible values: in_range, out_of_range, permission_denied, manual, unknown, etc.
 
-    if (locationStatus === 'out_of_range') {
-        showPopup("❌ Sorry! You are outside 20 km delivery area.", "warning");
+    // If location not verified (not 'in_range') -> show the special popup with Verify Now button
+    if (status !== "in_range") {
+        // special message required by you
+        showLocationRequiredForWhatsAppPopup();
         return;
     }
 
-    const userName = userManager.getCurrentUserName();
-    const distance = locationManager.distance ? locationManager.distance.toFixed(2) : "Unknown";
-    const message = `Hi, I am ${userName}. Distance: ${distance} km. I want to purchase toys.`;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/9879254030?text=${encodedMessage}`, '_blank');
+    // If in_range, proceed to open WhatsApp with prefilled message
+    openWhatsAppDirect();
 }
+
+/* === Hook footer whatsapp button (if present) so footer also uses same logic === */
+document.addEventListener("DOMContentLoaded", () => {
+    const footerBtn = document.getElementById("footerWhatsAppBtn");
+    if (footerBtn) {
+        // remove old listeners to avoid duplicates (best-effort)
+        footerBtn.replaceWith(footerBtn.cloneNode(true));
+        const newFooterBtn = document.getElementById("footerWhatsAppBtn") || document.querySelector("[data-footer-whatsapp]");
+        if (newFooterBtn) newFooterBtn.addEventListener("click", (e) => { e.preventDefault(); openWhatsApp(); });
+    }
+});
+
+// =================== WHATSAPP ===================
+// function openWhatsApp() {
+//     if (!userManager.isLoggedIn()) {
+//         showPopup("❌ Please sign up first!", "warning");
+//         return;
+//     }
+
+//     const locationStatus = locationManager.getLocationStatus();
+
+//     if (locationStatus === 'out_of_range') {
+//         showPopup("❌ Sorry! You are outside 20 km delivery area.", "warning");
+//         return;
+//     }
+
+//     const userName = userManager.getCurrentUserName();
+//     const distance = locationManager.distance ? locationManager.distance.toFixed(2) : "Unknown";
+//     const message = `Hi, I am ${userName}. Distance: ${distance} km. I want to purchase toys.`;
+
+//     const encodedMessage = encodeURIComponent(message);
+//     window.open(`https://wa.me/9879254030?text=${encodedMessage}`, '_blank');
+// }
 
 // =================== ACCOUNT MODAL ===================
 function showAccountModal() {
