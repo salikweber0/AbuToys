@@ -1432,8 +1432,6 @@ function createFloatingLocationButton() {
 }
 
 
-/* ===================== LOCATION POPUP ===================== */
-
 function openLocationPopup() {
     const status = localStorage.getItem("abutoys_location_status");
 
@@ -1462,15 +1460,18 @@ function openLocationPopup() {
     `;
 
     let html = "";
+    let showVerifyBtn = false; // 👉 yahan se control karenge
 
     if (status === "permission_denied") {
         html = `
             <h3 style="margin:0; font-size:18px; color:#d63031;">❌ Location Denied</h3>
             <p style="margin:8px 0; font-size:15px;">
                 You denied location access.<br>
-                <b>You can't purchase any item.</b>
+                <b>You can't purchase any item.</b><br>
+                After allowing location in browser/app settings, tap below:
             </p>
         `;
+        showVerifyBtn = true; // ❌ deny ke baad bhi "Verify Now" dikhega
     }
     else if (status === "in_range") {
         const charge = localStorage.getItem("abutoys_delivery_charge");
@@ -1481,22 +1482,34 @@ function openLocationPopup() {
                 <b>Delivery Charge: ₹${charge}</b>
             </p>
         `;
+        // in_range me button nahi chahiye (already verified)
     }
     else if (status === "out_of_range") {
         html = `
             <h3 style="margin:0; font-size:18px; color:#e67e22;">⚠️ Out of Range</h3>
             <p style="margin:8px 0; font-size:15px;">
-                Sorry! You are outside the 20km delivery area.
+                Sorry! You are outside the 20km delivery area.<br>
+                If you moved to a new location, tap below to re-check:
             </p>
         `;
+        showVerifyBtn = true; // ⚠️ yahan bhi dobara check karne ka option
     }
     else {
+        // null / unknown / manual / no_geo sab yahan aa jayenge
         html = `
             <h3 style="margin:0; font-size:18px; color:#0984e3;">📍 Location Unknown</h3>
             <p style="margin:8px 0; font-size:15px;">
                 Click below to verify your location.
             </p>
+        `;
+        showVerifyBtn = true;
+    }
+
+    // 👉 Common "Verify Now" button agar showVerifyBtn true hai
+    if (showVerifyBtn) {
+        html += `
             <button id="verifyLocationBtn" style="
+                margin-top:10px;
                 padding:10px 18px;
                 background:#0984e3;
                 color:white;
@@ -1511,19 +1524,21 @@ function openLocationPopup() {
     popup.innerHTML = html;
     document.body.appendChild(popup);
 
-    // Click → verify location  
+    // Agar button hai tabhi listener lagayenge
     const btn = document.getElementById("verifyLocationBtn");
     if (btn) {
         btn.addEventListener("click", async () => {
             popup.remove();
             showLocationLoader();
-            const res = await startLocationVerification();
+            const res = await startLocationVerification(); // iske andar verifyUserLocation_debug bhi use ho sakta hai
             hideLocationLoader();
 
             if (res.status === "in_range") {
                 showPopup("✅ Location Verified!", "success");
             } else if (res.status === "out_of_range") {
                 showPopup("❌ You are outside 20km area!", "error");
+            } else if (res.status === "permission_denied") {
+                showPopup("⚠️ Location access denied again!", "warning");
             } else {
                 showPopup("⚠️ Cannot verify location", "warning");
             }
