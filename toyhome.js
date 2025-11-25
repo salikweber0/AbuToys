@@ -189,114 +189,129 @@ async function handleManualLocationValue(val) {
 }
 
 
-// ====== Replace the existing verifyUserLocation() with this improved version ======
+// ===== fast + fallback location verification =====
 async function verifyUserLocation() {
     showLocationLoader();
 
-    try {
-        // 1) check basic support
-        if (!navigator.geolocation) {
-            hideLocationLoader();
-            localStorage.setItem("abutoys_location_status", "no_geo");
-            return { status: "no_geo" };
-        }
+    if (!navigator.geolocation) {
+        hideLocationLoader();
+        localStorage.setItem("abutoys_location_status", "no_geo");
+        return { status: "no_geo" };
+    }
 
-        // 2) Check Permissions API if available
-        try {
-            if (navigator.permissions && navigator.permissions.query) {
-                const p = await navigator.permissions.query({ name: 'geolocation' });
-                if (p && p.state === 'denied') {
-                    hideLocationLoader();
-                    localStorage.setItem("abutoys_location_status", "permission_denied");
-                    return { status: "permission_denied" };
-                }
-                // optional: listen for change (not required)
+    // helper to wrap getCurrentPosition as promise
+    const getPos = (opts) => new Promise((resolve, reject) => {
+        let handled = false;
+        navigator.geolocation.getCurrentPosition(
+            (p) => { if (!handled) { handled = true; resolve(p); } },
+            (e) => { if (!handled) { handled = true; reject(e); } },
+            opts
+        );
+        // safety fallback (in case browser hangs)
+        setTimeout(() => {
+            if (!handled) {
+                handled = true;
+                reject({ code: 999, message: 'geolocation_fallback_timeout' });
             }
-        } catch (permErr) {
-            // ignore permission API failures and continue to request position
-            console.warn("Permissions API not available or failed:", permErr);
+        }, (opts && opts.timeout ? opts.timeout + 2000 : 10000));
+    });
+
+    try {
+        // 1) Quick attempt: low-accuracy, short timeout, allow cached — usually fastest on mobile
+        try {
+            const quickOpts = { enableHighAccuracy: false, timeout: 8000, maximumAge: 15000 };
+            const quickPos = await getPos(quickOpts); // usually returns via network-based geolocation
+            return await handlePositionAndReturn(quickPos.coords);
+        } catch (quickErr) {
+            console.warn("quick position failed:", quickErr);
+            // continue to next strategy
         }
 
-        // 3) Try to get position (single robust attempt)
-        const coords = await new Promise((resolve, reject) => {
-            let handled = false;
-            navigator.geolocation.getCurrentPosition(
-                (pos) => { if (!handled) { handled = true; resolve(pos.coords); } },
-                (err) => { if (!handled) { handled = true; reject(err); } },
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+        // 2) Second attempt: use watchPosition for a faster first fix with high accuracy but we'll cancel quickly
+        const watchPromise = new Promise((resolve, reject) => {
+            let resolved = false;
+            const watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    if (resolved) return;
+                    resolved = true;
+                    try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
+                    resolve(pos);
+                },
+                (err) => {
+                    if (resolved) return;
+                    resolved = true;
+                    try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
+                    reject(err);
+                },
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 }
             );
 
-            // safety fallback timeout (in case provider hangs)
+            // safety: if nothing in 10s, clear and reject
             setTimeout(() => {
-                if (!handled) {
-                    handled = true;
-                    reject({ code: 999, message: "geolocation_timeout" });
+                if (!resolved) {
+                    try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
+                    reject({ code: 3, message: "watch_timeout" });
                 }
-            }, 23000);
+            }, 10000);
         });
 
-        // 4) compute distance and charge (uses SHOP_LOCATION constant above)
-        const userLat = coords.latitude;
-        const userLng = coords.longitude;
-
-        const dist = calculateDistance(userLat, userLng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
-
-        localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
-        localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
-
-        const charge = getDeliveryCharge(dist);
-        localStorage.setItem("abutoys_delivery_charge", charge);
-
-        if (charge === -1) {
-            localStorage.setItem("abutoys_location_status", "out_of_range");
-            hideLocationLoader();
-            return { status: "out_of_range", distance: dist, charge };
+        try {
+            const watchPos = await watchPromise;
+            return await handlePositionAndReturn(watchPos.coords);
+        } catch (watchErr) {
+            console.warn("watchPosition failed:", watchErr);
+            // fallback to a final getCurrentPosition with moderate timeout
+            try {
+                const finalPos = await getPos({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+                return await handlePositionAndReturn(finalPos.coords);
+            } catch (finalErr) {
+                console.warn("final getCurrentPosition failed:", finalErr);
+                // If inside webview give instructions
+                hideLocationLoader();
+                if (isInWebView()) {
+                    localStorage.setItem("abutoys_location_status", "permission_denied");
+                    showLocationDeniedInstructions(true);
+                    return { status: "permission_denied", fallback: true };
+                }
+                localStorage.setItem("abutoys_location_status", "unknown");
+                return { status: "unknown" };
+            }
         }
-
-        localStorage.setItem("abutoys_location_status", "in_range");
-        hideLocationLoader();
-        return { status: "in_range", distance: dist, charge };
-
     } catch (err) {
-        // Detailed error handling
-        console.warn("verifyUserLocation error:", err);
-
+        console.warn("verifyUserLocation overall error:", err);
         hideLocationLoader();
-
-        // navigator.geolocation errors: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
-        if (err && (err.code === 1 || err.code === 999 || err.name === "PermissionDeniedError")) {
+        if (err && (err.code === 1 || err.name === "PermissionDeniedError")) {
             localStorage.setItem("abutoys_location_status", "permission_denied");
             return { status: "permission_denied" };
-        } else if (err && err.code === 2) {
-            localStorage.setItem("abutoys_location_status", "unknown");
-            return { status: "unknown" }; // position unavailable
-        } else if (err && err.code === 3) {
-            localStorage.setItem("abutoys_location_status", "unknown");
-            return { status: "unknown" }; // timeout
-        } else {
-            // fallback: check if inside webview -> show webview hint
-            if (isInWebView()) {
-                localStorage.setItem("abutoys_location_status", "permission_denied");
-                showLocationDeniedInstructions(true);
-                return { status: "permission_denied", fallback: true };
-            }
-
-            localStorage.setItem("abutoys_location_status", "unknown");
-            return { status: "unknown" };
         }
+        localStorage.setItem("abutoys_location_status", "unknown");
+        return { status: "unknown" };
     }
 }
 
-(async function checkGeoPermissionOnLoad(){
-  if (!navigator.permissions) return;
-  try {
-    const p = await navigator.permissions.query({name:'geolocation'});
-    if (p.state === 'denied') {
-      // show simple banner or popup
-      showPopup("Location is blocked for this site. Tap the lock icon in the address bar → Site settings → Location → Allow, then refresh.", "error");
+// small helper used above to compute distance/charge & return same shape as original
+async function handlePositionAndReturn(coords) {
+    const userLat = coords.latitude;
+    const userLng = coords.longitude;
+
+    const dist = calculateDistance(userLat, userLng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
+
+    localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
+    localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
+
+    const charge = getDeliveryCharge(dist);
+    localStorage.setItem("abutoys_delivery_charge", charge);
+
+    if (charge === -1) {
+        localStorage.setItem("abutoys_location_status", "out_of_range");
+        hideLocationLoader();
+        return { status: "out_of_range", distance: dist, charge };
     }
-  } catch(e){}
-})();
+
+    localStorage.setItem("abutoys_location_status", "in_range");
+    hideLocationLoader();
+    return { status: "in_range", distance: dist, charge };
+}
 
 // ------------------ LOCATION VERIFICATION HELPERS (FIXED) ------------------
 async function startLocationVerification() {
