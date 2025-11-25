@@ -1383,21 +1383,92 @@ function handleWhatsAppClick() {
     openWhatsApp();
 }
 
+// ===== WhatsApp handler (home) - replace existing openWhatsApp / handler with this =====
 function openWhatsApp() {
-    const userName = userDataManager.getCurrentUserName();
-    const locationStatus = userDataManager.locationStatus;
-
-    let message;
-    if (locationStatus === "in_range") {
-        message = `Hi, I am ${userName}. Distance: ${userDataManager.userDistance.toFixed(2)} km. I want to purchase toys.`;
-    } else {
-        message = `Hi, I am ${userName}. Need to check delivery availability.`;
+    // Ensure user is logged in (use existing user manager)
+    const currentUser = localStorage.getItem("abutoys_current_user");
+    if (!currentUser || currentUser === "null" || currentUser === "" || currentUser === "visitor") {
+        showPopup("❌ Please sign up first!", "warning");
+        return;
     }
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/9879254030?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    // Use stored location status (prefer userDataManager if available)
+    const locStatus = (typeof userDataManager !== 'undefined') ? userDataManager.locationStatus : localStorage.getItem("abutoys_location_status");
+
+    if (locStatus !== "in_range") {
+        // Show popup asking to enable location, with Verify Now button
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = `
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); max-width: 420px;
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10002;
+            text-align: left;
+        `;
+        messageDiv.innerHTML = `
+            <h3 style="margin:0 0 8px; color:#FF6B6B;">⚠️ Location Unverified</h3>
+            <p style="margin:0 0 12px; color:#333;">
+                Sorry — your location is unverified. Please enable your location to use the WhatsApp function.
+            </p>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                <button id="wa_cancel_btn" style="padding:8px 12px;border-radius:8px;background:#eee;border:0;cursor:pointer;">Cancel</button>
+                <button id="wa_verify_btn" style="padding:8px 12px;border-radius:8px;background:#FF6B6B;color:#fff;border:0;cursor:pointer;">Verify Now</button>
+                <button id="wa_home_btn" style="padding:8px 12px;border-radius:8px;background:#4ECDC4;color:#fff;border:0;cursor:pointer;">Go to Home</button>
+            </div>
+        `;
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001;`;
+        overlay.addEventListener('click', () => { overlay.remove(); messageDiv.remove(); });
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(messageDiv);
+
+        document.getElementById('wa_cancel_btn').addEventListener('click', () => { overlay.remove(); messageDiv.remove(); });
+
+        document.getElementById('wa_verify_btn').addEventListener('click', () => {
+            overlay.remove(); messageDiv.remove();
+            // Try to call debug verifier if available (home page has verify functions)
+            if (typeof verifyUserLocation_debug === 'function') {
+                try { verifyUserLocation_debug(); } catch (e) { console.warn(e); window.location.href = 'index.html'; }
+            } else if (typeof verifyUserLocation === 'function') {
+                try { verifyUserLocation(); } catch (e) { console.warn(e); window.location.href = 'index.html'; }
+            } else {
+                // fallback: go to home page where location system exists
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('wa_home_btn').addEventListener('click', () => {
+            overlay.remove(); messageDiv.remove();
+            window.location.href = 'index.html';
+        });
+
+        return;
+    }
+
+    // If here -> location is verified: open WhatsApp with prefilled message
+    const userName = (typeof userDataManager !== 'undefined') ? userDataManager.getCurrentUserName() : (localStorage.getItem("abutoys_user_name") || localStorage.getItem("abutoys_current_user") || "User");
+    const message = `Hii 🧸 AbuToys, My name is "${userName}"`;
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/9879254030?text=${encoded}`, '_blank');
 }
+
+
+// function openWhatsApp() {
+//     const userName = userDataManager.getCurrentUserName();
+//     const locationStatus = userDataManager.locationStatus;
+
+//     let message;
+//     if (locationStatus === "in_range") {
+//         message = `Hi, I am ${userName}. Distance: ${userDataManager.userDistance.toFixed(2)} km. I want to purchase toys.`;
+//     } else {
+//         message = `Hi, I am ${userName}. Need to check delivery availability.`;
+//     }
+
+//     const encodedMessage = encodeURIComponent(message);
+//     const whatsappUrl = `https://wa.me/9879254030?text=${encodedMessage}`;
+//     window.open(whatsappUrl, '_blank');
+// }
 
 // =================== LOAD MORE FUNCTIONALITY ===================
 function initializeLoadMore() {
