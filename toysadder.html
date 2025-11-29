@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - AbuToys Admin 🧸</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 🎨 Simple Background Shapes */
+        .bg-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            filter: blur(60px);
+        }
+
+        .shape1 {
+            width: 400px;
+            height: 400px;
+            background: #FF6B6B;
+            top: -100px;
+            left: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .shape2 {
+            width: 350px;
+            height: 350px;
+            background: #4ECDC4;
+            bottom: -100px;
+            right: -100px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        .shape3 {
+            width: 300px;
+            height: 300px;
+            background: #FFD93D;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 30s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
+        }
+
+        /* 📦 Container - Only on first load */
+        .container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            animation: containerEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ✅ No animation on refresh */
+        .container.loaded {
+            animation: none;
+        }
+
+        @keyframes containerEntry {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* 🎯 Header */
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka One', cursive;
+            color: #FF6B6B;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 i {
+            animation: iconBounce 3s ease-in-out infinite;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* 📝 Form Groups */
+        .form-group {
+            margin-bottom: 25px;
+            animation: slideIn 0.5s ease-out backwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.15s; }
+        .form-group:nth-child(3) { animation-delay: 0.2s; }
+        .form-group:nth-child(4) { animation-delay: 0.25s; }
+        .form-group:nth-child(5) { animation-delay: 0.3s; }
+        .form-group:nth-child(6) { animation-delay: 0.35s; }
+        .form-group:nth-child(7) { animation-delay: 0.4s; }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        label i {
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        /* 🎨 Inputs - Clean & Simple */
+        input, textarea, select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input:hover, textarea:hover, select:hover {
+            border-color: #764ba2;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* 💰 Price Row */
+        .price-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* 🖼️ Image Row */
+        .image-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* ✅ Prefilled Badge */
+        .prefilled-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* 🚀 Submit Button - Elegant */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* ⏳ Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #FF6B6B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* 🎉 Success/Error Popup */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 10000;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .popup.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .popup-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: popupIconEntry 0.5s ease-out;
+        }
+
+        @keyframes popupIconEntry {
+            0% { transform: scale(0) rotate(-180deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .popup-icon.success {
+            color: #4CAF50;
+        }
+
+        .popup-icon.error {
+            color: #f44336;
+        }
+
+        .popup h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .popup p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+
+        .popup button {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .popup button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        /* 🎆 Confetti - Simple & Clean */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* 📱 Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .price-row, .image-row {
+                grid-template-columns: 1fr;
+            }
+
+            .submit-btn {
+                font-size: 1rem;
+                padding: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 🌈 Background -->
+    <div class="bg-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+
+    <!-- 📦 Main Container -->
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1>
+                <i class="fas fa-cube"></i>
+                Add New Product
+            </h1>
+            <p>Fill in the details below to add a new product to your store</p>
+        </div>
+
+        <form id="productForm">
+            <!-- Active (Hidden) -->
+            <input type="hidden" id="active" value="✅">
+
+            <!-- Product Name -->
+            <div class="form-group">
+                <label for="name">
+                    <i class="fas fa-tag"></i>
+                    Product Name
+                </label>
+                <input type="text" id="name" placeholder="e.g., Teddy Bear, School Bag" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label for="desc">
+                    <i class="fas fa-align-left"></i>
+                    Description
+                </label>
+                <textarea id="desc" placeholder="Enter product description..." required></textarea>
+            </div>
+
+            <!-- Price & Old Price -->
+            <div class="form-group">
+                <div class="price-row">
+                    <div>
+                        <label for="price">
+                            <i class="fas fa-rupee-sign"></i>
+                            Price (₹)
+                        </label>
+                        <input type="number" id="price" placeholder="499" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="oldPrice">
+                            <i class="fas fa-percentage"></i>
+                            Old Price (₹)
+                        </label>
+                        <input type="number" id="oldPrice" placeholder="699" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-images"></i>
+                    Product Images (URLs)
+                </label>
+                <div class="image-row">
+                    <input type="url" id="img1" placeholder="Image 1 URL" required>
+                    <input type="url" id="img2" placeholder="Image 2 URL">
+                </div>
+                <div class="image-row" style="margin-top: 15px;">
+                    <input type="url" id="img3" placeholder="Image 3 URL">
+                    <input type="url" id="img4" placeholder="Image 4 URL">
+                </div>
+            </div>
+
+            <!-- Video -->
+            <div class="form-group">
+                <label for="video">
+                    <i class="fas fa-video"></i>
+                    Video
+                    <span class="prefilled-badge">
+                        <i class="fas fa-check-circle"></i>
+                        Prefilled
+                    </span>
+                </label>
+                <input type="text" id="video" value="https://www.youtube.com/embed/" placeholder="Add YouTube video ID">
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label for="cat">
+                    <i class="fas fa-list"></i>
+                    Category
+                </label>
+                <select id="cat" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Toys Items">🧸 Toys Items</option>
+                    <option value="School Items">🎒 School Items</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-rocket"></i>
+                Add Product to Sheet
+            </button>
+        </form>
+    </div>
+
+    <!-- ⏳ Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Adding Product...</p>
+    </div>
+
+    <!-- 🎉 Popup -->
+    <div class="popup" id="popup">
+        <div class="popup-icon" id="popupIcon"></div>
+        <h2 id="popupTitle"></h2>
+        <p id="popupMessage"></p>
+        <button onclick="closePopup()">OK</button>
+    </div>
+
+    <script>
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNpkT1YEuvannOK0u_zPu0HUOiGI9IoF4_GaZqi7Y9E_1H9_PGXBv-NvrviZuvF8EWfw/exec";
+
+        const form = document.getElementById('productForm');
+        const loading = document.getElementById('loading');
+        const popup = document.getElementById('popup');
+        const mainContainer = document.getElementById('mainContainer');
+
+        // ✅ No animation on refresh
+        window.addEventListener('load', () => {
+            if (performance.navigation.type === 1) {
+                mainContainer.classList.add('loaded');
+                document.querySelectorAll('.form-group').forEach(group => {
+                    group.style.animation = 'none';
+                });
+            }
+        });
+
+        // 🎆 Simple Confetti
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.background = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#F093FB'][Math.floor(Math.random() * 4)];
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // 🚀 Form Submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const productData = {
+                active: "✅",
+                name: document.getElementById('name').value.trim(),
+                desc: document.getElementById('desc').value.trim(),
+                price: document.getElementById('price').value,
+                oldPrice: document.getElementById('oldPrice').value || "",
+                img1: document.getElementById('img1').value.trim(),
+                img2: document.getElementById('img2').value.trim() || "",
+                img3: document.getElementById('img3').value.trim() || "",
+                img4: document.getElementById('img4').value.trim() || "",
+                video: document.getElementById('video').value.trim(),
+                cat: document.getElementById('cat').value
+            };
+
+            loading.classList.add('active');
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+
+                const result = await response.json();
+                loading.classList.remove('active');
+
+                if (result.success) {
+                    createConfetti();
+                    showPopup('success', 'Success! 🎉', result.message);
+                    form.reset();
+                    document.getElementById('video').value = "https://www.youtube.com/embed/";
+                } else {
+                    showPopup('error', 'Error!', result.message);
+                }
+
+            } catch (error) {
+                loading.classList.remove('active');
+                showPopup('error', 'Network Error!', 'Failed to connect. Check your internet.');
+                console.error(error);
+            }
+        });
+
+        function showPopup(type, title, message) {
+            const icon = document.getElementById('popupIcon');
+            icon.className = `popup-icon ${type}`;
+            icon.innerHTML = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+            
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupMessage').textContent = message;
+            popup.classList.add('active');
+        }
+
+        function closePopup() {
+            popup.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
