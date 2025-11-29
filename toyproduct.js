@@ -1734,7 +1734,7 @@ function initializeLoadMore() {
 // ✅ REPLACE YOUR OLD loadProductsFromSheet FUNCTION WITH THIS
 
 async function loadProductsFromSheet() {
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwjNa6RAshl-MIO7sHEW4GAp_b8QYHvwXIb5USCpTJOhru9zzEEfooUy93OFXMDIIz/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNpkT1YEuvannOK0u_zPu0HUOiGI9IoF4_GaZqi7Y9E_1H9_PGXBv-NvrviZuvF8EWfw/exec";
     const OPENSHEET_URL = "https://opensheet.vercel.app/1LaF1JFdRSGhNvonfo8-G3mHEXIA5-ulPl_4JlIAOAfc/AbuToys";
     const grid = document.getElementById("products-grid");
 
