@@ -275,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3EkCIajF2oGICgzL8zDhU_0F3cHmA3S0V2vNMlrTECze6Ls8o5chR19LATFft1uM/exec";
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz69Ng_SmOHX9uMzcyiqddnZQkfb9PehnRjCZQS1AV8h0pAR7qDru0Ec2fqRLf8Vsv0/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
@@ -815,6 +815,8 @@ class OrderManager {
         // ✅ AB FETCH KARO SHEET SE
         this.fetchOrdersFromSheetInstant(panel);
     }
+
+    
 
     // ========== MISSING FUNCTION (ADD THIS INSIDE OrderManager CLASS) ==========
     async fetchOrdersFromSheet() {
@@ -2629,7 +2631,7 @@ setInterval(() => {
         // Panel open hai to refresh kar
         orderManager.fetchOrdersFromSheetInstant(cartPanel);
     }
-}, 5000); // ✅ 5 SECOND ME CHECK KARO
+}, 30 * 1000); // ✅ 30 SECOND ME CHECK KARO
 
 // ✅ AUTO CANCEL WATCHER - 1 HOUR PAYMENT DEADLINE
 setInterval(() => {
