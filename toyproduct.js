@@ -275,21 +275,36 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypV4TbmNCcFop86LYy38OBOfc7aTF-WWvQEa5jMz2VsoPlo_qLWYaJrHbRfP6FitPJ/exec"; 
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3EkCIajF2oGICgzL8zDhU_0F3cHmA3S0V2vNMlrTECze6Ls8o5chR19LATFft1uM/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
-        
+
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
         this.updateCartBadge();
-        
+
         // ✅ HAR 2 SECOND ME SYNC KARO
         this.startSync();
     }
-    
+
+    get48hTimeLeft(paymentTime) {
+        if (!paymentTime) return null;
+
+        const now = Date.now();
+        const diff = paymentTime + (48 * 60 * 60 * 1000) - now;
+
+        if (diff <= 0) return "Waiting for delivery update";
+
+        const hours = Math.floor(diff / (60 * 60 * 1000));
+        const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+
+        return `${hours}h ${minutes}m`;
+    }
+
+
     // ✅ AUTO SYNC - localStorage se orders refresh karo
     startSync() {
         setInterval(() => {
             const latestOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
-            
+
             // Agar orders change hue hain to update karo
             if (JSON.stringify(latestOrders) !== JSON.stringify(this.orders)) {
                 this.orders = latestOrders;
@@ -297,23 +312,23 @@ class OrderManager {
             }
         }, 1000); // ✅ 1 second me check
     }
-    
+
     generateOrderCode() {
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         return `Abu${randomNum}Toys`;
     }
-    
+
     // ✅ CART BADGE - FIXED LOGIC
     updateCartBadge() {
         const cartIcon = document.getElementById('cartIcon');
         if (!cartIcon) return;
-        
+
         // ✅ localStorage se fresh orders fetch karo
         const freshOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
         const pendingCount = freshOrders.filter(o => o.status !== 'Delivered').length;
-        
+
         let badge = cartIcon.querySelector('.cart-badge');
-        
+
         if (pendingCount > 0) {
             if (!badge) {
                 badge = document.createElement('span');
@@ -341,52 +356,52 @@ class OrderManager {
             badge.remove();
         }
     }
-    
+
     openOrderPanel(productCard) {
-    const orderCode = this.generateOrderCode();
-    const productName = productCard.querySelector('h3')?.textContent || '';
-    const productPrice = parseFloat(productCard.dataset.originalPrice || 0);
-    const deliveryCharge = userDataManager.deliveryCharge;
-    const totalPrice = productPrice + deliveryCharge;
-    
-    const userName = userDataManager.getCurrentUserName();
-    const userEmail = userDataManager.currentUser;
-    const userData = userDataManager.getUser(userEmail);
-    const userAddress = userData?.address || '';
-    const userPassword = userData?.password || '';
-    
-    const productCardClone = productCard.cloneNode(true);
-    
-    // Card cleaning code (already correct)
-    const allImages = productCardClone.querySelectorAll('.product-img');
-    const videoContainers = productCardClone.querySelectorAll('.video-container');
-    const arrows = productCardClone.querySelectorAll('.img-nav');
-    const buyButton = productCardClone.querySelector('.add-to-cart-btn');
-    const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
-    const productOverlay = productCardClone.querySelector('.product-overlay');
-    
-    allImages.forEach((img, index) => { if (index !== 0) img.remove(); });
-    videoContainers.forEach((video, index) => { if (index !== 0) video.remove(); });
-    arrows.forEach(arrow => arrow.remove());
-    if (buyButton) buyButton.remove();
-    if (wishlistIcon) wishlistIcon.remove();
-    if (productOverlay) productOverlay.remove();
-    
-    productCardClone.style.width = '100%';
-    productCardClone.style.maxWidth = '100%';
-    productCardClone.style.margin = '0';
-    productCardClone.style.transform = 'none';
-    
-    const panel = document.createElement('div');
-    panel.id = 'order-panel';
-    panel.style.cssText = `
+        const orderCode = this.generateOrderCode();
+        const productName = productCard.querySelector('h3')?.textContent || '';
+        const productPrice = parseFloat(productCard.dataset.originalPrice || 0);
+        const deliveryCharge = userDataManager.deliveryCharge;
+        const totalPrice = productPrice + deliveryCharge;
+
+        const userName = userDataManager.getCurrentUserName();
+        const userEmail = userDataManager.currentUser;
+        const userData = userDataManager.getUser(userEmail);
+        const userAddress = userData?.address || '';
+        const userPassword = userData?.password || '';
+
+        const productCardClone = productCard.cloneNode(true);
+
+        // Card cleaning code (already correct)
+        const allImages = productCardClone.querySelectorAll('.product-img');
+        const videoContainers = productCardClone.querySelectorAll('.video-container');
+        const arrows = productCardClone.querySelectorAll('.img-nav');
+        const buyButton = productCardClone.querySelector('.add-to-cart-btn');
+        const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
+        const productOverlay = productCardClone.querySelector('.product-overlay');
+
+        allImages.forEach((img, index) => { if (index !== 0) img.remove(); });
+        videoContainers.forEach((video, index) => { if (index !== 0) video.remove(); });
+        arrows.forEach(arrow => arrow.remove());
+        if (buyButton) buyButton.remove();
+        if (wishlistIcon) wishlistIcon.remove();
+        if (productOverlay) productOverlay.remove();
+
+        productCardClone.style.width = '100%';
+        productCardClone.style.maxWidth = '100%';
+        productCardClone.style.margin = '0';
+        productCardClone.style.transform = 'none';
+
+        const panel = document.createElement('div');
+        panel.id = 'order-panel';
+        panel.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.95); z-index: 999999;
         display: flex; align-items: center; justify-content: center;
         padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch;
     `;
-    
-    panel.innerHTML = `
+
+        panel.innerHTML = `
         <div style="background: white; border-radius: 20px; max-width: 600px; width: 100%; 
             padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">
             
@@ -445,85 +460,85 @@ class OrderManager {
             </form>
         </div>
     `;
-    
-    document.body.appendChild(panel);
-    
-    // ✅ CLOSE FUNCTION - PEHLE DEFINE KARO (Form submit se PEHLE)
-    window.closeOrderPanel = function() {
-        const panel = document.getElementById('order-panel');
-        if (panel) panel.remove();
-        document.body.style.overflow = ''; // Scroll enable
-    };
-    
-    // Product card add karo
-    const cardContainer = document.getElementById('order-product-card');
-    cardContainer.appendChild(productCardClone);
 
-    // --- FIX: Make sure order panel image always appears ---
-(function fixOrderPanelImage() {
-    const firstImg = productCardClone.querySelector('.product-img');
-    if (firstImg) {
-        // remove slider hidden style
-        firstImg.style.display = "block";
-        firstImg.classList.add("active");
+        document.body.appendChild(panel);
 
-        // if slider added inline style="display:none"
-        firstImg.removeAttribute("style"); 
-        firstImg.style.display = "block";
-
-        // lazy-load to normal src
-        const lazy = firstImg.getAttribute("data-src");
-        if (lazy) firstImg.src = lazy;
-
-        // force reload image so it appears
-        firstImg.loading = "eager";
-        firstImg.onerror = () => {
-            firstImg.src = "assets/placeholder.png";
-            firstImg.style.display = "block";
+        // ✅ CLOSE FUNCTION - PEHLE DEFINE KARO (Form submit se PEHLE)
+        window.closeOrderPanel = function () {
+            const panel = document.getElementById('order-panel');
+            if (panel) panel.remove();
+            document.body.style.overflow = ''; // Scroll enable
         };
-    }
-})();
 
-    
-    // Form submit handler
-    const form = document.getElementById('order-form');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const enteredPassword = document.getElementById('order-password').value;
-        const address = document.getElementById('order-address').value;
-        
-        if (enteredPassword !== userPassword) {
-            this.showPopup('❌ Password Incorrect!', 'error');
-            return;
-        }
-        
-        this.showLoadingAnimation();
-        
-        this.submitOrder({
-            orderCode, userName, productName,
-            productPrice, deliveryCharge, totalPrice,
-            address, password: enteredPassword
+        // Product card add karo
+        const cardContainer = document.getElementById('order-product-card');
+        cardContainer.appendChild(productCardClone);
+
+        // --- FIX: Make sure order panel image always appears ---
+        (function fixOrderPanelImage() {
+            const firstImg = productCardClone.querySelector('.product-img');
+            if (firstImg) {
+                // remove slider hidden style
+                firstImg.style.display = "block";
+                firstImg.classList.add("active");
+
+                // if slider added inline style="display:none"
+                firstImg.removeAttribute("style");
+                firstImg.style.display = "block";
+
+                // lazy-load to normal src
+                const lazy = firstImg.getAttribute("data-src");
+                if (lazy) firstImg.src = lazy;
+
+                // force reload image so it appears
+                firstImg.loading = "eager";
+                firstImg.onerror = () => {
+                    firstImg.src = "assets/placeholder.png";
+                    firstImg.style.display = "block";
+                };
+            }
+        })();
+
+
+        // Form submit handler
+        const form = document.getElementById('order-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const enteredPassword = document.getElementById('order-password').value;
+            const address = document.getElementById('order-address').value;
+
+            if (enteredPassword !== userPassword) {
+                this.showPopup('❌ Password Incorrect!', 'error');
+                return;
+            }
+
+            this.showLoadingAnimation();
+
+            this.submitOrder({
+                orderCode, userName, productName,
+                productPrice, deliveryCharge, totalPrice,
+                address, password: enteredPassword
+            });
         });
-    });
-    
-    // Body scroll lock
-    document.body.style.overflow = 'hidden';
-}
-    
+
+        // Body scroll lock
+        document.body.style.overflow = 'hidden';
+    }
+
     showLoadingAnimation() {
         const loader = document.createElement('div');
         loader.id = 'order-loader';
         loader.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999999; display: flex; flex-direction: column; align-items: center; justify-content: center;`;
-        
+
         loader.innerHTML = `
             <div style="width: 80px; height: 80px; border: 8px solid #f3f3f3; border-top: 8px solid #FF6B6B; border-radius: 50%; animation: spin 1s linear infinite;"></div>
             <p style="color: white; font-size: 1.3rem; margin-top: 20px; font-weight: 600;">Submitting Order...</p>
         `;
-        
+
         document.body.appendChild(loader);
     }
-    
+
     async submitOrder(orderData) {
     try {
         const response = await fetch(this.APPS_SCRIPT_URL, {
@@ -538,14 +553,17 @@ class OrderManager {
                 totalPrice: orderData.totalPrice,
                 fullAddress: orderData.address,
                 password: orderData.password,
-                userEmail: userDataManager.currentUser // ✅ EMAIL ADD KIYA
+                userEmail: userDataManager.currentUser
             })
         });
-        
+
         const result = await response.json();
         document.getElementById('order-loader')?.remove();
-        
+
         if (result.success) {
+            const now = Date.now();
+            const paymentDeadline = now + (60 * 60 * 1000); // ✅ 1 HOUR DEADLINE
+
             const orderToSave = {
                 orderCode: orderData.orderCode,
                 productName: orderData.productName,
@@ -553,24 +571,28 @@ class OrderManager {
                 deliveryCharge: orderData.deliveryCharge,
                 totalPrice: orderData.totalPrice,
                 orderDate: new Date().toLocaleString(),
-                orderTimestamp: Date.now(),
-                status: '' // ✅ EMPTY RKHENGE
+                orderTimestamp: now,
+                paymentDeadline: paymentDeadline,  // ✅ DEADLINE SAVE KIYA
+                status: '',  // ✅ Empty (not delivered yet)
+                paymentStatus: '',  // ✅ Empty (payment pending)
+                paymentConfirmedAt: null  // ✅ No timer yet
             };
-            
+
             const currentOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
             currentOrders.push(orderToSave);
             localStorage.setItem("abutoys_orders", JSON.stringify(currentOrders));
-            
+
             this.orders = currentOrders;
             this.updateCartBadge();
-            
-            closeOrderPanel(); // ✅ YE USE KARO instead of direct remove()
-            
-            // ✅ BEAUTIFUL CONFIRMATION CARD DIKHAO
-            this.showOrderConfirmationCard(orderData);
+
+            closeOrderPanel();
+
+            // ✅ SHOW PAYMENT CARD
+            this.showOrderConfirmationCardWithPayment(orderData, paymentDeadline);
         } else {
             this.showPopup('❌ Order failed! Try again.', 'error');
         }
+
     } catch (error) {
         document.getElementById('order-loader')?.remove();
         console.error(error);
@@ -578,26 +600,26 @@ class OrderManager {
     }
 }
 
-// ✅ BEAUTIFUL ORDER CONFIRMATION CARD - FIXED
-showOrderConfirmationCard(orderData) {
-    const backdrop = document.createElement('div');
-    backdrop.id = 'confirmation-backdrop'; // ✅ ID DIYA
-    backdrop.style.cssText = `
+    // ✅ BEAUTIFUL ORDER CONFIRMATION CARD - FIXED
+    showOrderConfirmationCard(orderData) {
+        const backdrop = document.createElement('div');
+        backdrop.id = 'confirmation-backdrop'; // ✅ ID DIYA
+        backdrop.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.7); z-index: 99999;
         display: flex; align-items: center; justify-content: center;
         backdrop-filter: blur(5px);
     `;
-    
-    const card = document.createElement('div');
-    card.id = 'confirmation-card'; // ✅ ID DIYA
-    card.style.cssText = `
+
+        const card = document.createElement('div');
+        card.id = 'confirmation-card'; // ✅ ID DIYA
+        card.style.cssText = `
         background: white; border-radius: 20px; max-width: 500px; width: 90%;
         padding: 40px 30px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         animation: slideInUp 0.5s ease-out;
     `;
-    
-    card.innerHTML = `
+
+        card.innerHTML = `
         <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 0.6s ease;">✅</div>
         
         <h1 style="color: #FF6B6B; font-size: 28px; margin-bottom: 10px; font-weight: 700; font-family: 'Fredoka One', cursive;">Order Submitted!</h1>
@@ -637,56 +659,133 @@ showOrderConfirmationCard(orderData) {
             Done
         </button>
     `;
-    
-    backdrop.appendChild(card);
-    document.body.appendChild(backdrop);
-    
-    // ✅ PROPER EVENT LISTENERS
-    const closeBtn = document.getElementById('close-confirmation-btn');
-    const confirmBackdrop = document.getElementById('confirmation-backdrop');
-    
-    // Button click
-closeBtn.addEventListener('click', function() {
-    const backdrop = document.getElementById('confirmation-backdrop');
-    if (backdrop) backdrop.remove();
-});
 
-    
-    // Backdrop click
-    confirmBackdrop.addEventListener('click', function(e) {
-        if (e.target === confirmBackdrop) {
-            confirmBackdrop.remove();
-        }
-    });
-    
-    // ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            confirmBackdrop.remove();
-        }
-    });
-}
-    
+        backdrop.appendChild(card);
+        document.body.appendChild(backdrop);
+
+        // ✅ PROPER EVENT LISTENERS
+        const closeBtn = document.getElementById('close-confirmation-btn');
+        const confirmBackdrop = document.getElementById('confirmation-backdrop');
+
+        // Button click
+        closeBtn.addEventListener('click', function () {
+            const backdrop = document.getElementById('confirmation-backdrop');
+            if (backdrop) backdrop.remove();
+        });
+
+
+        // Backdrop click
+        confirmBackdrop.addEventListener('click', function (e) {
+            if (e.target === confirmBackdrop) {
+                confirmBackdrop.remove();
+            }
+        });
+
+        // ESC key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                confirmBackdrop.remove();
+            }
+        });
+    }
+
+    // ======== ADD THIS METHOD inside OrderManager class ========
+    showOrderConfirmationCardWithPayment(orderData, paymentDeadline) {
+        // remove any previous backdrop
+        document.getElementById('confirmation-backdrop')?.remove();
+
+        const backdrop = document.createElement('div');
+        backdrop.id = 'confirmation-backdrop';
+        backdrop.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(4px);
+    `;
+
+        const remainingMs = paymentDeadline - Date.now();
+        const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+        const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+
+        const card = document.createElement('div');
+        card.style.cssText = `
+        background: white; border-radius: 16px; max-width: 520px; width: 92%;
+        padding: 28px; text-align: center; box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+    `;
+
+        const safeTotal = parseFloat(orderData.totalPrice) || 0;
+
+        // WhatsApp message (merchant number fixed as per app script)
+        const waNumber = "9879254030";
+        // prefilled message: user can just click pay; merchant will send UPI link or confirm
+        const waMsg = encodeURIComponent(`Hi AbuToys, I want to pay for Order ${orderData.orderCode}. Amount: ₹${safeTotal}. Please share payment link. - ${orderData.userName || ''}`);
+        const waUrl = `https://wa.me/${waNumber}?text=${waMsg}`;
+
+        // ⬇️ YE NAYA UPI PAYMENT LINK BANA
+    const upiId = "9879254030@okbizaxis";
+    const safeAmount = parseFloat(orderData.totalPrice) || 0;
+    const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
+
+    card.innerHTML = `
+        <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
+        <h2 style="color:#FF6B6B;margin:0 0 8px 0;">Order Submitted!</h2>
+        <p style="color:#666;margin:0 0 16px 0;">Order Code: <strong>${orderData.orderCode}</strong></p>
+        <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:18px;border-radius:12px;margin-bottom:16px;">
+            <p style="margin:0;font-weight:700;font-size:18px;">₹${safeAmount}</p>
+            <p style="margin:6px 0 0 0;font-size:13px;opacity:0.9;">Pay within 1 hour to avoid cancellation</p>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <a id="pay-now-wa" href="${waUrl}" target="_blank" style="text-decoration:none;">
+                <button style="background:linear-gradient(45deg,#25D366,#128C7E);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
+                    💬 Pay via WhatsApp
+                </button>
+            </a>
+
+            <a href="${upiUrl}" style="text-decoration:none;">
+                <button style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
+                    💳 Pay via UPI
+                </button>
+            </a>
+
+            <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
+                Done
+            </button>
+        </div>
+
+        <p style="margin-top:14px;color:#888;font-size:13px;">If payment is received within 1 hour, you'll get a confirmation email & order timer will start (48h).</p>
+    `;
+
+        backdrop.appendChild(card);
+        document.body.appendChild(backdrop);
+
+        document.getElementById('done-btn').addEventListener('click', () => backdrop.remove());
+
+        // Auto-close after 6 seconds maybe? (optional)
+        // setTimeout(() => backdrop.remove(), 10000);
+    }
+
+
     showPopup(message, type) {
         const popup = document.createElement('div');
         popup.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: ${type === 'success' ? '#4CAF50' : '#f44336'}; color: white; padding: 20px 40px; border-radius: 15px; font-size: 1.2rem; font-weight: 600; z-index: 9999999; box-shadow: 0 10px 30px rgba(0,0,0,0.3);`;
         popup.textContent = message;
         document.body.appendChild(popup);
-        
+
         setTimeout(() => {
             popup.style.opacity = '0';
             setTimeout(() => popup.remove(), 300);
         }, 3000);
     }
-    
+
     // ✅ INSTANT CART PANEL - Loading animation ke saath
-openCartPanelInstant() {
-    const panel = document.createElement('div');
-    panel.id = 'cart-panel';
-    panel.style.cssText = `position: fixed; top: 0; right: -100%; width: 100%; max-width: 450px; height: 100%; background: white; z-index: 999999; box-shadow: -5px 0 20px rgba(0,0,0,0.3); transition: right 0.3s ease; overflow-y: auto;`;
-    
-    // ✅ LOADING STATE
-    panel.innerHTML = `
+    openCartPanelInstant() {
+        const panel = document.createElement('div');
+        panel.id = 'cart-panel';
+        panel.style.cssText = `position: fixed; top: 0; right: -100%; width: 100%; max-width: 450px; height: 100%; background: white; z-index: 999999; box-shadow: -5px 0 20px rgba(0,0,0,0.3); transition: right 0.3s ease; overflow-y: auto;`;
+
+        // ✅ LOADING STATE
+        panel.innerHTML = `
         <div style="padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
                 <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
@@ -698,90 +797,188 @@ openCartPanelInstant() {
             </div>
         </div>
     `;
-    
-    const overlay = document.createElement('div');
-    overlay.id = 'cart-overlay';
-    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999998; opacity: 0; transition: opacity 0.3s ease;`;
-    overlay.addEventListener('click', () => { panel.remove(); overlay.remove(); });
-    
-    document.body.appendChild(overlay);
-    document.body.appendChild(panel);
-    
-    // ✅ INSTANT OPEN WITH ANIMATION
-    setTimeout(() => { 
-        panel.style.right = '0'; 
-        overlay.style.opacity = '1'; 
-    }, 10);
-    
-    // ✅ AB FETCH KARO SHEET SE
-    this.fetchOrdersFromSheetInstant(panel);
-}
 
-// ✅ INSTANT FETCH - Status properly check karo
-async fetchOrdersFromSheetInstant(panel) {
+        const overlay = document.createElement('div');
+        overlay.id = 'cart-overlay';
+        overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999998; opacity: 0; transition: opacity 0.3s ease;`;
+        overlay.addEventListener('click', () => { panel.remove(); overlay.remove(); });
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(panel);
+
+        // ✅ INSTANT OPEN WITH ANIMATION
+        setTimeout(() => {
+            panel.style.right = '0';
+            overlay.style.opacity = '1';
+        }, 10);
+
+        // ✅ AB FETCH KARO SHEET SE
+        this.fetchOrdersFromSheetInstant(panel);
+    }
+
+    // ========== MISSING FUNCTION (ADD THIS INSIDE OrderManager CLASS) ==========
+    async fetchOrdersFromSheet() {
+        try {
+            const response = await fetch(this.APPS_SCRIPT_URL);
+            const result = await response.json();
+
+            if (!result.success) return;
+
+            let localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+
+            localOrders = localOrders.map(local => {
+                const sheetOrder = result.orders.find(o => o['Order Code'] === local.orderCode);
+
+                let status = local.status || '';
+                let paymentStatus = local.paymentStatus || '';
+                let paymentConfirmedAt = local.paymentConfirmedAt || null;
+
+                if (sheetOrder) {
+                    const sheetPayment = (sheetOrder['Payment'] || '').toString().trim().toLowerCase();
+                    const sheetStatus = (sheetOrder['Status'] || '').toString().trim().toLowerCase();
+
+                    // PAYMENT OK → mark paid + start 48h timer
+                    if (sheetPayment === 'ok') {
+                        if (paymentStatus !== 'ok') {
+                            paymentStatus = 'ok';
+                            paymentConfirmedAt = Date.now();
+                        }
+                        if (status === 'Cancelled') status = '';
+                    }
+
+                    // DELIVERY OK → Delivered
+                    if (sheetStatus === 'ok') status = 'Delivered';
+
+                    // AUTO CANCEL (sheet canceled)
+                    if (sheetStatus === 'cancelled') status = 'Cancelled';
+                }
+
+                return {
+                    ...local,
+                    status,
+                    paymentStatus,
+                    paymentConfirmedAt
+                };
+            });
+
+            localStorage.setItem("abutoys_orders", JSON.stringify(localOrders));
+            this.orders = localOrders;
+
+        } catch (err) {
+            console.error("fetchOrdersFromSheet ERROR:", err);
+        }
+    }
+
+    // ✅ INSTANT FETCH - Status properly check karo
+    async fetchOrdersFromSheetInstant(panel) {
     try {
         const response = await fetch(this.APPS_SCRIPT_URL);
         const result = await response.json();
-        
+
         if (result.success) {
             const localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
-            
+
             this.orders = localOrders.map(localOrder => {
                 const sheetOrder = result.orders.find(o => o['Order Code'] === localOrder.orderCode);
                 
-                // ✅ STATUS CHECK - "ok" ya empty dono check kar
-                let status = localOrder.status;
+                let status = localOrder.status || '';
+                let paymentStatus = localOrder.paymentStatus || '';
+                let paymentConfirmedAt = localOrder.paymentConfirmedAt || null;
+
                 if (sheetOrder) {
-                    const sheetStatus = sheetOrder['Status'] ? sheetOrder['Status'].toString().trim().toLowerCase() : '';
-                    
+                    const sheetStatusRaw = sheetOrder['Status'] || '';
+                    const sheetStatus = sheetStatusRaw.toString().trim().toLowerCase();
+
+                    const sheetPaymentRaw = sheetOrder['Payment'] || '';
+                    const sheetPayment = sheetPaymentRaw.toString().trim().toLowerCase();
+
+                    // ✅ PAYMENT LOGIC
+                    if (sheetPayment === 'ok') {
+                        // Payment confirm hua - 48h timer START
+                        if (paymentStatus !== 'ok') {
+                            paymentStatus = 'ok';
+                            paymentConfirmedAt = Date.now();  // ✅ TIMER START
+                        }
+                        // Cancelled status clear kar do
+                        if (status === 'Cancelled') {
+                            status = '';  // Reset so timer can show
+                        }
+                    }
+
+                    // ✅ STATUS LOGIC (Delivery)
                     if (sheetStatus === 'ok') {
                         status = 'Delivered';
-                    } else if (sheetStatus === '') {
-                        status = 'Pending';
-                    } else {
-                        status = sheetStatus;
+                    } else if (sheetStatus === 'cancelled') {
+                        status = 'Cancelled';
                     }
                 }
-                
+
                 return {
                     ...localOrder,
-                    status: status
+                    status: status,
+                    paymentStatus: paymentStatus,
+                    paymentConfirmedAt: paymentConfirmedAt
                 };
             });
-            
+
             localStorage.setItem("abutoys_orders", JSON.stringify(this.orders));
             this.updateCartBadge();
-            
-            // ✅ LOADING ANIMATION HATAO, DATA SHOW KARO
+
+            // ✅ RENDER ORDER CARDS
             let ordersHTML = '';
-            
+
             if (this.orders.length === 0) {
                 ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
             } else {
                 ordersHTML = this.orders.map(order => {
                     const isDelivered = order.status === 'Delivered';
-                    const timeLeft = !isDelivered ? this.getTimeLeft(order.orderTimestamp) : null;
-                    
+                    const isCancelled = order.status === 'Cancelled';
+                    const isPaymentPending = order.paymentStatus !== 'ok';
+
+                    let statusHTML = '';
+
+                    if (isDelivered) {
+                        // ✅ DELIVERED
+                        statusHTML = `
+                            <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
+                            </div>
+                        `;
+                    } else if (isCancelled) {
+                        // ✅ CANCELLED
+                        statusHTML = `
+                            <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
+                            </div>
+                        `;
+                    } else if (isPaymentPending) {
+                        // ✅ PAYMENT PENDING
+                        statusHTML = `
+                            <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #856404; margin: 0; font-weight: 600;">⏳ Payment Pending (Pay within 1 hour)</p>
+                            </div>
+                        `;
+                    } else {
+                        // ✅ PAYMENT DONE - SHOW 48H TIMER
+                        const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
+                        statusHTML = `
+                            <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
+                            </div>
+                        `;
+                    }
+
                     return `
-                        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
+                        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
                             <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
                             <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
                             <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
-                            
-                            ${isDelivered ? 
-                                `<div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                                    <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
-                                </div>` 
-                                : 
-                                `<div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                                    <p style="color: #856404; margin: 0; font-weight: 600;">⏰ ${timeLeft || 'Processing...'}</p>
-                                </div>`
-                            }
+                            ${statusHTML}
                         </div>
                     `;
                 }).join('');
             }
-            
+
             panel.innerHTML = `
                 <div style="padding: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
@@ -807,13 +1004,18 @@ async fetchOrdersFromSheetInstant(panel) {
         `;
     }
 }
-    
-    getTimeLeft(timestamp) {
+
+    getTimeLeft(orderTimestamp) {
         const now = Date.now();
-        const diff = (timestamp + (48 * 60 * 60 * 1000)) - now;
-        if (diff <= 0) return null;
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const diff = orderTimestamp + (48 * 60 * 60 * 1000) - now;
+
+        if (diff <= 0) {
+            return "Waiting for delivery update";
+        }
+
+        const hours = Math.floor(diff / (60 * 60 * 1000));
+        const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+
         return `${hours}h ${minutes}m`;
     }
 }
@@ -827,12 +1029,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cartIcon.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
+
             if (!userDataManager.isLoggedIn()) {
                 userDataManager.showMessage("Please login first!", "error");
                 return;
             }
-            
+
             // ✅ INSTANT PANEL KHOLO - PEHLE EMPTY, PHIR LOAD KARO
             orderManager.openCartPanelInstant();
         });
@@ -1252,12 +1454,12 @@ function initializeNavbarIcons() {
 // =================== CART BUTTONS - MOBILE FIX ===================
 function initializeCartButtons() {
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        
+
         // ✅ DESKTOP CLICK
         btn.addEventListener('click', handleBuyNowClick);
-        
+
         // ✅ MOBILE TOUCH - YE BAHUT IMPORTANT HAI
-        btn.addEventListener('touchend', function(e) {
+        btn.addEventListener('touchend', function (e) {
             e.preventDefault(); // Default touch behavior rok do
             e.stopPropagation();
             handleBuyNowClick.call(this, e);
@@ -1532,7 +1734,7 @@ function initializeLoadMore() {
 // ✅ REPLACE YOUR OLD loadProductsFromSheet FUNCTION WITH THIS
 
 async function loadProductsFromSheet() {
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4GGhFnFg262TM-yOapTiOTu3qW9a6xYEaa3lgWTvwOHrqqjcCoz6UECft1p-CxcD7Dw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwjNa6RAshl-MIO7sHEW4GAp_b8QYHvwXIb5USCpTJOhru9zzEEfooUy93OFXMDIIz/exec";
     const OPENSHEET_URL = "https://opensheet.vercel.app/1LaF1JFdRSGhNvonfo8-G3mHEXIA5-ulPl_4JlIAOAfc/AbuToys";
     const grid = document.getElementById("products-grid");
 
@@ -1655,11 +1857,11 @@ async function loadProductsFromSheet() {
             const totalPrice = originalPrice + deliveryCharge;
 
             // ✅ PRICE SIRF LOGGED IN + LOCATION VERIFIED USER KO DIKHAO
-const shouldShowPrice = userDataManager.isLoggedIn() && 
-                        userDataManager.isLocationVerified() && 
-                        userDataManager.userDistance <= 20;
+            const shouldShowPrice = userDataManager.isLoggedIn() &&
+                userDataManager.isLocationVerified() &&
+                userDataManager.userDistance <= 20;
 
-const priceHTML = shouldShowPrice ? `
+            const priceHTML = shouldShowPrice ? `
     <div class="price-display" style="margin: 12px 0; padding: 12px; background: #fcececff; border-radius: 8px; text-align: center;">
         <div style="font-size: 1.8rem; font-weight: 800; color: #FF6B6B;">
             ₹${originalPrice.toFixed(0)}
@@ -2428,3 +2630,35 @@ setInterval(() => {
         orderManager.fetchOrdersFromSheetInstant(cartPanel);
     }
 }, 5000); // ✅ 5 SECOND ME CHECK KARO
+
+// ✅ AUTO CANCEL WATCHER - 1 HOUR PAYMENT DEADLINE
+setInterval(() => {
+    try {
+        const orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+        let changed = false;
+        const now = Date.now();
+
+        for (let i = 0; i < orders.length; i++) {
+            const o = orders[i];
+
+            // ✅ AUTO-CANCEL: Payment deadline cross + payment not ok
+            if (o.paymentStatus !== 'ok' && o.paymentDeadline) {
+                if (now > o.paymentDeadline) {
+                    if (o.status !== 'Cancelled') {
+                        o.status = 'Cancelled';
+                        changed = true;
+                        console.log(`❌ Auto-cancelled order: ${o.orderCode}`);
+                    }
+                }
+            }
+        }
+
+        if (changed) {
+            localStorage.setItem("abutoys_orders", JSON.stringify(orders));
+            orderManager.updateCartBadge();
+        }
+    } catch (err) {
+        console.warn('Auto-cancel watcher error:', err);
+    }
+}, 30 * 1000); // ✅ Har 30 seconds check
+
