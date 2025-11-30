@@ -275,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz69Ng_SmOHX9uMzcyiqddnZQkfb9PehnRjCZQS1AV8h0pAR7qDru0Ec2fqRLf8Vsv0/exec";
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDofMsnjM4CL7LRt0PyQwajvOdXAPWcY3cWV_MWrxRwh9Y6qQ2qnH4lWCaIs087TUwOg/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
@@ -540,65 +540,65 @@ class OrderManager {
     }
 
     async submitOrder(orderData) {
-    try {
-        const response = await fetch(this.APPS_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                orderCode: orderData.orderCode,
-                orderDate: new Date().toLocaleString(),
-                userName: orderData.userName,
-                productName: orderData.productName,
-                productPrice: orderData.productPrice,
-                deliveryCharge: orderData.deliveryCharge,
-                totalPrice: orderData.totalPrice,
-                fullAddress: orderData.address,
-                password: orderData.password,
-                userEmail: userDataManager.currentUser
-            })
-        });
+        try {
+            const response = await fetch(this.APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    orderCode: orderData.orderCode,
+                    orderDate: new Date().toLocaleString(),
+                    userName: orderData.userName,
+                    productName: orderData.productName,
+                    productPrice: orderData.productPrice,
+                    deliveryCharge: orderData.deliveryCharge,
+                    totalPrice: orderData.totalPrice,
+                    fullAddress: orderData.address,
+                    password: orderData.password,
+                    userEmail: userDataManager.currentUser
+                })
+            });
 
-        const result = await response.json();
-        document.getElementById('order-loader')?.remove();
+            const result = await response.json();
+            document.getElementById('order-loader')?.remove();
 
-        if (result.success) {
-            const now = Date.now();
-            const paymentDeadline = now + (60 * 60 * 1000); // ✅ 1 HOUR DEADLINE
+            if (result.success) {
+                const now = Date.now();
+                const paymentDeadline = now + (60 * 60 * 1000); // ✅ 1 HOUR DEADLINE
 
-            const orderToSave = {
-                orderCode: orderData.orderCode,
-                productName: orderData.productName,
-                productPrice: orderData.productPrice,
-                deliveryCharge: orderData.deliveryCharge,
-                totalPrice: orderData.totalPrice,
-                orderDate: new Date().toLocaleString(),
-                orderTimestamp: now,
-                paymentDeadline: paymentDeadline,  // ✅ DEADLINE SAVE KIYA
-                status: '',  // ✅ Empty (not delivered yet)
-                paymentStatus: '',  // ✅ Empty (payment pending)
-                paymentConfirmedAt: null  // ✅ No timer yet
-            };
+                const orderToSave = {
+                    orderCode: orderData.orderCode,
+                    productName: orderData.productName,
+                    productPrice: orderData.productPrice,
+                    deliveryCharge: orderData.deliveryCharge,
+                    totalPrice: orderData.totalPrice,
+                    orderDate: new Date().toLocaleString(),
+                    orderTimestamp: now,
+                    paymentDeadline: paymentDeadline,  // ✅ DEADLINE SAVE KIYA
+                    status: '',  // ✅ Empty (not delivered yet)
+                    paymentStatus: '',  // ✅ Empty (payment pending)
+                    paymentConfirmedAt: null  // ✅ No timer yet
+                };
 
-            const currentOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
-            currentOrders.push(orderToSave);
-            localStorage.setItem("abutoys_orders", JSON.stringify(currentOrders));
+                const currentOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+                currentOrders.push(orderToSave);
+                localStorage.setItem("abutoys_orders", JSON.stringify(currentOrders));
 
-            this.orders = currentOrders;
-            this.updateCartBadge();
+                this.orders = currentOrders;
+                this.updateCartBadge();
 
-            closeOrderPanel();
+                closeOrderPanel();
 
-            // ✅ SHOW PAYMENT CARD
-            this.showOrderConfirmationCardWithPayment(orderData, paymentDeadline);
-        } else {
-            this.showPopup('❌ Order failed! Try again.', 'error');
+                // ✅ SHOW PAYMENT CARD
+                this.showOrderConfirmationCardWithPayment(orderData, paymentDeadline);
+            } else {
+                this.showPopup('❌ Order failed! Try again.', 'error');
+            }
+
+        } catch (error) {
+            document.getElementById('order-loader')?.remove();
+            console.error(error);
+            this.showPopup('❌ Network error! Check internet.', 'error');
         }
-
-    } catch (error) {
-        document.getElementById('order-loader')?.remove();
-        console.error(error);
-        this.showPopup('❌ Network error! Check internet.', 'error');
     }
-}
 
     // ✅ BEAUTIFUL ORDER CONFIRMATION CARD - FIXED
     showOrderConfirmationCard(orderData) {
@@ -713,20 +713,14 @@ class OrderManager {
         padding: 28px; text-align: center; box-shadow: 0 18px 60px rgba(0,0,0,0.25);
     `;
 
-        const safeTotal = parseFloat(orderData.totalPrice) || 0;
-
-        // WhatsApp message (merchant number fixed as per app script)
-        const waNumber = "9879254030";
-        // prefilled message: user can just click pay; merchant will send UPI link or confirm
-        const waMsg = encodeURIComponent(`Hi AbuToys, I want to pay for Order ${orderData.orderCode}. Amount: ₹${safeTotal}. Please share payment link. - ${orderData.userName || ''}`);
-        const waUrl = `https://wa.me/${waNumber}?text=${waMsg}`;
-
         // ⬇️ YE NAYA UPI PAYMENT LINK BANA
-    const upiId = "9879254030@okbizaxis";
-    const safeAmount = parseFloat(orderData.totalPrice) || 0;
-    const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
+        const upiId = "9879254030@okbizaxis";
+        const safeAmount = parseFloat(orderData.totalPrice) || 0;
+        const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
+        // 👉 Direct WhatsApp Payment Page (no chat)
+        const waUrl = `https://wa.me/pay?pa=${upiId}&pn=AbuToys&am=${safeAmount}&cu=INR`;
 
-    card.innerHTML = `
+        card.innerHTML = `
         <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
         <h2 style="color:#FF6B6B;margin:0 0 8px 0;">Order Submitted!</h2>
         <p style="color:#666;margin:0 0 16px 0;">Order Code: <strong>${orderData.orderCode}</strong></p>
@@ -816,7 +810,7 @@ class OrderManager {
         this.fetchOrdersFromSheetInstant(panel);
     }
 
-    
+
 
     // ========== MISSING FUNCTION (ADD THIS INSIDE OrderManager CLASS) ==========
     async fetchOrdersFromSheet() {
@@ -873,104 +867,104 @@ class OrderManager {
 
     // ✅ INSTANT FETCH - Status properly check karo
     async fetchOrdersFromSheetInstant(panel) {
-    try {
-        const response = await fetch(this.APPS_SCRIPT_URL);
-        const result = await response.json();
+        try {
+            const response = await fetch(this.APPS_SCRIPT_URL);
+            const result = await response.json();
 
-        if (result.success) {
-            const localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+            if (result.success) {
+                const localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
-            this.orders = localOrders.map(localOrder => {
-                const sheetOrder = result.orders.find(o => o['Order Code'] === localOrder.orderCode);
-                
-                let status = localOrder.status || '';
-                let paymentStatus = localOrder.paymentStatus || '';
-                let paymentConfirmedAt = localOrder.paymentConfirmedAt || null;
+                this.orders = localOrders.map(localOrder => {
+                    const sheetOrder = result.orders.find(o => o['Order Code'] === localOrder.orderCode);
 
-                if (sheetOrder) {
-                    const sheetStatusRaw = sheetOrder['Status'] || '';
-                    const sheetStatus = sheetStatusRaw.toString().trim().toLowerCase();
+                    let status = localOrder.status || '';
+                    let paymentStatus = localOrder.paymentStatus || '';
+                    let paymentConfirmedAt = localOrder.paymentConfirmedAt || null;
 
-                    const sheetPaymentRaw = sheetOrder['Payment'] || '';
-                    const sheetPayment = sheetPaymentRaw.toString().trim().toLowerCase();
+                    if (sheetOrder) {
+                        const sheetStatusRaw = sheetOrder['Status'] || '';
+                        const sheetStatus = sheetStatusRaw.toString().trim().toLowerCase();
 
-                    // ✅ PAYMENT LOGIC
-                    if (sheetPayment === 'ok') {
-                        // Payment confirm hua - 48h timer START
-                        if (paymentStatus !== 'ok') {
-                            paymentStatus = 'ok';
-                            paymentConfirmedAt = Date.now();  // ✅ TIMER START
+                        const sheetPaymentRaw = sheetOrder['Payment'] || '';
+                        const sheetPayment = sheetPaymentRaw.toString().trim().toLowerCase();
+
+                        // ✅ PAYMENT LOGIC
+                        if (sheetPayment === 'ok') {
+                            // Payment confirm hua - 48h timer START
+                            if (paymentStatus !== 'ok') {
+                                paymentStatus = 'ok';
+                                paymentConfirmedAt = Date.now();  // ✅ TIMER START
+                            }
+                            // Cancelled status clear kar do
+                            if (status === 'Cancelled') {
+                                status = '';  // Reset so timer can show
+                            }
                         }
-                        // Cancelled status clear kar do
-                        if (status === 'Cancelled') {
-                            status = '';  // Reset so timer can show
+
+                        // ✅ STATUS LOGIC (Delivery)
+                        if (sheetStatus === 'ok') {
+                            status = 'Delivered';
+                        } else if (sheetStatus === 'cancelled') {
+                            status = 'Cancelled';
                         }
                     }
 
-                    // ✅ STATUS LOGIC (Delivery)
-                    if (sheetStatus === 'ok') {
-                        status = 'Delivered';
-                    } else if (sheetStatus === 'cancelled') {
-                        status = 'Cancelled';
-                    }
-                }
+                    return {
+                        ...localOrder,
+                        status: status,
+                        paymentStatus: paymentStatus,
+                        paymentConfirmedAt: paymentConfirmedAt
+                    };
+                });
 
-                return {
-                    ...localOrder,
-                    status: status,
-                    paymentStatus: paymentStatus,
-                    paymentConfirmedAt: paymentConfirmedAt
-                };
-            });
+                localStorage.setItem("abutoys_orders", JSON.stringify(this.orders));
+                this.updateCartBadge();
 
-            localStorage.setItem("abutoys_orders", JSON.stringify(this.orders));
-            this.updateCartBadge();
+                // ✅ RENDER ORDER CARDS
+                let ordersHTML = '';
 
-            // ✅ RENDER ORDER CARDS
-            let ordersHTML = '';
+                if (this.orders.length === 0) {
+                    ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
+                } else {
+                    ordersHTML = this.orders.map(order => {
+                        const isDelivered = order.status === 'Delivered';
+                        const isCancelled = order.status === 'Cancelled';
+                        const isPaymentPending = order.paymentStatus !== 'ok';
 
-            if (this.orders.length === 0) {
-                ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
-            } else {
-                ordersHTML = this.orders.map(order => {
-                    const isDelivered = order.status === 'Delivered';
-                    const isCancelled = order.status === 'Cancelled';
-                    const isPaymentPending = order.paymentStatus !== 'ok';
+                        let statusHTML = '';
 
-                    let statusHTML = '';
-
-                    if (isDelivered) {
-                        // ✅ DELIVERED
-                        statusHTML = `
+                        if (isDelivered) {
+                            // ✅ DELIVERED
+                            statusHTML = `
                             <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
                                 <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
                             </div>
                         `;
-                    } else if (isCancelled) {
-                        // ✅ CANCELLED
-                        statusHTML = `
+                        } else if (isCancelled) {
+                            // ✅ CANCELLED
+                            statusHTML = `
                             <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
                                 <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
                             </div>
                         `;
-                    } else if (isPaymentPending) {
-                        // ✅ PAYMENT PENDING
-                        statusHTML = `
+                        } else if (isPaymentPending) {
+                            // ✅ PAYMENT PENDING
+                            statusHTML = `
                             <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
                                 <p style="color: #856404; margin: 0; font-weight: 600;">⏳ Payment Pending (Pay within 1 hour)</p>
                             </div>
                         `;
-                    } else {
-                        // ✅ PAYMENT DONE - SHOW 48H TIMER
-                        const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
-                        statusHTML = `
+                        } else {
+                            // ✅ PAYMENT DONE - SHOW 48H TIMER
+                            const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
+                            statusHTML = `
                             <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
                                 <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
                             </div>
                         `;
-                    }
+                        }
 
-                    return `
+                        return `
                         <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
                             <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
                             <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
@@ -978,10 +972,10 @@ class OrderManager {
                             ${statusHTML}
                         </div>
                     `;
-                }).join('');
-            }
+                    }).join('');
+                }
 
-            panel.innerHTML = `
+                panel.innerHTML = `
                 <div style="padding: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
                         <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
@@ -990,10 +984,10 @@ class OrderManager {
                     ${ordersHTML}
                 </div>
             `;
-        }
-    } catch (error) {
-        console.error('Failed to fetch orders:', error);
-        panel.innerHTML = `
+            }
+        } catch (error) {
+            console.error('Failed to fetch orders:', error);
+            panel.innerHTML = `
             <div style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
                     <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
@@ -1004,8 +998,8 @@ class OrderManager {
                 </div>
             </div>
         `;
+        }
     }
-}
 
     getTimeLeft(orderTimestamp) {
         const now = Date.now();
@@ -1680,7 +1674,7 @@ function openWhatsApp() {
     const userName = (typeof userDataManager !== 'undefined') ? userDataManager.getCurrentUserName() : (localStorage.getItem("abutoys_user_name") || localStorage.getItem("abutoys_current_user") || "User");
     const message = `Hii 🧸 AbuToys, My name is "${userName}"`;
     const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/9879254030?text=${encoded}`, '_blank');
+    window.open(`https://wa.me/8160154042?text=${encoded}`, '_blank');
 }
 
 
