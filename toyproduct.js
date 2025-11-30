@@ -275,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDofMsnjM4CL7LRt0PyQwajvOdXAPWcY3cWV_MWrxRwh9Y6qQ2qnH4lWCaIs087TUwOg/exec";
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbxz7DRdXrAsAG42l9LyJLv-WOTi0usjXAc-snw_oasyt4v5kASABaMX4wl7exHAWGMg/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
@@ -926,6 +926,7 @@ class OrderManager {
                 if (this.orders.length === 0) {
                     ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
                 } else {
+                    this.orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
                     ordersHTML = this.orders.map(order => {
                         const isDelivered = order.status === 'Delivered';
                         const isCancelled = order.status === 'Cancelled';
