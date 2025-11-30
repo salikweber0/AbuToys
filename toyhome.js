@@ -64,7 +64,7 @@ const SHOP_LOCATION = { lat: 23.0370322, lng: 72.5822496 }; // use this if you w
 const DELIVERY_RANGE_KM = 20;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
-const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwOM8-Q2SXuzFESlsJc1yOOiNGJCaZIzmlMNk6rJkCwssER7UYXE00WiYaaeWsBE-odQ/exec";
+const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdP_klBNa_q2YTbF7C07AzXeTcJ7dYudKveZawuCVgfakVA2WQe4gJ4mCmlbiTAJYM-Q/exec";
 
 console.log("🚀 AbuToys Script Loaded");
 
@@ -712,7 +712,7 @@ function openWhatsAppDirect() {
     const encodedMessage = encodeURIComponent(message);
 
     // open whatsapp (use target _blank)
-    window.open(`https://wa.me/9879254030?text=${encodedMessage}`, "_blank");
+    window.open(`https://wa.me/8160154042?text=${encodedMessage}`, "_blank");
 }
 
 function showLocationRequiredForWhatsAppPopup() {
@@ -1684,4 +1684,3 @@ window.addEventListener("load", () => {
         createFloatingLocationButton();   // ⭐ New Floating Button
     }, 1000);
 });
-
