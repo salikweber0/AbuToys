@@ -718,8 +718,8 @@ class OrderManager {
         const safeAmount = parseFloat(orderData.totalPrice) || 0;
         const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
         // 👉 Direct WhatsApp Payment Page (no chat)
-        const waPaymentId = "naimuddin.4030@waicici";
-        const waPayUrl = `upi://pay?pa=${waPaymentId}&pn=AbuToys&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
+        // const waPaymentId = "naimuddin.4030@waicici";
+        // const waPayUrl = `upi://pay?pa=${waPaymentId}&pn=AbuToys&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
 
 
         card.innerHTML = `
