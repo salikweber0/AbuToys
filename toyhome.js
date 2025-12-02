@@ -193,101 +193,65 @@ async function handleManualLocationValue(val) {
 async function verifyUserLocation() {
     showLocationLoader();
 
-    if (!navigator.geolocation) {
-        hideLocationLoader();
-        localStorage.setItem("abutoys_location_status", "no_geo");
-        return { status: "no_geo" };
-    }
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            hideLocationLoader();
+            resolve({ status: "no_geo" });
+            return;
+        }
 
-    // helper to wrap getCurrentPosition as promise
-    const getPos = (opts) => new Promise((resolve, reject) => {
-        let handled = false;
+        // SIMPLE WORKING OPTIONS
         navigator.geolocation.getCurrentPosition(
-            (p) => { if (!handled) { handled = true; resolve(p); } },
-            (e) => { if (!handled) { handled = true; reject(e); } },
-            opts
-        );
-        // safety fallback (in case browser hangs)
-        setTimeout(() => {
-            if (!handled) {
-                handled = true;
-                reject({ code: 999, message: 'geolocation_fallback_timeout' });
-            }
-        }, (opts && opts.timeout ? opts.timeout + 2000 : 10000));
-    });
-
-    try {
-        // 1) Quick attempt: low-accuracy, short timeout, allow cached — usually fastest on mobile
-        try {
-            const quickOpts = { enableHighAccuracy: false, timeout: 8000, maximumAge: 15000 };
-            const quickPos = await getPos(quickOpts); // usually returns via network-based geolocation
-            return await handlePositionAndReturn(quickPos.coords);
-        } catch (quickErr) {
-            console.warn("quick position failed:", quickErr);
-            // continue to next strategy
-        }
-
-        // 2) Second attempt: use watchPosition for a faster first fix with high accuracy but we'll cancel quickly
-        const watchPromise = new Promise((resolve, reject) => {
-            let resolved = false;
-            const watchId = navigator.geolocation.watchPosition(
-                (pos) => {
-                    if (resolved) return;
-                    resolved = true;
-                    try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
-                    resolve(pos);
-                },
-                (err) => {
-                    if (resolved) return;
-                    resolved = true;
-                    try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
-                    reject(err);
-                },
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 }
-            );
-
-            // safety: if nothing in 10s, clear and reject
-            setTimeout(() => {
-                if (!resolved) {
-                    try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
-                    reject({ code: 3, message: "watch_timeout" });
-                }
-            }, 10000);
-        });
-
-        try {
-            const watchPos = await watchPromise;
-            return await handlePositionAndReturn(watchPos.coords);
-        } catch (watchErr) {
-            console.warn("watchPosition failed:", watchErr);
-            // fallback to a final getCurrentPosition with moderate timeout
-            try {
-                const finalPos = await getPos({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-                return await handlePositionAndReturn(finalPos.coords);
-            } catch (finalErr) {
-                console.warn("final getCurrentPosition failed:", finalErr);
-                // If inside webview give instructions
+            (pos) => {
                 hideLocationLoader();
-                if (isInWebView()) {
-                    localStorage.setItem("abutoys_location_status", "permission_denied");
-                    showLocationDeniedInstructions(true);
-                    return { status: "permission_denied", fallback: true };
+
+                const userLat = pos.coords.latitude;
+                const userLng = pos.coords.longitude;
+
+                const dist = calculateDistance(
+                    userLat,
+                    userLng,
+                    SHOP_LOCATION.lat,
+                    SHOP_LOCATION.lng
+                );
+
+                const charge = getDeliveryCharge(dist);
+
+                localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
+                localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
+                localStorage.setItem("abutoys_delivery_charge", charge);
+
+                if (charge === -1) {
+                    localStorage.setItem("abutoys_location_status", "out_of_range");
+                    resolve({ status: "out_of_range", distance: dist, charge });
+                } else {
+                    localStorage.setItem("abutoys_location_status", "in_range");
+                    resolve({ status: "in_range", distance: dist, charge });
                 }
-                localStorage.setItem("abutoys_location_status", "unknown");
-                return { status: "unknown" };
+            },
+
+            // ERROR CALLBACK
+            (err) => {
+                hideLocationLoader();
+
+                if (err.code === 1) {
+                    localStorage.setItem("abutoys_location_status", "permission_denied");
+                    resolve({ status: "permission_denied" });
+                } else {
+                    localStorage.setItem("abutoys_location_status", "unknown");
+                    resolve({ status: "unknown" });
+                }
+            },
+
+            {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 0
             }
-        }
-    } catch (err) {
-        console.warn("verifyUserLocation overall error:", err);
-        hideLocationLoader();
-        if (err && (err.code === 1 || err.name === "PermissionDeniedError")) {
-            localStorage.setItem("abutoys_location_status", "permission_denied");
-            return { status: "permission_denied" };
-        }
-        localStorage.setItem("abutoys_location_status", "unknown");
-        return { status: "unknown" };
-    }
+        );
+    });
 }
+
 
 // small helper used above to compute distance/charge & return same shape as original
 async function handlePositionAndReturn(coords) {
