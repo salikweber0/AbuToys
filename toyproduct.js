@@ -718,7 +718,9 @@ class OrderManager {
         const safeAmount = parseFloat(orderData.totalPrice) || 0;
         const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
         // 👉 Direct WhatsApp Payment Page (no chat)
-        const waUrl = `https://wa.me/pay?pa=naimuddin.4030@waicici&pn=AbuToys&am=${safeAmount}&cu=INR`;
+        const waPaymentId = "naimuddin.4030@waicici";
+        const waPayUrl = `upi://pay?pa=${waPaymentId}&pn=AbuToys&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
+
 
         card.innerHTML = `
         <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
@@ -730,7 +732,7 @@ class OrderManager {
         </div>
 
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <a id="pay-now-wa" href="${waUrl}" target="_blank" style="text-decoration:none;">
+            <a id="pay-now-wa" href="${waPayUrl}" target="_blank" style="text-decoration:none;">
                 <button style="background:linear-gradient(45deg,#25D366,#128C7E);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
                     💬 Pay via WhatsApp
                 </button>
@@ -2658,5 +2660,4 @@ setInterval(() => {
         console.warn('Auto-cancel watcher error:', err);
     }
 }, 30 * 1000); // ✅ Har 30 seconds check
-
 
