@@ -61,7 +61,7 @@ try {
 
 // =================== CONFIG ===================
 const SHOP_LOCATION = { lat: 23.0370322, lng: 72.5822496 }; // use this if you want exact map pin
-const DELIVERY_RANGE_KM = 20;
+const DELIVERY_RANGE_KM = 10;
 
 // ✅ SAME URL FOR BOTH - YAHI ISSUE THA
 const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdP_klBNa_q2YTbF7C07AzXeTcJ7dYudKveZawuCVgfakVA2WQe4gJ4mCmlbiTAJYM-Q/exec";
@@ -408,19 +408,21 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 /* ========== DELIVERY CHARGE ========== */
 function getDeliveryCharge(d) {
-    if (d > 20) return -1;
+    if (d > 10) return -1;     // ❌ Above 10 km = No delivery
     if (d <= 1) return 0;
     if (d <= 2) return 60;
-    if (d <= 3) return 70;
-    if (d <= 4) return 80;
+    if (d <= 3) return 80;
+    if (d <= 4) return 100;
     if (d <= 5) return 120;
     if (d <= 6) return 140;
     if (d <= 7) return 160;
     if (d <= 8) return 180;
-    if (d <= 9) return 210;
-    if (d <= 10) return 230;
-    return 430;
+    if (d <= 9) return 200;
+    if (d <= 10) return 220;
+
+    return -1;
 }
+
 
 
 // =================== USER MANAGER ===================
