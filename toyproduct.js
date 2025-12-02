@@ -718,8 +718,8 @@ class OrderManager {
         const safeAmount = parseFloat(orderData.totalPrice) || 0;
         const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
         // 👉 Direct WhatsApp Payment Page (no chat)
-        const waPaymentId = "naimuddin.4030@waicici";
-        const waPayUrl = `upi://pay?pa=${waPaymentId}&pn=AbuToys&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
+        // const waPaymentId = "naimuddin.4030@waicici";
+        // const waPayUrl = `upi://pay?pa=${waPaymentId}&pn=AbuToys&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
 
 
         card.innerHTML = `
@@ -732,11 +732,21 @@ class OrderManager {
         </div>
 
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <a id="pay-now-wa" href="${waPayUrl}" target="_blank" style="text-decoration:none;">
-                <button style="background:linear-gradient(45deg,#25D366,#128C7E);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
-                    💬 Pay via WhatsApp
-                </button>
-            </a>
+            <!-- ✅ New SEND PAYMENT DONE MESSAGE BUTTON -->
+<a href="https://wa.me/8160154042?text=${encodeURIComponent(
+            `Order Code: ${orderData.orderCode}
+Total Amount: ₹${safeAmount}
+Email: ${userDataManager.currentUser}
+Payment Done ✔`
+        )}" target="_blank" style="text-decoration:none;">
+    <button style="
+        background:linear-gradient(45deg,#25D366,#128C7E);
+        color:white;border:0;padding:12px 20px;
+        border-radius:10px;font-weight:700;cursor:pointer;">
+        📩 Send Payment Done
+    </button>
+</a>
+
 
             <a href="${upiUrl}" style="text-decoration:none;">
                 <button style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
@@ -750,6 +760,10 @@ class OrderManager {
         </div>
 
         <p style="margin-top:14px;color:#888;font-size:13px;">If payment is received within 1 hour, you'll get a confirmation email & order timer will start (48h).</p>
+        <p style="margin-top:10px;color:#28a745;font-size:13px;font-weight:600;">
+After making the payment, click the WhatsApp button above and send us a message to confirm your payment.
+</p>
+
     `;
 
         backdrop.appendChild(card);
