@@ -718,7 +718,7 @@ class OrderManager {
         const safeAmount = parseFloat(orderData.totalPrice) || 0;
         const upiUrl = `upi://pay?pa=${upiId}&am=${safeAmount}&cu=INR&tn=AbuToys Order ${orderData.orderCode}`;
         // 👉 Direct WhatsApp Payment Page (no chat)
-        const waUrl = `https://wa.me/pay?pa=${upiId}&pn=AbuToys&am=${safeAmount}&cu=INR`;
+        const waUrl = `https://wa.me/pay?pa=naimuddin.4030@waicici&pn=AbuToys&am=${safeAmount}&cu=INR`;
 
         card.innerHTML = `
         <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
@@ -2658,4 +2658,5 @@ setInterval(() => {
         console.warn('Auto-cancel watcher error:', err);
     }
 }, 30 * 1000); // ✅ Har 30 seconds check
+
 
