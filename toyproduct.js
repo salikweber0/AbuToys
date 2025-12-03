@@ -747,9 +747,19 @@ Payment Done ✔`
     </button>
 </a>
 
-            <button onclick="openUPI('upi://pay?pa=9879254030@okbizaxis&am=100&cu=INR&tn=Payment')">
-                💳 Pay via UPI
-            </button>
+            <button onclick="openUPIPayment('${orderData.orderCode}', ${orderData.totalPrice})"
+style="
+background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+color: white;
+border: none;
+padding: 12px 20px;
+border-radius: 10px;
+font-weight: 700;
+cursor: pointer;
+">
+💳 Pay via UPI
+</button>
+
 
             <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
                 Done
@@ -2672,15 +2682,17 @@ setInterval(() => {
     }
 }, 30 * 1000); // ✅ Har 30 seconds check
 
-function openUPI(url) {
-    // 1) hidden iframe trick (WebView में सबसे ज्यादा काम करता है)
-    let iframe = document.createElement("iframe");
+function openUPIPayment(orderCode, amount) {
+    const upiUrl = `upi://pay?pa=9879254030@okbizaxis&pn=AbuToys&am=${amount}&cu=INR&tn=AbuToys-${orderCode}`;
+
+    // 1) Hidden iframe (WebView ke andar sabse powerful trick)
+    const iframe = document.createElement("iframe");
     iframe.style.display = "none";
-    iframe.src = url;
+    iframe.src = upiUrl;
     document.body.appendChild(iframe);
 
-    // 2) fallback force redirect
+    // 2) Fallback to open using redirect
     setTimeout(() => {
-        window.location.href = url;
-    }, 300);
+        window.location.href = upiUrl;
+    }, 200);
 }
