@@ -747,18 +747,9 @@ Payment Done ✔`
     </button>
 </a>
 
-
-//             <button onclick="openUPIPayment('${upiUrl}')" 
-// style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;
-// padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
-// 💳 Pay via UPI
-// </button>
-
-<button onclick="openUPI('upi://pay?pa=9879254030@okbizaxis&am=100&cu=INR&tn=Payment')">
-    💳 Pay via UPI
-</button>
-
-
+            <button onclick="openUPI('upi://pay?pa=9879254030@okbizaxis&am=100&cu=INR&tn=Payment')">
+                💳 Pay via UPI
+            </button>
 
             <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
                 Done
