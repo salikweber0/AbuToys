@@ -747,14 +747,12 @@ Payment Done ✔`
     </button>
 </a>
 
-<button onclick="openDefaultUPI('${orderData.orderCode}', ${orderData.totalPrice})"
-style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;
-padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
+<a id="upiPayLink" 
+style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;
+padding:12px 20px;border-radius:10px;font-weight:700;text-decoration:none;
+display:inline-block;">
 💳 Pay via UPI
-</button>
-
-
-
+</a>
 
             <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
                 Done
@@ -2677,11 +2675,13 @@ setInterval(() => {
     }
 }, 30 * 1000); // ✅ Har 30 seconds check
 
-function openDefaultUPI(orderCode, amount) {
+document.getElementById("upiPayLink").href =
+    getUPILink(orderData.orderCode, orderData.totalPrice);
+
+function getUPILink(orderCode, amount) {
     const vpa = "9879254030@okbizaxis";
     const name = "AbuToys";
 
-    const gpayUrl = `https://pay.google.com/gp/p/ui/pay?pa=${vpa}&pn=${name}&am=${amount}&cu=INR&tn=Order-${orderCode}`;
-
-    window.location.href = gpayUrl;
+    return `https://pay.google.com/gp/p/ui/pay?pa=${vpa}&pn=${name}&am=${amount}&cu=INR&tn=Order-${orderCode}`;
 }
+
