@@ -747,18 +747,12 @@ Payment Done ✔`
     </button>
 </a>
 
-            <button onclick="openUPIPayment('${orderData.orderCode}', ${orderData.totalPrice})"
-style="
-background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-color: white;
-border: none;
-padding: 12px 20px;
-border-radius: 10px;
-font-weight: 700;
-cursor: pointer;
-">
+<button onclick="openUPIPayment('${orderData.orderCode}', ${orderData.totalPrice})"
+style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;
+padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
 💳 Pay via UPI
 </button>
+
 
 
             <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
@@ -2683,16 +2677,17 @@ setInterval(() => {
 }, 30 * 1000); // ✅ Har 30 seconds check
 
 function openUPIPayment(orderCode, amount) {
-    const upiUrl = `upi://pay?pa=9879254030@okbizaxis&pn=AbuToys&am=${amount}&cu=INR&tn=AbuToys-${orderCode}`;
+    const note = encodeURIComponent(`AbuToys ${orderCode}`);
+    const upiUrl = `upi://pay?pa=9879254030@okbizaxis&pn=AbuToys&am=${amount}&cu=INR&tn=${note}`;
 
-    // 1) Hidden iframe (WebView ke andar sabse powerful trick)
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = upiUrl;
-    document.body.appendChild(iframe);
+    // Try opening using direct redirect
+    window.location.href = upiUrl;
 
-    // 2) Fallback to open using redirect
+    // Extra safety fallback for WebView
     setTimeout(() => {
-        window.location.href = upiUrl;
-    }, 200);
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = upiUrl;
+        document.body.appendChild(iframe);
+    }, 150);
 }
