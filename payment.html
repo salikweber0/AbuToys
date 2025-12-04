@@ -7,10 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-        // Security: Disable right click and inspect
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', function (e) {
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S
             if (e.keyCode === 123 ||
                 (e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
                 (e.ctrlKey && e.shiftKey && e.keyCode === 67) ||
@@ -38,7 +36,6 @@
             overflow-x: hidden;
         }
 
-        /* =================== PAGE LOAD LOADER =================== */
         .abutoys-loader-container {
             position: fixed;
             top: 0;
@@ -134,7 +131,6 @@
         .text-char:nth-child(6) { animation-delay: 0.75s, 0.5s; }
         .text-char:nth-child(7) { animation-delay: 0.9s, 0.6s; }
 
-        /* =================== PAYMENT CONTAINER =================== */
         .payment-container {
             width: 90%;
             max-width: 550px;
@@ -161,7 +157,6 @@
             }
         }
 
-        /* =================== PAYMENT HEADER =================== */
         .payment-header {
             background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
             color: white;
@@ -199,7 +194,6 @@
             z-index: 1;
         }
 
-        /* =================== PAYMENT CONTENT =================== */
         .payment-content {
             padding: 40px 30px;
         }
@@ -254,7 +248,6 @@
             color: #FF6B6B;
         }
 
-        /* =================== AMOUNT DISPLAY =================== */
         .amount-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -280,7 +273,6 @@
             text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* =================== INFO BOX =================== */
         .info-box {
             background: #e8f5e9;
             border-left: 5px solid #4CAF50;
@@ -304,7 +296,6 @@
             line-height: 1.6;
         }
 
-        /* =================== PAYMENT BUTTON =================== */
         .payment-button {
             width: 100%;
             padding: 18px;
@@ -337,7 +328,6 @@
             font-size: 1.3rem;
         }
 
-        /* =================== SECURITY BADGE =================== */
         .security-badge {
             display: flex;
             align-items: center;
@@ -354,7 +344,6 @@
             font-size: 1.1rem;
         }
 
-        /* =================== LOADER ANIMATION =================== */
         .payment-loader {
             display: none;
             position: fixed;
@@ -408,7 +397,6 @@
             50% { opacity: 1; }
         }
 
-        /* =================== RESPONSIVE =================== */
         @media (max-width: 768px) {
             .payment-container {
                 width: 95%;
@@ -457,7 +445,6 @@
     </style>
 </head>
 <body>
-    <!-- =================== PAGE LOADER =================== -->
     <div id="abutoys-page-loader" class="abutoys-loader-container">
         <div class="loader-content">
             <div class="teddy-container">
@@ -475,7 +462,6 @@
         </div>
     </div>
 
-    <!-- =================== PAYMENT LOADER =================== -->
     <div id="paymentLoader" class="payment-loader">
         <div class="loader-wrapper">
             <div class="loader-spinner"></div>
@@ -483,17 +469,13 @@
         </div>
     </div>
 
-    <!-- =================== PAYMENT CONTAINER =================== -->
     <div class="payment-container" id="paymentContainer">
-        <!-- HEADER -->
         <div class="payment-header">
             <h1>🧸 AbuToys Payment</h1>
             <p>Complete Your Order</p>
         </div>
 
-        <!-- CONTENT -->
         <div class="payment-content">
-            <!-- ORDER INFO -->
             <div class="order-info">
                 <h3>
                     <i class="fas fa-shopping-bag" style="color: #FF6B6B;"></i>
@@ -521,13 +503,11 @@
                 </div>
             </div>
 
-            <!-- AMOUNT BOX -->
             <div class="amount-box">
                 <p>Amount to Pay</p>
                 <div class="amount-value" id="displayAmount">₹0</div>
             </div>
 
-            <!-- INFO BOX -->
             <div class="info-box">
                 <h4>
                     <i class="fas fa-check-circle"></i>
@@ -536,13 +516,11 @@
                 <p>Your payment is secure and encrypted. Click below to complete payment via UPI.</p>
             </div>
 
-            <!-- PAYMENT BUTTON -->
             <button class="payment-button" id="paymentBtn">
                 <i class="fas fa-mobile-alt"></i>
                 <span>Pay Now with UPI</span>
             </button>
 
-            <!-- SECURITY BADGE -->
             <div class="security-badge">
                 <i class="fas fa-lock"></i>
                 <span>100% Secure Transaction</span>
@@ -551,7 +529,6 @@
     </div>
 
     <script>
-        // =================== PAGE LOADER LOGIC ===================
         function hasLoaderBeenShown() {
             return sessionStorage.getItem("abutoys_payment_loader_shown") === "true";
         }
@@ -595,7 +572,6 @@
             }
         }
 
-        // =================== GET PARAMETERS FROM URL ===================
         function getParameterByName(name, url = window.location.href) {
             name = name.replace(/[\[\]]/g, '\\$&');
             const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
@@ -605,15 +581,18 @@
             return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
-        // =================== POPULATE PAYMENT DETAILS ===================
         function populatePaymentDetails() {
             const orderCode = getParameterByName('orderCode') || 'ABU12345Toys';
             const productName = getParameterByName('productName') || 'Toy Product';
-            const productPrice = parseFloat(getParameterByName('productPrice')) || 500;
-            const deliveryCharge = parseFloat(getParameterByName('deliveryCharge')) || 50;
+            
+            // ✅ FIX: Handle 0 values correctly
+            const productPriceParam = getParameterByName('productPrice');
+            const deliveryChargeParam = getParameterByName('deliveryCharge');
+            
+            const productPrice = productPriceParam !== null ? parseFloat(productPriceParam) : 500;
+            const deliveryCharge = deliveryChargeParam !== null ? parseFloat(deliveryChargeParam) : 50;
             const totalAmount = productPrice + deliveryCharge;
 
-            // Update DOM
             document.getElementById('orderCode').textContent = orderCode;
             document.getElementById('productName').textContent = productName;
             document.getElementById('productPrice').textContent = `₹${productPrice}`;
@@ -621,38 +600,31 @@
             document.getElementById('totalAmount').textContent = `₹${totalAmount}`;
             document.getElementById('displayAmount').textContent = `₹${totalAmount}`;
 
-            // Store in data attribute for payment button
             document.getElementById('paymentBtn').dataset.amount = totalAmount;
             document.getElementById('paymentBtn').dataset.orderCode = orderCode;
             document.getElementById('paymentBtn').dataset.productName = productName;
         }
 
-        // =================== UPI PAYMENT HANDLER ===================
         document.getElementById('paymentBtn').addEventListener('click', function() {
             const amount = this.dataset.amount;
             const orderCode = this.dataset.orderCode;
             
-            // Show loader
             document.getElementById('paymentLoader').classList.add('show');
 
-            // UPI Details
             const upiId = "9879254030@okbizaxis";
             const payeeName = "AbuToys";
             const transactionRef = orderCode;
             const upiUrl = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&tn=AbuToys%20Order%20${transactionRef}&tr=${transactionRef}`;
 
-            // Open UPI handler
             setTimeout(() => {
                 window.location.href = upiUrl;
                 
-                // Hide loader after 2 seconds
                 setTimeout(() => {
                     document.getElementById('paymentLoader').classList.remove('show');
                 }, 2000);
             }, 1000);
         });
 
-        // =================== INITIALIZATION ===================
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 populatePaymentDetails();
@@ -662,13 +634,6 @@
             populatePaymentDetails();
             initializeLoader();
         }
-
-        // =================== PREVENT BACK BUTTON ABUSE ===================
-        window.addEventListener('beforeunload', function(e) {
-            // Optional: warn user before leaving
-            // e.preventDefault();
-            // e.returnValue = '';
-        });
     </script>
 </body>
 </html>
