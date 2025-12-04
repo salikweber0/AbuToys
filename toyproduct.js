@@ -275,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbxz7DRdXrAsAG42l9LyJLv-WOTi0usjXAc-snw_oasyt4v5kASABaMX4wl7exHAWGMg/exec";
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwotTCzlgPp4_IlWRmQbacIc6NgIylAQ6MVHSSO17dAnNCqesL_ugBao-3eYsjl72b2/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
@@ -620,45 +620,39 @@ class OrderManager {
     `;
 
         card.innerHTML = `
-        <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 0.6s ease;">✅</div>
-        
-        <h1 style="color: #FF6B6B; font-size: 28px; margin-bottom: 10px; font-weight: 700; font-family: 'Fredoka One', cursive;">Order Submitted!</h1>
-        
-        <p style="color: #666; font-size: 14px; margin-bottom: 30px;">Your order has been received. Check your email for confirmation.</p>
-        
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 25px; margin-bottom: 30px; text-align: left;">
-            
-            <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px;">
-                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Order Code</p>
-                <p style="color: white; font-size: 22px; font-weight: 700; margin: 8px 0 0 0;">${orderData.orderCode}</p>
-            </div>
-            
-            <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px;">
-                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Product</p>
-                <p style="color: white; font-size: 16px; font-weight: 600; margin: 8px 0 0 0;">${orderData.productName}</p>
-            </div>
-            
-            <div>
-                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Total Amount</p>
-                <p style="color: #FFD700; font-size: 26px; font-weight: 700; margin: 8px 0 0 0;">₹${orderData.totalPrice}</p>
-            </div>
-            
-        </div>
-        
-        <div style="background: #fff3cd; border-radius: 10px; padding: 15px; margin-bottom: 25px; border-left: 4px solid #FF6B6B;">
-            <p style="color: #856404; font-size: 13px; margin: 0; font-weight: 600;">⏱️ Delivery in 48 Hours</p>
-        </div>
-        
-        <button id="close-confirmation-btn" style="
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            color: white; border: none; padding: 14px 40px;
-            border-radius: 25px; font-weight: 600; font-size: 16px;
-            cursor: pointer; transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
+    <h2 style="color:#FF6B6B;margin:0 0 8px 0;">Order Submitted!</h2>
+    <p style="color:#666;margin:0 0 16px 0;">Order Code: <strong>${orderData.orderCode}</strong></p>
+    
+    <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:18px;border-radius:12px;margin-bottom:16px;">
+        <p style="margin:0;font-weight:700;font-size:18px;">₹${safeAmount}</p>
+        <p style="margin:6px 0 0 0;font-size:13px;opacity:0.9;">Pay within 1 hour to avoid cancellation</p>
+    </div>
+
+    <div style="background:#e8f5e9;padding:15px;border-radius:10px;margin-bottom:16px;border-left:4px solid #4CAF50;">
+        <p style="color:#2e7d32;margin:0;font-weight:600;font-size:14px;">
+            ✅ Check your email for payment link
+        </p>
+        <p style="color:#2e7d32;margin:8px 0 0 0;font-size:13px;">
+            Click the payment button in the email to pay instantly with UPI
+        </p>
+    </div>
+
+    <div style="background:#fff3cd;padding:15px;border-radius:10px;margin-bottom:16px;border-left:4px solid #FF6B6B;">
+        <p style="color:#856404;margin:0;font-weight:600;font-size:14px;">
+            ⏰ After Payment:
+        </p>
+        <p style="color:#856404;margin:8px 0 0 0;font-size:13px;">
+            Go to My Orders → Click WhatsApp button → Send payment confirmation message
+        </p>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;">
+        <button id="done-btn" style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;padding:12px 30px;border-radius:10px;font-weight:700;cursor:pointer;">
             Done
         </button>
-    `;
+    </div>
+`;
 
         backdrop.appendChild(card);
         document.body.appendChild(backdrop);
@@ -723,48 +717,39 @@ class OrderManager {
 
 
         card.innerHTML = `
-        <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
-        <h2 style="color:#FF6B6B;margin:0 0 8px 0;">Order Submitted!</h2>
-        <p style="color:#666;margin:0 0 16px 0;">Order Code: <strong>${orderData.orderCode}</strong></p>
-        <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:18px;border-radius:12px;margin-bottom:16px;">
-            <p style="margin:0;font-weight:700;font-size:18px;">₹${safeAmount}</p>
-            <p style="margin:6px 0 0 0;font-size:13px;opacity:0.9;">Pay within 1 hour to avoid cancellation</p>
-        </div>
+    <div style="font-size: 64px; margin-bottom: 8px;">🎉</div>
+    <h2 style="color:#FF6B6B;margin:0 0 8px 0;">Order Submitted!</h2>
+    <p style="color:#666;margin:0 0 16px 0;">Order Code: <strong>${orderData.orderCode}</strong></p>
+    
+    <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:18px;border-radius:12px;margin-bottom:16px;">
+        <p style="margin:0;font-weight:700;font-size:18px;">₹${safeAmount}</p>
+        <p style="margin:6px 0 0 0;font-size:13px;opacity:0.9;">Pay within 1 hour to avoid cancellation</p>
+    </div>
 
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <!-- ✅ New SEND PAYMENT DONE MESSAGE BUTTON -->
-<a href="https://wa.me/8160154042?text=${encodeURIComponent(
-            `Order Code: ${orderData.orderCode}
-Total Amount: ₹${safeAmount}
-Email: ${userDataManager.currentUser}
-Payment Done ✔`
-        )}" target="_blank" style="text-decoration:none;">
-    <button style="
-        background:linear-gradient(45deg,#25D366,#128C7E);
-        color:white;border:0;padding:12px 20px;
-        border-radius:10px;font-weight:700;cursor:pointer;">
-        📩 Send Payment Done
-    </button>
-</a>
+    <div style="background:#e8f5e9;padding:15px;border-radius:10px;margin-bottom:16px;border-left:4px solid #4CAF50;">
+        <p style="color:#2e7d32;margin:0;font-weight:600;font-size:14px;">
+            ✅ Check your email for payment link
+        </p>
+        <p style="color:#2e7d32;margin:8px 0 0 0;font-size:13px;">
+            Click the payment button in the email to pay instantly with UPI
+        </p>
+    </div>
 
+    <div style="background:#fff3cd;padding:15px;border-radius:10px;margin-bottom:16px;border-left:4px solid #FF6B6B;">
+        <p style="color:#856404;margin:0;font-weight:600;font-size:14px;">
+            ⏰ After Payment:
+        </p>
+        <p style="color:#856404;margin:8px 0 0 0;font-size:13px;">
+            Go to My Orders → Click WhatsApp button → Send payment confirmation
+        </p>
+    </div>
 
-            <a href="${upiUrl}" style="text-decoration:none;">
-                <button style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
-                    💳 Pay via UPI
-                </button>
-            </a>
-
-            <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
-                Done
-            </button>
-        </div>
-
-        <p style="margin-top:14px;color:#888;font-size:13px;">If payment is received within 1 hour, you'll get a confirmation email & order timer will start (48h).</p>
-        <p style="margin-top:10px;color:#28a745;font-size:13px;font-weight:600;">
-After making the payment, click the WhatsApp button above and send us a message to confirm your payment.
-</p>
-
-    `;
+    <div style="text-align:center;margin-top:20px;">
+        <button id="done-btn" style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;padding:12px 30px;border-radius:10px;font-weight:700;cursor:pointer;">
+            Done
+        </button>
+    </div>
+`;
 
         backdrop.appendChild(card);
         document.body.appendChild(backdrop);
@@ -949,46 +934,79 @@ After making the payment, click the WhatsApp button above and send us a message 
                         const isPaymentPending = order.paymentStatus !== 'ok';
 
                         let statusHTML = '';
+                        let whatsappButtonHTML = '';
 
                         if (isDelivered) {
                             // ✅ DELIVERED
                             statusHTML = `
-                            <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                                <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
-                            </div>
-                        `;
+            <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
+            </div>
+        `;
+
+                            // WhatsApp button for delivery confirmation
+                            whatsappButtonHTML = `
+            <a href="https://wa.me/8160154042?text=${encodeURIComponent(
+                                `Order Code: ${order.orderCode}
+User Name: ${userDataManager.getCurrentUserName()}
+Total Amount: ₹${order.totalPrice}
+Delivery Done ✅`
+                            )}" target="_blank" style="text-decoration:none;">
+                <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
+                    💬 Confirm Delivery
+                </button>
+            </a>
+        `;
+
                         } else if (isCancelled) {
-                            // ✅ CANCELLED
+                            // ❌ CANCELLED
                             statusHTML = `
-                            <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                                <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
-                            </div>
-                        `;
+            <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
+            </div>
+        `;
+
                         } else if (isPaymentPending) {
-                            // ✅ PAYMENT PENDING
+                            // ⏳ PAYMENT PENDING
                             statusHTML = `
-                            <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                                <p style="color: #856404; margin: 0; font-weight: 600;">⏳ Payment Pending (Pay within 1 hour)</p>
-                            </div>
-                        `;
+            <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                <p style="color: #856404; margin: 0; font-weight: 600;">⏳ Payment Pending (Pay within 1 hour)</p>
+            </div>
+        `;
+
                         } else {
-                            // ✅ PAYMENT DONE - SHOW 48H TIMER
+                            // ✅ PAYMENT DONE - 48H TIMER
                             const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
                             statusHTML = `
-                            <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                                <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
-                            </div>
-                        `;
+            <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
+            </div>
+        `;
+
+                            // WhatsApp button for payment confirmation
+                            whatsappButtonHTML = `
+            <a href="https://wa.me/8160154042?text=${encodeURIComponent(
+                                `Order Code: ${order.orderCode}
+User Name: ${userDataManager.getCurrentUserName()}
+Total Amount: ₹${order.totalPrice}
+Payment Done ✅`
+                            )}" target="_blank" style="text-decoration:none;">
+                <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
+                    💬 Confirm Payment
+                </button>
+            </a>
+        `;
                         }
 
                         return `
-                        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
-                            <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
-                            <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
-                            <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
-                            ${statusHTML}
-                        </div>
-                    `;
+        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
+            <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
+            <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
+            <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
+            ${statusHTML}
+            ${whatsappButtonHTML}
+        </div>
+    `;
                     }).join('');
                 }
 
