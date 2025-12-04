@@ -747,12 +747,12 @@ Payment Done ✔`
     </button>
 </a>
 
-<a id="upiPayLink" 
-style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;
-padding:12px 20px;border-radius:10px;font-weight:700;text-decoration:none;
-display:inline-block;">
-💳 Pay via UPI
-</a>
+
+            <a href="${upiUrl}" style="text-decoration:none;">
+                <button style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:white;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
+                    💳 Pay via UPI
+                </button>
+            </a>
 
             <button id="done-btn" style="background:#eee;border:0;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;">
                 Done
@@ -2674,14 +2674,4 @@ setInterval(() => {
         console.warn('Auto-cancel watcher error:', err);
     }
 }, 30 * 1000); // ✅ Har 30 seconds check
-
-document.getElementById("upiPayLink").href =
-    getUPILink(orderData.orderCode, orderData.totalPrice);
-
-function getUPILink(orderCode, amount) {
-    const vpa = "9879254030@okbizaxis";
-    const name = "AbuToys";
-
-    return `https://pay.google.com/gp/p/ui/pay?pa=${vpa}&pn=${name}&am=${amount}&cu=INR&tn=Order-${orderCode}`;
-}
 
