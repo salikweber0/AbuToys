@@ -74,14 +74,14 @@ body {
 
 .teddy-emoji {
     font-size: 120px;
-    animation: float 2.5s ease-in-out infinite;
+    animation: float 2s ease-in-out infinite;
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
 }
 
 /* AbuToys Text Animation */
 @keyframes slideInUp {
     0% {
-        transform: translateY(30px);
+        transform: translateY(50px);
         opacity: 0;
     }
     100% {
@@ -103,10 +103,10 @@ body {
 
 @keyframes pulse-scale {
     0%, 100% {
-        transform: scaleY(1);
+        transform: scaleY(0.8);
     }
     50% {
-        transform: scaleY(1.15);
+        transform: scaleY(1.2);
     }
 }
 
@@ -123,8 +123,8 @@ body {
 
 .text-char {
     display: inline-block;
-    animation: glow 2.2s ease-in-out infinite, pulse-scale 1.8s ease-in-out infinite;
-    min-width: 35px;
+    animation: glow 2.5s ease-in-out infinite, pulse-scale 2s ease-in-out infinite;
+    min-width: 30px;
     text-align: center;
 }
 
