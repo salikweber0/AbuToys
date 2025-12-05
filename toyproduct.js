@@ -927,88 +927,98 @@ class OrderManager {
                 if (this.orders.length === 0) {
                     ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
                 } else {
-                    this.orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-                    ordersHTML = this.orders.map(order => {
-                        const isDelivered = order.status === 'Delivered';
-                        const isCancelled = order.status === 'Cancelled';
-                        const isPaymentPending = order.paymentStatus !== 'ok';
+    this.orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+    
+    ordersHTML = this.orders.map(order => {
+        const isDelivered = order.status === 'Delivered';
+        const isCancelled = order.status === 'Cancelled';
+        const isPaymentPending = order.paymentStatus !== 'ok';
 
-                        let statusHTML = '';
-                        let whatsappButtonHTML = '';
+        let statusHTML = '';
+        let whatsappButtonHTML = '';
 
-                        if (isDelivered) {
-                            // ✅ DELIVERED
-                            statusHTML = `
-            <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
-            </div>
-        `;
-
-                            // WhatsApp button for delivery confirmation
-                            whatsappButtonHTML = `
-            <a href="https://wa.me/8160154042?text=${encodeURIComponent(
-                                `Order Code: ${order.orderCode}
-User Name: ${userDataManager.getCurrentUserName()}
-Total Amount: ₹${order.totalPrice}
-Delivery Done ✅`
-                            )}" target="_blank" style="text-decoration:none;">
-                <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
-                    💬 Confirm Delivery
-                </button>
-            </a>
-        `;
-
-                        } else if (isCancelled) {
-                            // ❌ CANCELLED
-                            statusHTML = `
-            <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
-            </div>
-        `;
-
-                        } else if (isPaymentPending) {
-                            // ⏳ PAYMENT PENDING
-                            statusHTML = `
-            <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                <p style="color: #856404; margin: 0; font-weight: 600;">⏳ Payment Pending (Pay within 1 hour)</p>
-            </div>
-        `;
-
-                        } else {
-                            // ✅ PAYMENT DONE - 48H TIMER
-                            const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
-                            statusHTML = `
-            <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
-            </div>
-        `;
-
-                            // WhatsApp button for payment confirmation
-                            whatsappButtonHTML = `
-            <a href="https://wa.me/8160154042?text=${encodeURIComponent(
-                                `Order Code: ${order.orderCode}
+        // ✅ STATUS MESSAGES
+        if (isDelivered) {
+            statusHTML = `
+                <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                    <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
+                </div>
+            `;
+            whatsappButtonHTML = ''; // NO BUTTON
+            
+        } else if (isCancelled) {
+            statusHTML = `
+                <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                    <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
+                </div>
+            `;
+            whatsappButtonHTML = ''; // NO BUTTON
+            
+        } else if (isPaymentPending) {
+    // ⏳ CALCULATE TIME LEFT FOR PAYMENT
+    const now = Date.now();
+    const timeLeft = order.paymentDeadline - now;
+    
+    let timerText = '';
+    if (timeLeft > 0) {
+        const minutes = Math.floor(timeLeft / (60 * 1000));
+        timerText = `⏰ Time Left: ${minutes}m`;
+    } else {
+        timerText = '⏰ Payment Time Expired';
+    }
+    
+    statusHTML = `
+        <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+            <p style="color: #856404; margin: 0 0 5px 0; font-weight: 600;">⏳ Payment Pending</p>
+            <p style="color: #d32f2f; margin: 0; font-weight: 700; font-size: 0.95rem;">${timerText}</p>
+        </div>
+    `;
+    whatsappButtonHTML = `
+        <a href="https://wa.me/8160154042?text=${encodeURIComponent(
+            `Order Code: ${order.orderCode}
 User Name: ${userDataManager.getCurrentUserName()}
 Total Amount: ₹${order.totalPrice}
 Payment Done ✅`
-                            )}" target="_blank" style="text-decoration:none;">
-                <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
-                    💬 Confirm Payment
-                </button>
-            </a>
-        `;
-                        }
-
-                        return `
-        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
-            <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
-            <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
-            <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
-            ${statusHTML}
-            ${whatsappButtonHTML}
-        </div>
+        )}" target="_blank" style="text-decoration:none;">
+            <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
+                💬 Confirm Payment
+            </button>
+        </a>
     `;
-                    }).join('');
-                }
+            
+        } else {
+            // Timer running (Payment done)
+            const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
+            statusHTML = `
+                <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                    <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
+                </div>
+            `;
+            whatsappButtonHTML = `
+                <a href="https://wa.me/8160154042?text=${encodeURIComponent(
+                    `Order Code: ${order.orderCode}
+User Name: ${userDataManager.getCurrentUserName()}
+Total Amount: ₹${order.totalPrice}
+Delivery Done ✅`
+                )}" target="_blank" style="text-decoration:none;">
+                    <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
+                        💬 Confirm Delivery
+                    </button>
+                </a>
+            `;
+        }
+
+        return `
+            <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
+                <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
+                <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
+                <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
+                ${statusHTML}
+                ${whatsappButtonHTML}
+            </div>
+        `;
+    }).join('');
+}
 
                 panel.innerHTML = `
                 <div style="padding: 20px;">
