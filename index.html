@@ -31,6 +31,186 @@
             }
         });
     </script>
+
+    <style>
+         /* Update Panel Styles */
+        .update-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+            z-index: 99998;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+            animation: slideUp 0.5s ease-out;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .update-panel.show {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .update-content {
+            max-width: 400px;
+        }
+
+        .update-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .update-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .update-description {
+            font-size: 16px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .update-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 16px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .update-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .update-button i {
+            font-size: 20px;
+        }
+
+        .version-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Overlay for update panel */
+        .update-overlay {
+            position: fixed;
+            bottom: 50vh;
+            left: 0;
+            right: 0;
+            top: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99997;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .update-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .update-panel {
+                height: 55vh;
+                padding: 30px 15px;
+            }
+
+            .update-icon {
+                font-size: 70px;
+                margin-bottom: 15px;
+            }
+
+            .update-title {
+                font-size: 24px;
+            }
+
+            .update-description {
+                font-size: 15px;
+                margin-bottom: 25px;
+            }
+
+            .update-button {
+                padding: 14px 35px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .update-panel {
+                height: 60vh;
+                padding: 25px 15px;
+            }
+
+            .update-icon {
+                font-size: 60px;
+            }
+
+            .update-title {
+                font-size: 22px;
+            }
+
+            .update-description {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .update-button {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+
+            .version-badge {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -51,6 +231,23 @@
             <span class="text-char">y</span>
             <span class="text-char">s</span>
         </div>
+    </div>
+</div>
+
+<!-- Update Check System -->
+<div class="update-overlay" id="updateOverlay"></div>
+<div class="update-panel" id="updatePanel">
+    <div class="version-badge">Latest Version</div>
+    <div class="update-content">
+        <div class="update-icon">🧸</div>
+        <h1 class="update-title">New Update!</h1>
+        <p class="update-description">
+            Please update your application to enjoy the latest features and improvements.
+        </p>
+        <a href="https://github.com/salikweber0/AbuToys-apk/raw/main/app-release.apk" class="update-button">
+            <i class="fas fa-download"></i>
+            Update to v1.0
+        </a>
     </div>
 </div>
     <!-- Navbar -->
@@ -513,6 +710,85 @@
         });
     </script>
     <script src="toyhome.js"></script>
+
+    <script>
+        // Version Check System
+        const CURRENT_VERSION = 'v1.0';
+        const VERSION_KEY = 'abutoys_version';
+
+        function checkVersionAndShowUpdate() {
+            // Get stored version from localStorage
+            const storedVersion = localStorage.getItem(VERSION_KEY);
+            
+            const updatePanel = document.getElementById('updatePanel');
+            const updateOverlay = document.getElementById('updateOverlay');
+
+            // Agar version nahi hai ya different hai
+            if (storedVersion !== CURRENT_VERSION) {
+                // Show update panel
+                updatePanel.classList.add('show');
+                updateOverlay.classList.add('show');
+            } else {
+                // Version match ho gaya - website normal load karo
+                updatePanel.style.display = 'none';
+                updateOverlay.style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }
+        }
+
+        function saveCurrentVersion() {
+            localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
+        }
+
+        // Jab user update button click kare
+        document.addEventListener('DOMContentLoaded', function() {
+            // Page load ho gaya - version check karo
+            window.addEventListener('load', function() {
+                // Loader fade out ke baad check karo
+                setTimeout(() => {
+                    checkVersionAndShowUpdate();
+                }, 1000);
+            });
+
+            // Update button click event
+            const updateButtons = document.querySelectorAll('.update-button');
+            updateButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Version ko save karo when user clicks update
+                    saveCurrentVersion();
+                });
+            });
+        });
+
+        // Jab user apk.html se wapas aa jaye
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Back button se aya to version check karo
+                const storedVersion = localStorage.getItem(VERSION_KEY);
+                if (storedVersion === CURRENT_VERSION) {
+                    const updatePanel = document.getElementById('updatePanel');
+                    const updateOverlay = document.getElementById('updateOverlay');
+                    updatePanel.classList.remove('show');
+                    updateOverlay.classList.remove('show');
+                    document.getElementById('mainContent').style.display = 'block';
+                }
+            }
+        });
+
+        window.addEventListener('load', function() {
+        setTimeout(() => {
+            const storedVersion = localStorage.getItem(VERSION_KEY);
+            const updatePanel = document.getElementById('updatePanel');
+            const updateOverlay = document.getElementById('updateOverlay');
+
+            if (storedVersion !== CURRENT_VERSION) {
+                updatePanel.classList.add('show');
+                updateOverlay.classList.add('show');
+            }
+        }, 1500); // Loader ke baad show karo
+    });
+    </script>
+
 </body>
 
 </html>
