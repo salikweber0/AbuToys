@@ -668,85 +668,10 @@
     </script>
     <script src="toyhome.js"></script>
 
-    <script>
-        // Version Check System
-        const CURRENT_VERSION = 'v1.0';
-        const VERSION_KEY = 'abutoys_version';
-
-        function checkVersionAndShowUpdate() {
-            // Get stored version from localStorage
-            const storedVersion = localStorage.getItem(VERSION_KEY);
-            
-            const updatePanel = document.getElementById('updatePanel');
-            const updateOverlay = document.getElementById('updateOverlay');
-
-            // Agar version nahi hai ya different hai
-            if (storedVersion !== CURRENT_VERSION) {
-                // Show update panel
-                updatePanel.classList.add('show');
-                updateOverlay.classList.add('show');
-            } else {
-                // Version match ho gaya - website normal load karo
-                updatePanel.style.display = 'none';
-                updateOverlay.style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-            }
-        }
-
-        function saveCurrentVersion() {
-            localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
-        }
-
-        // Jab user update button click kare
-        document.addEventListener('DOMContentLoaded', function() {
-            // Page load ho gaya - version check karo
-            window.addEventListener('load', function() {
-                // Loader fade out ke baad check karo
-                setTimeout(() => {
-                    checkVersionAndShowUpdate();
-                }, 1000);
-            });
-
-            // Update button click event
-            const updateButtons = document.querySelectorAll('.update-button');
-            updateButtons.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    // Version ko save karo when user clicks update
-                    saveCurrentVersion();
-                });
-            });
-        });
-
-        // Jab user apk.html se wapas aa jaye
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) {
-                // Back button se aya to version check karo
-                const storedVersion = localStorage.getItem(VERSION_KEY);
-                if (storedVersion === CURRENT_VERSION) {
-                    const updatePanel = document.getElementById('updatePanel');
-                    const updateOverlay = document.getElementById('updateOverlay');
-                    updatePanel.classList.remove('show');
-                    updateOverlay.classList.remove('show');
-                    document.getElementById('mainContent').style.display = 'block';
-                }
-            }
-        });
-
-        window.addEventListener('load', function() {
-        setTimeout(() => {
-            const storedVersion = localStorage.getItem(VERSION_KEY);
-            const updatePanel = document.getElementById('updatePanel');
-            const updateOverlay = document.getElementById('updateOverlay');
-
-            if (storedVersion !== CURRENT_VERSION) {
-                updatePanel.classList.add('show');
-                updateOverlay.classList.add('show');
-            }
-        }, 1500); // Loader ke baad show karo
-    });
-    </script>
+    
 
 </body>
 
 </html>
+
 
