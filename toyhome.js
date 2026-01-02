@@ -113,15 +113,137 @@ const SIGNUP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdP_klBNa_q2
 
 console.log("🚀 AbuToys Script Loaded");
 
-// ---------- HELPER: Detect if inside an in-app WebView ----------
+// ---------- Detect WebView (in-app browser) ----------
 function isInWebView() {
     const ua = navigator.userAgent || "";
-    // crude but works in many cases
     const standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
     if (standalone) return false;
-    // common webview signals
     return /wv|WebView|FBAN|FBAV|Instagram|Line|FB_IAB|Twitter|Pinterest/i.test(ua);
 }
+
+// ---------- Main Robust Location Function (with retry + fallback) ----------
+async function verifyUserLocation_debug() {
+    showLocationLoader();
+
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            hideLocationLoader();
+            localStorage.setItem("abutoys_location_status", "no_geo");
+            resolve({ status: "no_geo" });
+            return;
+        }
+
+        // Mobile pe high accuracy (GPS), desktop pe low (WiFi/IP)
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        let attempts = 0;
+        const maxAttempts = 2;
+
+        const tryGeo = (highAccuracy) => {
+            attempts++;
+            const options = {
+                enableHighAccuracy: highAccuracy,
+                timeout: highAccuracy ? 15000 : 10000,
+                maximumAge: 600000 // 10 min cache
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const result = await handlePositionSuccess(pos.coords);
+                    resolve(result);
+                },
+                async (err) => {
+                    console.warn(`Geo attempt ${attempts} failed:`, err.message);
+
+                    if (attempts < maxAttempts && err.code === 3) { // Timeout
+                        // Flip accuracy and retry
+                        tryGeo(!highAccuracy);
+                    } else {
+                        // Final fallback
+                        hideLocationLoader();
+                        localStorage.setItem("abutoys_location_status", "unknown");
+                        resolve({ status: "unknown" });
+                    }
+                },
+                options
+            );
+        };
+
+        // First try: mobile = high, desktop = low
+        tryGeo(isMobile);
+    });
+}
+
+// Success handler
+async function handlePositionSuccess(coords) {
+    const userLat = coords.latitude;
+    const userLng = coords.longitude;
+    const dist = calculateDistance(userLat, userLng, SHOP_LOCATION.lat, SHOP_LOCATION.lng);
+    const charge = getDeliveryCharge(dist);
+
+    localStorage.setItem("abutoys_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
+    localStorage.setItem("abutoys_user_distance", dist.toFixed(2));
+    localStorage.setItem("abutoys_delivery_charge", charge);
+
+    if (charge === -1) {
+        localStorage.setItem("abutoys_location_status", "out_of_range");
+        hideLocationLoader();
+        return { status: "out_of_range", distance: dist, charge };
+    }
+
+    localStorage.setItem("abutoys_location_status", "in_range");
+    hideLocationLoader();
+    return { status: "in_range", distance: dist, charge };
+}
+
+// ---------- Start Verification (main function jo baaki jagah use hota hai) ----------
+async function startLocationVerification() {
+    try {
+        // WebView mein directly deny dikhao
+        if (isInWebView()) {
+            hideLocationLoader();
+            showPopup("📱 App ke browser mein location block hota hai.\n\nChrome ya Safari mein kholo aur try karo!", "error");
+            localStorage.setItem("abutoys_location_status", "permission_denied");
+            return { status: "permission_denied", fallback: true };
+        }
+
+        const result = await verifyUserLocation_debug();
+
+        if (result.status === "in_range") {
+            showPopup(`✅ Location Verified!\nDistance: ${result.distance.toFixed(1)} km\nDelivery Charge: ₹${result.charge}`, "success");
+        } else if (result.status === "out_of_range") {
+            showPopup(`❌ Sorry baby!\nAap ${Math.round(result.distance)} km door ho.\nDelivery nahi ho payegi 😘`, "warning");
+        } else if (result.status === "permission_denied") {
+            showPopup("⚠️ Location permission deny kar diya tune!\nSettings mein jaake allow kar na ❤️", "error");
+        } else {
+            showPopup("⚠️ Location nahi mil raha...\nGPS + Internet on hai na? Try again kar!", "warning");
+        }
+
+        return result;
+    } catch (e) {
+        hideLocationLoader();
+        localStorage.setItem("abutoys_location_status", "unknown");
+        return { status: "unknown" };
+    }
+}
+
+// Distance & Charge (unchanged)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// // ---------- HELPER: Detect if inside an in-app WebView ----------
+// function isInWebView() {
+//     const ua = navigator.userAgent || "";
+//     // crude but works in many cases
+//     const standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+//     if (standalone) return false;
+//     // common webview signals
+//     return /wv|WebView|FBAN|FBAV|Instagram|Line|FB_IAB|Twitter|Pinterest/i.test(ua);
+// }
 
 // ---------- WRAPPER: Try geolocation, if denied or WebView show fallback ----------
 async function verifyOrFallback() {
@@ -297,62 +419,62 @@ async function verifyUserLocation() {
     });
 }
 
-// ========== ROBUST DEBUG VERSION WITH FALLBACKS ==========
-async function verifyUserLocation_debug() {
-    showLocationLoader();
+// // ========== ROBUST DEBUG VERSION WITH FALLBACKS ==========
+// async function verifyUserLocation_debug() {
+//     showLocationLoader();
 
-    return new Promise((resolve) => {
-        if (!navigator.geolocation) {
-            hideLocationLoader();
-            resolve({ status: "no_geo" });
-            return;
-        }
+//     return new Promise((resolve) => {
+//         if (!navigator.geolocation) {
+//             hideLocationLoader();
+//             resolve({ status: "no_geo" });
+//             return;
+//         }
 
-        const isMobile = /mobile|tablet|ipad|android/i.test(navigator.userAgent.toLowerCase());
-        const options = {
-            enableHighAccuracy: isMobile, // High accuracy on mobile (GPS), low on desktop (IP/WiFi)
-            timeout: 10000,
-            maximumAge: 0
-        };
+//         const isMobile = /mobile|tablet|ipad|android/i.test(navigator.userAgent.toLowerCase());
+//         const options = {
+//             enableHighAccuracy: isMobile, // High accuracy on mobile (GPS), low on desktop (IP/WiFi)
+//             timeout: 10000,
+//             maximumAge: 0
+//         };
 
-        navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-                const res = await handlePositionAndReturn(pos.coords);
-                resolve(res);
-            },
-            (err) => {
-                if (err.code === 1) {
-                    hideLocationLoader();
-                    localStorage.setItem("abutoys_location_status", "permission_denied");
-                    resolve({ status: "permission_denied" });
-                } else if (err.code === 3) { // TIMEOUT - Retry with flipped accuracy and longer timeout
-                    const retryOptions = {
-                        enableHighAccuracy: !options.enableHighAccuracy,
-                        timeout: 15000,
-                        maximumAge: 0
-                    };
-                    navigator.geolocation.getCurrentPosition(
-                        async (pos) => {
-                            const res = await handlePositionAndReturn(pos.coords);
-                            resolve(res);
-                        },
-                        (retryErr) => {
-                            hideLocationLoader();
-                            localStorage.setItem("abutoys_location_status", "unknown");
-                            resolve({ status: "unknown", error: retryErr.message });
-                        },
-                        retryOptions
-                    );
-                } else { // POSITION_UNAVAILABLE or other
-                    hideLocationLoader();
-                    localStorage.setItem("abutoys_location_status", "unknown");
-                    resolve({ status: "unknown", error: err.message });
-                }
-            },
-            options
-        );
-    });
-}
+//         navigator.geolocation.getCurrentPosition(
+//             async (pos) => {
+//                 const res = await handlePositionAndReturn(pos.coords);
+//                 resolve(res);
+//             },
+//             (err) => {
+//                 if (err.code === 1) {
+//                     hideLocationLoader();
+//                     localStorage.setItem("abutoys_location_status", "permission_denied");
+//                     resolve({ status: "permission_denied" });
+//                 } else if (err.code === 3) { // TIMEOUT - Retry with flipped accuracy and longer timeout
+//                     const retryOptions = {
+//                         enableHighAccuracy: !options.enableHighAccuracy,
+//                         timeout: 15000,
+//                         maximumAge: 0
+//                     };
+//                     navigator.geolocation.getCurrentPosition(
+//                         async (pos) => {
+//                             const res = await handlePositionAndReturn(pos.coords);
+//                             resolve(res);
+//                         },
+//                         (retryErr) => {
+//                             hideLocationLoader();
+//                             localStorage.setItem("abutoys_location_status", "unknown");
+//                             resolve({ status: "unknown", error: retryErr.message });
+//                         },
+//                         retryOptions
+//                     );
+//                 } else { // POSITION_UNAVAILABLE or other
+//                     hideLocationLoader();
+//                     localStorage.setItem("abutoys_location_status", "unknown");
+//                     resolve({ status: "unknown", error: err.message });
+//                 }
+//             },
+//             options
+//         );
+//     });
+// }
 
 
 // small helper used above to compute distance/charge & return same shape as original
@@ -379,32 +501,32 @@ async function handlePositionAndReturn(coords) {
     return { status: "in_range", distance: dist, charge };
 }
 
-// ------------------ LOCATION VERIFICATION HELPERS (FIXED) ------------------
-async function startLocationVerification() {
-    // start and return the verification result so callers can use it
-    try {
-        const result = await verifyUserLocation();
+// // ------------------ LOCATION VERIFICATION HELPERS (FIXED) ------------------
+// async function startLocationVerification() {
+//     // start and return the verification result so callers can use it
+//     try {
+//         const result = await verifyUserLocation();
 
-        // Normalize statuses (verifyUserLocation returns in_range / out_of_range / unknown)
-        if (result && result.status === "in_range") {
-            showPopup(`✅ Location Verified!\nDistance Charge: \n₹${result.charge}`, "success");
-        } else if (result && result.status === "out_of_range") {
-            showPopup(`❌ You are ${Math.round(result.distance)} km away.\nDelivery not available!`, "error");
-        } else if (result && result.status === "permission_denied") {
-            showPopup("⚠️ Location Access Denied! Please enable location permissions.", "error");
-        } else {
-            showPopup("⚠️ Cannot detect location.\nPlease enable GPS & internet.", "warning");
-        }
+//         // Normalize statuses (verifyUserLocation returns in_range / out_of_range / unknown)
+//         if (result && result.status === "in_range") {
+//             showPopup(`✅ Location Verified!\nDistance Charge: \n₹${result.charge}`, "success");
+//         } else if (result && result.status === "out_of_range") {
+//             showPopup(`❌ You are ${Math.round(result.distance)} km away.\nDelivery not available!`, "error");
+//         } else if (result && result.status === "permission_denied") {
+//             showPopup("⚠️ Location Access Denied! Please enable location permissions.", "error");
+//         } else {
+//             showPopup("⚠️ Cannot detect location.\nPlease enable GPS & internet.", "warning");
+//         }
 
-        // always return the raw result object so the caller can make decisions
-        return result;
-    } catch (err) {
-        // In case anything throws, ensure loader is hidden and return unknown
-        hideLocationLoader();
-        localStorage.setItem("abutoys_location_status", "unknown");
-        return { status: "unknown" };
-    }
-}
+//         // always return the raw result object so the caller can make decisions
+//         return result;
+//     } catch (err) {
+//         // In case anything throws, ensure loader is hidden and return unknown
+//         hideLocationLoader();
+//         localStorage.setItem("abutoys_location_status", "unknown");
+//         return { status: "unknown" };
+//     }
+// }
 
 async function showWelcomeMessage() {
     const isFirstVisit = !sessionStorage.getItem("abutoys_welcomed");
