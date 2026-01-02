@@ -297,6 +297,63 @@ async function verifyUserLocation() {
     });
 }
 
+// ========== ROBUST DEBUG VERSION WITH FALLBACKS ==========
+async function verifyUserLocation_debug() {
+    showLocationLoader();
+
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            hideLocationLoader();
+            resolve({ status: "no_geo" });
+            return;
+        }
+
+        const isMobile = /mobile|tablet|ipad|android/i.test(navigator.userAgent.toLowerCase());
+        const options = {
+            enableHighAccuracy: isMobile, // High accuracy on mobile (GPS), low on desktop (IP/WiFi)
+            timeout: 10000,
+            maximumAge: 0
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const res = await handlePositionAndReturn(pos.coords);
+                resolve(res);
+            },
+            (err) => {
+                if (err.code === 1) {
+                    hideLocationLoader();
+                    localStorage.setItem("abutoys_location_status", "permission_denied");
+                    resolve({ status: "permission_denied" });
+                } else if (err.code === 3) { // TIMEOUT - Retry with flipped accuracy and longer timeout
+                    const retryOptions = {
+                        enableHighAccuracy: !options.enableHighAccuracy,
+                        timeout: 15000,
+                        maximumAge: 0
+                    };
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            const res = await handlePositionAndReturn(pos.coords);
+                            resolve(res);
+                        },
+                        (retryErr) => {
+                            hideLocationLoader();
+                            localStorage.setItem("abutoys_location_status", "unknown");
+                            resolve({ status: "unknown", error: retryErr.message });
+                        },
+                        retryOptions
+                    );
+                } else { // POSITION_UNAVAILABLE or other
+                    hideLocationLoader();
+                    localStorage.setItem("abutoys_location_status", "unknown");
+                    resolve({ status: "unknown", error: err.message });
+                }
+            },
+            options
+        );
+    });
+}
+
 
 // small helper used above to compute distance/charge & return same shape as original
 async function handlePositionAndReturn(coords) {
