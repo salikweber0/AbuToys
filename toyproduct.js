@@ -275,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSZZmSS2jJ3ERY2UxkoftYnAvbB_Y8sZvcf-iLL-3u3xd-HVFfbyEd-8hceautt0vGJg/exec";
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLiCqfzKH-CvCQORqGtEHvgW42LDY_j0cyE_ybk2w1PnQveELrlqm9PhrSKOcM4-by8Q/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
@@ -357,60 +357,63 @@ class OrderManager {
         }
     }
 
-    openOrderPanel(productCard) {
-        const orderCode = this.generateOrderCode();
-        const productName = productCard.querySelector('h3')?.textContent || '';
-        const productPrice = parseFloat(productCard.dataset.originalPrice || 0);
-        const deliveryCharge = userDataManager.deliveryCharge;
-        const totalPrice = productPrice + deliveryCharge;
+    openOrderPanel(productCard, quantity = 1) {
+    const orderCode = this.generateOrderCode();
+    const productName = productCard.querySelector('h3')?.textContent || '';
+    const productPrice = parseFloat(productCard.dataset.originalPrice || 0);
+    const deliveryCharge = userDataManager.deliveryCharge;
+    
+    // ✅ CALCULATE WITH QUANTITY & DISCOUNT
+    const subtotal = productPrice * quantity;
+    const discountPercent = quantity;
+    const discountAmount = (subtotal * discountPercent) / 100;
+    const afterDiscount = subtotal - discountAmount;
+    const totalPrice = afterDiscount + deliveryCharge;
 
-        const userName = userDataManager.getCurrentUserName();
-        const userEmail = userDataManager.currentUser;
-        const userData = userDataManager.getUser(userEmail);
-        const userAddress = userData?.address || '';
-        const userPassword = userData?.password || '';
+    const userName = userDataManager.getCurrentUserName();
+    const userEmail = userDataManager.currentUser;
+    const userData = userDataManager.getUser(userEmail);
+    const userAddress = userData?.address || '';
+    const userPassword = userData?.password || '';
 
-        const productCardClone = productCard.cloneNode(true);
+    const productCardClone = productCard.cloneNode(true);
 
-        // Card cleaning code (already correct)
-        const allImages = productCardClone.querySelectorAll('.product-img');
-        const videoContainers = productCardClone.querySelectorAll('.video-container');
-        const arrows = productCardClone.querySelectorAll('.img-nav');
-        const buyButton = productCardClone.querySelector('.add-to-cart-btn');
-        const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
-        const productOverlay = productCardClone.querySelector('.product-overlay');
+    const allImages = productCardClone.querySelectorAll('.product-img');
+    const videoContainers = productCardClone.querySelectorAll('.video-container');
+    const arrows = productCardClone.querySelectorAll('.img-nav');
+    const buyButton = productCardClone.querySelector('.add-to-cart-btn');
+    const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
+    const productOverlay = productCardClone.querySelector('.product-overlay');
 
-        allImages.forEach((img, index) => { if (index !== 0) img.remove(); });
-        videoContainers.forEach((video, index) => { if (index !== 0) video.remove(); });
-        arrows.forEach(arrow => arrow.remove());
-        if (buyButton) buyButton.remove();
-        if (wishlistIcon) wishlistIcon.remove();
-        if (productOverlay) productOverlay.remove();
+    allImages.forEach((img, index) => { if (index !== 0) img.remove(); });
+    videoContainers.forEach((video, index) => { if (index !== 0) video.remove(); });
+    arrows.forEach(arrow => arrow.remove());
+    if (buyButton) buyButton.remove();
+    if (wishlistIcon) wishlistIcon.remove();
+    if (productOverlay) productOverlay.remove();
 
-        productCardClone.style.width = '100%';
-        productCardClone.style.maxWidth = '100%';
-        productCardClone.style.margin = '0';
-        productCardClone.style.transform = 'none';
+    productCardClone.style.width = '100%';
+    productCardClone.style.maxWidth = '100%';
+    productCardClone.style.margin = '0';
+    productCardClone.style.transform = 'none';
 
-        const panel = document.createElement('div');
-        panel.id = 'order-panel';
-        panel.style.cssText = `
+    const panel = document.createElement('div');
+    panel.id = 'order-panel';
+    panel.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.95); z-index: 999999;
         display: flex; align-items: center; justify-content: center;
-        padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        padding: 20px; overflow-y: auto;
     `;
 
-        panel.innerHTML = `
+    panel.innerHTML = `
         <div style="background: white; border-radius: 20px; max-width: 600px; width: 100%; 
-            padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+            padding: 30px; position: relative; max-height: 90vh; overflow-y: auto;">
             
             <button onclick="closeOrderPanel()" style="
                 position: sticky; top: 0; right: 0; float: right;
                 background: #ff6b6b; color: white; border: none; border-radius: 50%; 
-                width: 40px; height: 40px; cursor: pointer; font-size: 20px; 
-                display: flex; align-items: center; justify-content: center;
-                z-index: 10; margin-bottom: 10px;
+                width: 40px; height: 40px; cursor: pointer; font-size: 20px;
             ">×</button>
             
             <h2 style="text-align: center; color: #FF6B6B; font-size: 1.8rem; 
@@ -418,111 +421,115 @@ class OrderManager {
                 ${orderCode}
             </h2>
             
-            <div id="order-product-card" style="margin-bottom: 30px; width: 100%; padding: 0;"></div>
+            <div id="order-product-card" style="margin-bottom: 20px;"></div>
+            
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: #333; margin: 0 0 12px 0; font-size: 1.1rem;">💰 Price Details</h3>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Unit Price:</span>
+                    <span>₹${productPrice}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Quantity:</span>
+                    <span style="font-weight: 700; color: #4ECDC4;">× ${quantity}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Subtotal:</span>
+                    <span>₹${subtotal.toFixed(0)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #27ae60;">
+                    <span>Discount (${discountPercent}%):</span>
+                    <span>-₹${discountAmount.toFixed(0)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Delivery:</span>
+                    <span>₹${deliveryCharge}</span>
+                </div>
+                <div style="border-top: 2px solid #ddd; padding-top: 8px; margin-top: 8px; 
+                    display: flex; justify-content: space-between; font-weight: 700; font-size: 1.2rem;">
+                    <span>Grand Total:</span>
+                    <span style="color: #FF6B6B;">₹${totalPrice.toFixed(0)}</span>
+                </div>
+            </div>
             
             <form id="order-form" style="display: flex; flex-direction: column; gap: 15px;">
                 <div>
-                    <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Name:</label>
+                    <label style="font-weight: 600; color: #333;">Name:</label>
                     <input type="text" value="${userName}" readonly style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; 
-                        cursor: not-allowed; box-sizing: border-box;">
+                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5;">
                 </div>
                 <div>
-                    <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Product:</label>
+                    <label style="font-weight: 600; color: #333;">Product:</label>
                     <input type="text" value="${productName}" readonly style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; 
-                        cursor: not-allowed; box-sizing: border-box;">
+                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5;">
                 </div>
                 <div>
-                    <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Full Address:</label>
+                    <label style="font-weight: 600; color: #333;">Full Address:</label>
                     <textarea id="order-address" style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; min-height: 80px; 
-                        resize: vertical; box-sizing: border-box;">${userAddress}</textarea>
+                        border: 2px solid #e0e0e0; border-radius: 10px; min-height: 80px;">${userAddress}</textarea>
                 </div>
                 <div>
-                    <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Order Code:</label>
+                    <label style="font-weight: 600; color: #333;">Order Code:</label>
                     <input type="text" value="${orderCode}" readonly style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5; 
-                        cursor: not-allowed; box-sizing: border-box;">
+                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5;">
                 </div>
                 <div>
-                    <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Password:</label>
+                    <label style="font-weight: 600; color: #333;">Password:</label>
                     <input type="password" id="order-password" placeholder="Enter your password" 
-                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; 
-                        border-radius: 10px; box-sizing: border-box;" required>
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;" required>
                 </div>
                 <button type="submit" style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); 
                     color: white; border: none; padding: 15px; border-radius: 10px; 
-                    font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 10px;
-                    touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                    font-size: 1.1rem; font-weight: 600; cursor: pointer;">
                     Submit Order 🚀
                 </button>
             </form>
         </div>
     `;
 
-        document.body.appendChild(panel);
+    document.body.appendChild(panel);
 
-        // ✅ CLOSE FUNCTION - PEHLE DEFINE KARO (Form submit se PEHLE)
-        window.closeOrderPanel = function () {
-            const panel = document.getElementById('order-panel');
-            if (panel) panel.remove();
-            document.body.style.overflow = ''; // Scroll enable
-        };
+    window.closeOrderPanel = function() {
+        panel.remove();
+        document.body.style.overflow = '';
+    };
 
-        // Product card add karo
-        const cardContainer = document.getElementById('order-product-card');
-        cardContainer.appendChild(productCardClone);
+    const cardContainer = document.getElementById('order-product-card');
+    cardContainer.appendChild(productCardClone);
 
-        // --- FIX: Make sure order panel image always appears ---
-        (function fixOrderPanelImage() {
-            const firstImg = productCardClone.querySelector('.product-img');
-            if (firstImg) {
-                // remove slider hidden style
-                firstImg.style.display = "block";
-                firstImg.classList.add("active");
+    const firstImg = productCardClone.querySelector('.product-img');
+    if (firstImg) {
+        firstImg.style.display = "block";
+        firstImg.classList.add("active");
+    }
 
-                // if slider added inline style="display:none"
-                firstImg.removeAttribute("style");
-                firstImg.style.display = "block";
+    const form = document.getElementById('order-form');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-                // lazy-load to normal src
-                const lazy = firstImg.getAttribute("data-src");
-                if (lazy) firstImg.src = lazy;
+        const enteredPassword = document.getElementById('order-password').value;
+        const address = document.getElementById('order-address').value;
 
-                // force reload image so it appears
-                firstImg.loading = "eager";
-                firstImg.onerror = () => {
-                    firstImg.src = "assets/placeholder.png";
-                    firstImg.style.display = "block";
-                };
-            }
-        })();
+        if (enteredPassword !== userPassword) {
+            this.showPopup('❌ Password Incorrect!', 'error');
+            return;
+        }
 
-
-        // Form submit handler
-        const form = document.getElementById('order-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const enteredPassword = document.getElementById('order-password').value;
-            const address = document.getElementById('order-address').value;
-
-            if (enteredPassword !== userPassword) {
-                this.showPopup('❌ Password Incorrect!', 'error');
-                return;
-            }
-
-            this.showLoadingAnimation();
+        this.showLoadingAnimation();
 
             this.submitOrder({
-                orderCode, userName, productName,
-                productPrice, deliveryCharge, totalPrice,
-                address, password: enteredPassword
+                orderCode,
+                userName,
+                productName,
+                productPrice,
+                quantity,  // ✅ YE ALREADY HAI
+                deliveryCharge,
+                totalPrice: totalPrice.toFixed(0), // ✅ DECIMAL HATAYA
+                address,
+                password: enteredPassword
             });
         });
 
-        // Body scroll lock
         document.body.style.overflow = 'hidden';
     }
 
@@ -540,65 +547,65 @@ class OrderManager {
     }
 
     async submitOrder(orderData) {
-        try {
-            const response = await fetch(this.APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    orderCode: orderData.orderCode,
-                    orderDate: new Date().toLocaleString(),
-                    userName: orderData.userName,
-                    productName: orderData.productName,
-                    productPrice: orderData.productPrice,
-                    deliveryCharge: orderData.deliveryCharge,
-                    totalPrice: orderData.totalPrice,
-                    fullAddress: orderData.address,
-                    password: orderData.password,
-                    userEmail: userDataManager.currentUser
-                })
-            });
+    try {
+        const response = await fetch(this.APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                orderCode: orderData.orderCode,
+                orderDate: new Date().toLocaleString(),
+                userName: orderData.userName,
+                productName: orderData.productName,
+                productPrice: orderData.productPrice,
+                quantity: orderData.quantity, // ✅ YE ADD KIYA
+                deliveryCharge: orderData.deliveryCharge,
+                totalPrice: orderData.totalPrice,
+                fullAddress: orderData.address,
+                password: orderData.password,
+                userEmail: userDataManager.currentUser
+            })
+        });
 
-            const result = await response.json();
-            document.getElementById('order-loader')?.remove();
+        const result = await response.json();
+        document.getElementById('order-loader')?.remove();
 
-            if (result.success) {
-                const now = Date.now();
-                const paymentDeadline = now + (60 * 60 * 1000); // ✅ 1 HOUR DEADLINE
+        if (result.success) {
+            const now = Date.now();
+            const paymentDeadline = now + (60 * 60 * 1000);
 
-                const orderToSave = {
-                    orderCode: orderData.orderCode,
-                    productName: orderData.productName,
-                    productPrice: orderData.productPrice,
-                    deliveryCharge: orderData.deliveryCharge,
-                    totalPrice: orderData.totalPrice,
-                    orderDate: new Date().toLocaleString(),
-                    orderTimestamp: now,
-                    paymentDeadline: paymentDeadline,  // ✅ DEADLINE SAVE KIYA
-                    status: '',  // ✅ Empty (not delivered yet)
-                    paymentStatus: '',  // ✅ Empty (payment pending)
-                    paymentConfirmedAt: null  // ✅ No timer yet
-                };
+            const orderToSave = {
+                orderCode: orderData.orderCode,
+                productName: orderData.productName,
+                productPrice: orderData.productPrice,
+                quantity: orderData.quantity, // ✅ YE BHI ADD KIYA
+                deliveryCharge: orderData.deliveryCharge,
+                totalPrice: orderData.totalPrice,
+                orderDate: new Date().toLocaleString(),
+                orderTimestamp: now,
+                paymentDeadline: paymentDeadline,
+                status: '',
+                paymentStatus: '',
+                paymentConfirmedAt: null
+            };
 
-                const currentOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
-                currentOrders.push(orderToSave);
-                localStorage.setItem("abutoys_orders", JSON.stringify(currentOrders));
+            const currentOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+            currentOrders.push(orderToSave);
+            localStorage.setItem("abutoys_orders", JSON.stringify(currentOrders));
 
-                this.orders = currentOrders;
-                this.updateCartBadge();
+            this.orders = currentOrders;
+            this.updateCartBadge();
 
-                closeOrderPanel();
-
-                // ✅ SHOW PAYMENT CARD
-                this.showOrderConfirmationCardWithPayment(orderData, paymentDeadline);
-            } else {
-                this.showPopup('❌ Order failed! Try again.', 'error');
-            }
-
-        } catch (error) {
-            document.getElementById('order-loader')?.remove();
-            console.error(error);
-            this.showPopup('❌ Network error! Check internet.', 'error');
+            closeOrderPanel();
+            this.showOrderConfirmationCardWithPayment(orderData, paymentDeadline);
+        } else {
+            this.showPopup('❌ Order failed! Try again.', 'error');
         }
+
+    } catch (error) {
+        document.getElementById('order-loader')?.remove();
+        console.error(error);
+        this.showPopup('❌ Network error! Check internet.', 'error');
     }
+}
 
     // ✅ BEAUTIFUL ORDER CONFIRMATION CARD - FIXED
     showOrderConfirmationCard(orderData) {
@@ -866,161 +873,192 @@ class OrderManager {
         }
     }
 
-    // ✅ INSTANT FETCH - Status properly check karo
-    async fetchOrdersFromSheetInstant(panel) {
-        try {
-            const response = await fetch(this.APPS_SCRIPT_URL);
-            const result = await response.json();
+    // ✅ INSTANT FETCH - FIXED VERSION
+async fetchOrdersFromSheetInstant(panel) {
+    try {
+        const response = await fetch(this.APPS_SCRIPT_URL);
+        const result = await response.json();
 
-            if (result.success) {
-                const localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
+        console.log("📡 API Response:", result); // ✅ DEBUG LINE
 
-                this.orders = localOrders.map(localOrder => {
-                    const sheetOrder = result.orders.find(o => o['Order Code'] === localOrder.orderCode);
+        if (result.success) {
+            const localOrders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
-                    let status = localOrder.status || '';
-                    let paymentStatus = localOrder.paymentStatus || '';
-                    let paymentConfirmedAt = localOrder.paymentConfirmedAt || null;
+            console.log("📦 Local Orders:", localOrders); // ✅ DEBUG LINE
+            console.log("📋 Sheet Orders:", result.orders); // ✅ DEBUG LINE
 
-                    if (sheetOrder) {
-                        const sheetStatusRaw = sheetOrder['Status'] || '';
-                        const sheetStatus = sheetStatusRaw.toString().trim().toLowerCase();
+            this.orders = localOrders.map(localOrder => {
+                // ✅ CASE-INSENSITIVE MATCH
+                const sheetOrder = result.orders.find(o => {
+                    const sheetCode = String(o['Order Code'] || '').trim().toLowerCase();
+                    const localCode = String(localOrder.orderCode || '').trim().toLowerCase();
+                    return sheetCode === localCode;
+                });
 
-                        const sheetPaymentRaw = sheetOrder['Payment'] || '';
-                        const sheetPayment = sheetPaymentRaw.toString().trim().toLowerCase();
+                let status = localOrder.status || '';
+                let paymentStatus = localOrder.paymentStatus || '';
+                let paymentConfirmedAt = localOrder.paymentConfirmedAt || null;
 
-                        // ✅ PAYMENT LOGIC
-                        if (sheetPayment === 'ok') {
-                            // Payment confirm hua - 48h timer START
-                            if (paymentStatus !== 'ok') {
-                                paymentStatus = 'ok';
-                                paymentConfirmedAt = Date.now();  // ✅ TIMER START
-                            }
-                            // Cancelled status clear kar do
-                            if (status === 'Cancelled') {
-                                status = '';  // Reset so timer can show
-                            }
+                if (sheetOrder) {
+                    console.log(`✅ Found match for ${localOrder.orderCode}:`, sheetOrder); // ✅ DEBUG
+
+                    // ✅ GET STATUS - Try multiple column name variations
+                    const sheetStatusRaw = sheetOrder['Status'] || sheetOrder['status'] || sheetOrder['STATUS'] || '';
+                    const sheetStatus = String(sheetStatusRaw).trim().toLowerCase();
+
+                    // ✅ GET PAYMENT - Try multiple column name variations
+                    const sheetPaymentRaw = sheetOrder['Payment'] || sheetOrder['payment'] || sheetOrder['PAYMENT'] || '';
+                    const sheetPayment = String(sheetPaymentRaw).trim().toLowerCase();
+
+                    console.log(`🔍 Order ${localOrder.orderCode} - Status: "${sheetStatus}", Payment: "${sheetPayment}"`); // ✅ DEBUG
+
+                    // ✅ PAYMENT LOGIC
+                    if (sheetPayment === 'ok' || sheetPayment === 'done' || sheetPayment === '✅') {
+                        if (paymentStatus !== 'ok') {
+                            paymentStatus = 'ok';
+                            paymentConfirmedAt = Date.now();  // ✅ TIMER START
+                            console.log(`💰 Payment confirmed for ${localOrder.orderCode}`);
                         }
-
-                        // ✅ STATUS LOGIC (Delivery)
-                        if (sheetStatus === 'ok') {
-                            status = 'Delivered';
-                        } else if (sheetStatus === 'cancelled') {
-                            status = 'Cancelled';
+                        if (status === 'Cancelled') {
+                            status = '';  // Reset cancelled status
                         }
                     }
 
-                    return {
-                        ...localOrder,
-                        status: status,
-                        paymentStatus: paymentStatus,
-                        paymentConfirmedAt: paymentConfirmedAt
-                    };
-                });
-
-                localStorage.setItem("abutoys_orders", JSON.stringify(this.orders));
-                this.updateCartBadge();
-
-                // ✅ RENDER ORDER CARDS
-                let ordersHTML = '';
-
-                if (this.orders.length === 0) {
-                    ordersHTML = `<div style="text-align: center; padding: 60px 20px;"><i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i><h3>No orders yet!</h3></div>`;
+                    // ✅ STATUS LOGIC (Delivery)
+                    if (sheetStatus === 'ok' || sheetStatus === 'delivered' || sheetStatus === '✅') {
+                        status = 'Delivered';
+                        console.log(`✅ Delivered: ${localOrder.orderCode}`);
+                    } else if (sheetStatus === 'cancelled' || sheetStatus === 'canceled' || sheetStatus === '❌') {
+                        status = 'Cancelled';
+                        console.log(`❌ Cancelled: ${localOrder.orderCode}`);
+                    }
                 } else {
-    this.orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-    
-    ordersHTML = this.orders.map(order => {
-        const isDelivered = order.status === 'Delivered';
-        const isCancelled = order.status === 'Cancelled';
-        const isPaymentPending = order.paymentStatus !== 'ok';
+                    console.warn(`⚠️ No sheet match found for ${localOrder.orderCode}`);
+                }
 
-        let statusHTML = '';
-        let whatsappButtonHTML = '';
+                return {
+                    ...localOrder,
+                    status: status,
+                    paymentStatus: paymentStatus,
+                    paymentConfirmedAt: paymentConfirmedAt
+                };
+            });
 
-        // ✅ STATUS MESSAGES
-        if (isDelivered) {
-            statusHTML = `
-                <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                    <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
-                </div>
-            `;
-            whatsappButtonHTML = ''; // NO BUTTON
-            
-        } else if (isCancelled) {
-            statusHTML = `
-                <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                    <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled (Payment not received)</p>
-                </div>
-            `;
-            whatsappButtonHTML = ''; // NO BUTTON
-            
-        } else if (isPaymentPending) {
-    // ⏳ CALCULATE TIME LEFT FOR PAYMENT
-    const now = Date.now();
-    const timeLeft = order.paymentDeadline - now;
-    
-    let timerText = '';
-    if (timeLeft > 0) {
-        const minutes = Math.floor(timeLeft / (60 * 1000));
-        timerText = `⏰ Time Left: ${minutes}m`;
-    } else {
-        timerText = '⏰ Payment Time Expired';
-    }
-    
-    statusHTML = `
-        <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-            <p style="color: #856404; margin: 0 0 5px 0; font-weight: 600;">⏳ Payment Pending</p>
-            <p style="color: #d32f2f; margin: 0; font-weight: 700; font-size: 0.95rem;">${timerText}</p>
-        </div>
-    `;
-    whatsappButtonHTML = `
-        <a href="https://wa.me/8160154042?text=${encodeURIComponent(
-            `Order Code: ${order.orderCode}
-User Name: ${userDataManager.getCurrentUserName()}
-Total Amount: ₹${order.totalPrice}
-Payment Done ✅`
-        )}" target="_blank" style="text-decoration:none;">
-            <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
-                💬 Confirm Payment
-            </button>
-        </a>
-    `;
-            
-        } else {
-            // Timer running (Payment done)
-            const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
-            statusHTML = `
-                <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
-                    <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
-                </div>
-            `;
-            whatsappButtonHTML = `
-                <a href="https://wa.me/8160154042?text=${encodeURIComponent(
-                    `Order Code: ${order.orderCode}
-User Name: ${userDataManager.getCurrentUserName()}
-Total Amount: ₹${order.totalPrice}
-Delivery Done ✅`
-                )}" target="_blank" style="text-decoration:none;">
-                    <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
-                        💬 Confirm Delivery
-                    </button>
-                </a>
-            `;
-        }
+            localStorage.setItem("abutoys_orders", JSON.stringify(this.orders));
+            this.updateCartBadge();
 
-        return `
-            <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${isDelivered ? '#4CAF50' : isCancelled ? '#e74c3c' : '#FF6B6B'}; animation: fadeInUp 0.5s ease;">
-                <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
-                <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
-                <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
-                ${statusHTML}
-                ${whatsappButtonHTML}
-            </div>
-        `;
-    }).join('');
-}
+            // ✅ RENDER ORDER CARDS
+            let ordersHTML = '';
 
-                panel.innerHTML = `
+            if (this.orders.length === 0) {
+                ordersHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd;"></i>
+                        <h3>No orders yet!</h3>
+                    </div>
+                `;
+            } else {
+                this.orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+                ordersHTML = this.orders.map(order => {
+                    const isDelivered = order.status === 'Delivered';
+                    const isCancelled = order.status === 'Cancelled';
+                    const isPaymentPending = order.paymentStatus !== 'ok';
+
+                    let statusHTML = '';
+                    let whatsappButtonHTML = '';
+                    let borderColor = '#4ECDC4';
+
+                    if (isDelivered) {
+                        borderColor = '#27ae60';
+                        statusHTML = `
+                            <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #155724; margin: 0; font-weight: 600;">✅ Delivered!</p>
+                            </div>
+                        `;
+                    } else if (isCancelled) {
+                        borderColor = '#e74c3c';
+                        statusHTML = `
+                            <div style="background: #f8d7da; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #721c24; margin: 0; font-weight: 600;">❌ Cancelled</p>
+                            </div>
+                        `;
+                    } else if (isPaymentPending) {
+                        borderColor = '#f39c12';
+                        const now = Date.now();
+                        const timeLeft = order.paymentDeadline - now;
+                        let timerText = '';
+                        
+                        if (timeLeft > 0) {
+                            const minutes = Math.floor(timeLeft / (60 * 1000));
+                            timerText = `⏰ ${minutes}m left`;
+                        } else {
+                            timerText = '⏰ Expired';
+                        }
+
+                        statusHTML = `
+                            <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #856404; margin: 0 0 5px 0; font-weight: 600;">⏳ Payment Pending</p>
+                                <p style="color: #d32f2f; margin: 0; font-weight: 700;">${timerText}</p>
+                            </div>
+                        `;
+                        
+                        whatsappButtonHTML = `
+                            <a href="https://wa.me/8160154042?text=${encodeURIComponent(
+                                `Order Code: ${order.orderCode}\nUser: ${userDataManager.getCurrentUserName()}\nAmount: ₹${order.totalPrice}\nPayment Done ✅`
+                            )}" target="_blank" style="text-decoration:none;">
+                                <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
+                                    💬 Confirm Payment
+                                </button>
+                            </a>
+                        `;
+                    } else {
+                        borderColor = '#3498db';
+                        const timeLeft = this.get48hTimeLeft(order.paymentConfirmedAt);
+                        statusHTML = `
+                            <div style="background: #d1ecf1; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center;">
+                                <p style="color: #0c5460; margin: 0; font-weight: 600;">🚚 Delivery: ${timeLeft}</p>
+                            </div>
+                        `;
+                        
+                        whatsappButtonHTML = `
+                            <a href="https://wa.me/8160154042?text=${encodeURIComponent(
+                                `Order Code: ${order.orderCode}\nUser: ${userDataManager.getCurrentUserName()}\nAmount: ₹${order.totalPrice}\nDelivery Done ✅`
+                            )}" target="_blank" style="text-decoration:none;">
+                                <button style="width:100%;background:#25D366;color:white;border:0;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;">
+                                    💬 Confirm Delivery
+                                </button>
+                            </a>
+                        `;
+                    }
+
+                    // ✅ CALCULATE DISCOUNT FOR DISPLAY
+                    const qty = order.quantity || 1;
+                    const discountPercent = qty; // 1 qty = 1%, 10 qty = 10%
+                    const productPrice = parseFloat(order.productPrice || 0);
+                    const subtotal = productPrice * qty;
+                    const discountAmount = Math.round((subtotal * discountPercent) / 100);
+                    
+                    return `
+                        <div style="background: #f9f9f9; border-radius: 15px; padding: 20px; 
+                            margin-bottom: 15px; border-left: 4px solid ${borderColor};">
+                            <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${order.orderCode}</h3>
+                            <p style="margin: 8px 0;"><strong>Product:</strong> ${order.productName}</p>
+                            <p style="margin: 8px 0;"><strong>Quantity:</strong> <span style="background: #4ECDC4; color: white; padding: 3px 10px; border-radius: 5px; font-weight: 700;">${qty}</span></p>
+                            <p style="margin: 8px 0;">
+                                <strong>🎉 Discount:</strong> 
+                                <span style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); color: white; padding: 3px 10px; border-radius: 5px; font-weight: 700;">${discountPercent}% OFF</span>
+                                <span style="color: #27ae60; font-weight: 700; margin-left: 8px;">(-₹${discountAmount})</span>
+                            </p>
+                            <p style="margin: 8px 0;"><strong>Total:</strong> ₹${order.totalPrice}</p>
+                            ${statusHTML}
+                            ${whatsappButtonHTML}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            panel.innerHTML = `
                 <div style="padding: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
                         <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
@@ -1029,23 +1067,25 @@ Delivery Done ✅`
                     ${ordersHTML}
                 </div>
             `;
-            }
-        } catch (error) {
-            console.error('Failed to fetch orders:', error);
-            panel.innerHTML = `
+
+            console.log("✅ Orders rendered successfully!");
+        }
+    } catch (error) {
+        console.error('❌ Failed to fetch orders:', error);
+        panel.innerHTML = `
             <div style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;">
                     <h2 style="color: #FF6B6B; font-family: 'Fredoka One', cursive !important;">🛒 My Orders</h2>
                     <button onclick="document.getElementById('cart-panel').remove(); document.getElementById('cart-overlay').remove();" style="background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">×</button>
                 </div>
                 <div style="text-align: center; padding: 60px 20px; background: #fff3f3; border-radius: 15px;">
-                    <p style="color: #e74c3c; font-weight: 600;">⚠️ Failed to load orders. Check internet.</p>
+                    <p style="color: #e74c3c; font-weight: 600;">⚠️ Failed to load orders</p>
+                    <p style="color: #666; font-size: 0.9rem;">Check internet connection</p>
                 </div>
             </div>
         `;
-        }
     }
-
+}
     getTimeLeft(orderTimestamp) {
         const now = Date.now();
         const diff = orderTimestamp + (48 * 60 * 60 * 1000) - now;
@@ -1059,6 +1099,105 @@ Delivery Done ✅`
 
         return `${hours}h ${minutes}m`;
     }
+}
+
+// =================== QUANTITY SELECTION PANEL ===================
+function openQuantityPanel(productCard) {
+    const panel = document.createElement('div');
+    panel.id = 'quantity-panel';
+    panel.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); z-index: 999998;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; animation: fadeIn 0.3s ease;
+    `;
+
+    panel.innerHTML = `
+        <div style="background: white; border-radius: 20px; max-width: 450px; width: 100%; 
+            padding: 35px; position: relative; animation: slideInUp 0.4s ease;">
+            
+            <button onclick="document.getElementById('quantity-panel').remove(); document.body.style.overflow = '';" style="
+                position: absolute; top: 15px; right: 15px;
+                background: #ff6b6b; color: white; border: none; border-radius: 50%; 
+                width: 35px; height: 35px; cursor: pointer; font-size: 18px;
+            ">×</button>
+            
+            <h2 style="text-align: center; color: #FF6B6B; font-size: 1.8rem; 
+                margin-bottom: 10px; font-family: 'Fredoka One', cursive !important;">
+                📦 Select Quantity
+            </h2>
+            
+            <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 0.95rem;">
+                Choose how many items you want to order
+            </p>
+            
+            <div id="quantity-options" style="display: grid; grid-template-columns: repeat(5, 1fr); 
+                gap: 12px; margin-bottom: 20px;">
+                ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => `
+                    <button class="qty-btn ${num === 1 ? 'active' : ''}" data-qty="${num}" style="
+                        padding: 15px; border: 2px solid ${num === 1 ? '#FF6B6B' : '#e0e0e0'}; 
+                        border-radius: 12px; background: ${num === 1 ? '#FF6B6B' : 'white'}; 
+                        color: ${num === 1 ? 'white' : '#333'}; font-size: 1.1rem; 
+                        font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+                    ">${num}</button>
+                `).join('')}
+            </div>
+            
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <p style="margin: 0 0 8px 0; color: #666; font-size: 0.9rem;">🎉 Special Discount:</p>
+                <p id="discount-info" style="margin: 0; color: #27ae60; font-weight: 700; font-size: 1.1rem;">
+                    1% OFF on this order!
+                </p>
+            </div>
+            
+            <button id="confirm-qty-btn" style="
+                width: 100%; padding: 15px; background: linear-gradient(45deg, #FF6B6B, #4ECDC4); 
+                color: white; border: none; border-radius: 12px; font-size: 1.1rem; 
+                font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            ">
+                ✅ Confirm Quantity
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(panel);
+
+    let selectedQty = 1;
+
+    // Quantity button click handler
+    panel.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            panel.querySelectorAll('.qty-btn').forEach(b => {
+                b.style.border = '2px solid #e0e0e0';
+                b.style.background = 'white';
+                b.style.color = '#333';
+                b.classList.remove('active');
+            });
+
+            this.style.border = '2px solid #FF6B6B';
+            this.style.background = '#FF6B6B';
+            this.style.color = 'white';
+            this.classList.add('active');
+
+            selectedQty = parseInt(this.dataset.qty);
+
+            const discountInfo = panel.querySelector('#discount-info');
+            discountInfo.textContent = `${selectedQty}% OFF on this order!`;
+
+            this.style.transform = 'scale(1.1)';
+            setTimeout(() => this.style.transform = 'scale(1)', 200);
+        });
+    });
+
+    // Confirm button
+    panel.querySelector('#confirm-qty-btn').addEventListener('click', () => {
+        panel.remove();
+        document.body.style.overflow = '';
+        orderManager.openOrderPanel(productCard, selectedQty);
+    });
+
+    // Body scroll lock
+    document.body.style.overflow = 'hidden';
 }
 
 const orderManager = new OrderManager();
@@ -1513,22 +1652,16 @@ function handleBuyNowClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("🔥 Buy Now clicked!");
-
-    // ❌ Login + Location required
     if (!userDataManager.isLocationVerified() || !userDataManager.isLoggedIn()) {
         userDataManager.showMessage("Please login and verify location first!", "error");
         return;
     }
 
     const card = this.closest('.product-card');
-    if (!card) {
-        console.error("❌ Product card not found");
-        return;
-    }
+    if (!card) return;
 
-    console.log("✅ Opening order panel...");
-    orderManager.openOrderPanel(card);
+    // ✅ OPEN QUANTITY PANEL FIRST
+    openQuantityPanel(card);
 }
 
 
@@ -1729,7 +1862,7 @@ function openWhatsApp() {
 
 //     let message;
 //     if (locationStatus === "in_range") {
-//         message = `Hi, I am ${userName}. Distance: ${userDataManager.userDistance.toFixed(2)} km. I want to purchase toys.`;
+//         message = `Hi, I am ${userName}. Distance: ${userDataManager.userDistance} km. I want to purchase toys.`;
 //     } else {
 //         message = `Hi, I am ${userName}. Need to check delivery availability.`;
 //     }
@@ -2107,12 +2240,16 @@ body {
         transform: translateY(0);
     }
 }
+}
 
 @keyframes bounce {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
 }
-        }
+        .qty-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
 
         .product-card {
             animation: fadeInUp 0.6s ease-out;
@@ -2702,4 +2839,3 @@ setInterval(() => {
         console.warn('Auto-cancel watcher error:', err);
     }
 }, 30 * 1000); // ✅ Har 30 seconds check
-
