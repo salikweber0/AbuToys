@@ -748,7 +748,7 @@
         if (existingCard) {
           // Update existing card without animation
           const statusBadge = getStatusBadge(order);
-          existingCard.querySelector('.order-detail:nth-child(2)').innerHTML = `
+          existingCard.querySelector('.order-detail:nth-child()').innerHTML = `
                 <strong>👤 Customer:</strong>
                 ${order['User Name']}
             `;
@@ -776,24 +776,35 @@
             card.style.animation = 'slideUp 0.5s ease';
           }
           card.innerHTML = `
-                <div class="order-code">${order['Order Code']}</div>
-                <div class="order-detail">
-                    <strong>👤 Customer:</strong>
-                    ${order['User Name']}
-                </div>
-                <div class="order-detail">
-                    <strong>🧸 Product:</strong>
-                    ${order['Product Name']}
-                </div>
-                <div class="order-detail">
-                    <strong>💰 Total Price:</strong>
-                    ₹${order['Total Price']}
-                </div>
-                ${statusBadge}
-                <button class="edit-btn" onclick="openEditModal('${order['Order Code']}')">
-                    ✏️ Edit Order
-                </button>
-            `;
+    <div class="order-code">${order['Order Code']}</div>
+    <div class="order-detail">
+        <strong>👤 Customer:</strong>
+        ${order['User Name']}
+    </div>
+    <div class="order-detail">
+        <strong>🧸 Product:</strong>
+        ${order['Product Name']}
+    </div>
+    <div class="order-detail">
+        <strong>📦 Quantity:</strong>
+        <span style="background: #4ECDC4; color: white; padding: 5px 12px; 
+        border-radius: 8px; font-weight: 700; display: inline-block; margin-top: 5px;">
+        ${order['Quantity'] || 1}
+        </span>
+    </div>
+    <div class="order-detail">
+        <strong>💰 Total Price:</strong>
+        ₹${Math.round(order['Total Price'])}
+    </div>
+    <div class="order-detail">
+        <strong>🎉 Discount:</strong>
+        ${order['Discount %'] || 0}% (₹${Math.round((parseFloat(order['Product Price'] || 0) * (order['Quantity'] || 1) * (order['Discount %'] || 0)) / 100)} saved)
+    </div>
+    ${statusBadge}
+    <button class="edit-btn" onclick="openEditModal('${order['Order Code']}')">
+        ✏️ Edit Order
+    </button>
+`;
 
           // Insert at correct position
           if (grid.children[index]) {
@@ -910,8 +921,6 @@
         const saveBtn = document.querySelector('.btn-submit');
         saveBtn.classList.remove('loading');
         saveBtn.innerHTML = '💾 Save Changes';
-
-        alert('Failed to save changes!');
       }
     }
 
