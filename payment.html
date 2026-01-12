@@ -681,54 +681,68 @@
         }
 
         function populatePaymentDetails() {
-            const orderCode = getParameterByName('orderCode') || 'ABU12345Toys';
-            const productName = getParameterByName('productName') || 'Toy Product';
-
-            // ✅ FIX: Quantity & Discount params
-            const quantityParam = getParameterByName('quantity');
-            const quantity = quantityParam !== null ? parseInt(quantityParam) : 1;
-
-            // ✅ FIX: Handle 0 values correctly
-            const productPriceParam = getParameterByName('productPrice');
-            const deliveryChargeParam = getParameterByName('deliveryCharge');
-            const totalPriceParam = getParameterByName('totalPrice');
-
-            const productPrice = productPriceParam !== null ? parseFloat(productPriceParam) : 500;
-            const deliveryCharge = deliveryChargeParam !== null ? parseFloat(deliveryChargeParam) : 50;
-
-            // ✅ CALCULATE DISCOUNT
-            const discountPercent = quantity; // 1 qty = 1%, 10 qty = 10%
-            const subtotal = productPrice * quantity;
-            const discountAmount = Math.round((subtotal * discountPercent) / 100);
-            const afterDiscount = subtotal - discountAmount;
-
-            // ✅ Use totalPrice from URL if available, else calculate
-            const totalAmount = totalPriceParam !== null ? parseFloat(totalPriceParam) : (afterDiscount + deliveryCharge);
-
-            // ✅ UPDATE HTML
-            document.getElementById('orderCode').textContent = orderCode;
-            document.getElementById('productName').textContent = productName;
-            document.getElementById('productPrice').textContent = `₹${productPrice}`;
-            document.getElementById('deliveryCharge').textContent = `₹${deliveryCharge}`;
-            document.getElementById('totalAmount').textContent = `₹${Math.round(totalAmount)}`;
-            document.getElementById('displayAmount').textContent = `₹${Math.round(totalAmount)}`;
-
-            // ✅ UPDATE QUANTITY & DISCOUNT FIELDS (add these IDs in HTML)
-            const qtyElement = document.getElementById('orderQuantity');
-            const discountElement = document.getElementById('orderDiscount');
-            const discountAmtElement = document.getElementById('discountAmount');
-            const subtotalElement = document.getElementById('orderSubtotal');
-
-            if (qtyElement) qtyElement.textContent = quantity;
-            if (discountElement) discountElement.textContent = `${discountPercent}%`;
-            if (discountAmtElement) discountAmtElement.textContent = `₹${discountAmount}`;
-            if (subtotalElement) subtotalElement.textContent = `₹${subtotal}`;
-
-            // ✅ PAYMENT BUTTON DATA
-            document.getElementById('paymentBtn').dataset.amount = Math.round(totalAmount);
-            document.getElementById('paymentBtn').dataset.orderCode = orderCode;
-            document.getElementById('paymentBtn').dataset.productName = productName;
-        }
+    // ✅ GET ALL URL PARAMETERS
+    const orderCode = getParameterByName('orderCode') || 'ABU12345Toys';
+    const productName = getParameterByName('productName') || 'Toy Product';
+    
+    // ✅ GET PRICE PARAMS (with null check)
+    const productPriceParam = getParameterByName('productPrice');
+    const deliveryChargeParam = getParameterByName('deliveryCharge');
+    const totalPriceParam = getParameterByName('totalPrice');
+    const quantityParam = getParameterByName('quantity');
+    
+    // ✅ PARSE VALUES (handle 0 correctly)
+    const productPrice = productPriceParam !== null ? parseFloat(productPriceParam) : 500;
+    const deliveryCharge = deliveryChargeParam !== null ? parseFloat(deliveryChargeParam) : 50;
+    const quantity = quantityParam !== null ? parseInt(quantityParam) : 1;
+    
+    // ✅ CALCULATE DISCOUNT & TOTALS
+    const discountPercent = quantity; // 1 qty = 1%, 10 qty = 10%
+    const subtotal = productPrice * quantity;
+    const discountAmount = Math.round((subtotal * discountPercent) / 100);
+    const afterDiscount = subtotal - discountAmount;
+    
+    // ✅ FINAL TOTAL (use URL param if available, else calculate)
+    const totalAmount = totalPriceParam !== null ? parseFloat(totalPriceParam) : (afterDiscount + deliveryCharge);
+    
+    // ✅ CONSOLE DEBUG (check karne ke liye)
+    console.log('📦 Payment Page Data:', {
+        orderCode,
+        productName,
+        productPrice,
+        quantity,
+        subtotal,
+        discountPercent,
+        discountAmount,
+        afterDiscount,
+        deliveryCharge,
+        totalAmount
+    });
+    
+    // ✅ UPDATE ALL FIELDS
+    document.getElementById('orderCode').textContent = orderCode;
+    document.getElementById('productName').textContent = productName;
+    document.getElementById('productPrice').textContent = `₹${productPrice}`;
+    document.getElementById('deliveryCharge').textContent = `₹${deliveryCharge}`;
+    document.getElementById('totalAmount').textContent = `₹${Math.round(totalAmount)}`;
+    document.getElementById('displayAmount').textContent = `₹${Math.round(totalAmount)}`;
+    
+    // ✅ UPDATE QUANTITY & DISCOUNT DISPLAY
+    const qtyElement = document.getElementById('orderQuantity');
+    const discountElement = document.getElementById('orderDiscount');
+    const discountAmtElement = document.getElementById('discountAmount');
+    const subtotalElement = document.getElementById('orderSubtotal');
+    
+    if (qtyElement) qtyElement.textContent = quantity;
+    if (discountElement) discountElement.textContent = `${discountPercent}%`;
+    if (discountAmtElement) discountAmtElement.textContent = `₹${discountAmount}`;
+    if (subtotalElement) subtotalElement.textContent = `₹${subtotal}`;
+    
+    // ✅ SET PAYMENT BUTTON DATA
+    document.getElementById('paymentBtn').dataset.amount = Math.round(totalAmount);
+    document.getElementById('paymentBtn').dataset.orderCode = orderCode;
+    document.getElementById('paymentBtn').dataset.productName = productName;
+}
 
         document.getElementById('paymentBtn').addEventListener('click', function () {
             const amount = this.dataset.amount;
