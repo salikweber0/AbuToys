@@ -685,60 +685,57 @@
     const orderCode = getParameterByName('orderCode') || 'ABU12345Toys';
     const productName = getParameterByName('productName') || 'Toy Product';
     
-    // ✅ GET PRICE PARAMS (with null check)
     const productPriceParam = getParameterByName('productPrice');
     const deliveryChargeParam = getParameterByName('deliveryCharge');
     const totalPriceParam = getParameterByName('totalPrice');
     const quantityParam = getParameterByName('quantity');
     
-    // ✅ PARSE VALUES (handle 0 correctly)
+    // ✅ NEW PARAMS (exact values from server)
+    const subtotalParam = getParameterByName('subtotal');
+    const discountPercentParam = getParameterByName('discountPercent');
+    const discountAmountParam = getParameterByName('discountAmount');
+
+    // ✅ PARSE BASIC VALUES
     const productPrice = productPriceParam !== null ? parseFloat(productPriceParam) : 500;
     const deliveryCharge = deliveryChargeParam !== null ? parseFloat(deliveryChargeParam) : 50;
     const quantity = quantityParam !== null ? parseInt(quantityParam) : 1;
     
-    // ✅ CALCULATE DISCOUNT & TOTALS
-    const discountPercent = quantity; // 1 qty = 1%, 10 qty = 10%
-    const subtotal = productPrice * quantity;
-    const discountAmount = Math.round((subtotal * discountPercent) / 100);
+    // ✅ USE SERVER VALUES IF AVAILABLE, ELSE FALLBACK
+    let discountPercent = quantity;
+    if (discountPercentParam !== null) discountPercent = parseInt(discountPercentParam);
+
+    let subtotal = productPrice * quantity;
+    if (subtotalParam !== null) subtotal = parseFloat(subtotalParam);
+
+    let discountAmount = (subtotal * discountPercent) / 100;
+    if (discountAmountParam !== null) discountAmount = parseFloat(discountAmountParam);
+
     const afterDiscount = subtotal - discountAmount;
-    
-    // ✅ FINAL TOTAL (use URL param if available, else calculate)
-    const totalAmount = totalPriceParam !== null ? parseFloat(totalPriceParam) : (afterDiscount + deliveryCharge);
-    
-    // ✅ CONSOLE DEBUG (check karne ke liye)
-    console.log('📦 Payment Page Data:', {
-        orderCode,
-        productName,
-        productPrice,
-        quantity,
-        subtotal,
-        discountPercent,
-        discountAmount,
-        afterDiscount,
-        deliveryCharge,
-        totalAmount
+    let totalAmount = afterDiscount + deliveryCharge;
+    if (totalPriceParam !== null) totalAmount = parseFloat(totalPriceParam);
+
+    // ✅ CONSOLE DEBUG
+    console.log('📦 Payment Page Final Data:', {
+        orderCode, productName, productPrice, quantity,
+        subtotal, discountPercent, discountAmount,
+        deliveryCharge, totalAmount
     });
-    
-    // ✅ UPDATE ALL FIELDS
+
+    // ✅ UPDATE ALL FIELDS (exact same as email)
     document.getElementById('orderCode').textContent = orderCode;
     document.getElementById('productName').textContent = productName;
-    document.getElementById('productPrice').textContent = `₹${productPrice}`;
-    document.getElementById('deliveryCharge').textContent = `₹${deliveryCharge}`;
+    document.getElementById('productPrice').textContent = `₹${productPrice.toFixed(0)}`;
+    document.getElementById('deliveryCharge').textContent = `₹${deliveryCharge.toFixed(0)}`;
     document.getElementById('totalAmount').textContent = `₹${Math.round(totalAmount)}`;
     document.getElementById('displayAmount').textContent = `₹${Math.round(totalAmount)}`;
-    
-    // ✅ UPDATE QUANTITY & DISCOUNT DISPLAY
-    const qtyElement = document.getElementById('orderQuantity');
-    const discountElement = document.getElementById('orderDiscount');
-    const discountAmtElement = document.getElementById('discountAmount');
-    const subtotalElement = document.getElementById('orderSubtotal');
-    
-    if (qtyElement) qtyElement.textContent = quantity;
-    if (discountElement) discountElement.textContent = `${discountPercent}%`;
-    if (discountAmtElement) discountAmtElement.textContent = `₹${discountAmount}`;
-    if (subtotalElement) subtotalElement.textContent = `₹${subtotal}`;
-    
-    // ✅ SET PAYMENT BUTTON DATA
+
+    // Quantity & Discount
+    document.getElementById('orderQuantity').textContent = quantity;
+    document.getElementById('orderDiscount').textContent = `${discountPercent}%`;
+    document.getElementById('discountAmount').textContent = `(-₹${discountAmount.toFixed(0)})`;
+    document.getElementById('orderSubtotal').textContent = `₹${subtotal.toFixed(0)}`;
+
+    // Payment button data
     document.getElementById('paymentBtn').dataset.amount = Math.round(totalAmount);
     document.getElementById('paymentBtn').dataset.orderCode = orderCode;
     document.getElementById('paymentBtn').dataset.productName = productName;
