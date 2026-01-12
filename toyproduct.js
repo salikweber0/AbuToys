@@ -275,7 +275,7 @@ const userDataManager = new UserDataManager();
 // =================== ORDER SYSTEM (FIXED) ===================
 class OrderManager {
     constructor() {
-        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBZMYYW5G7hGauJBrE7Al4LkoSRUhFVFlZIwivGIOSqLxTRyfo3F0_krLqJkfdazdZbw/exec";
+        this.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxP4MCI7NOA7XvA-rFEDiJh0QCHP8isKmZtxclsIUZGz5JRSVUHxN2PPSUpDS_3UMb-hg/exec";
         this.orders = JSON.parse(localStorage.getItem("abutoys_orders") || "[]");
 
         // ✅ PAGE LOAD PE BADGE UPDATE KARO
