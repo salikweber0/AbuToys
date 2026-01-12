@@ -574,8 +574,23 @@
                     <span id="productName">-</span>
                 </div>
                 <div class="order-detail">
-                    <strong>Product Price:</strong>
+                    <strong>Unit Price:</strong>
                     <span id="productPrice">₹0</span>
+                </div>
+                <div class="order-detail">
+                    <strong>📦 Quantity:</strong>
+                    <span id="orderQuantity"
+                        style="background: #4ECDC4; color: white; padding: 4px 10px; border-radius: 5px; font-weight: 700;">1</span>
+                </div>
+                <div class="order-detail">
+                    <strong>💰 Subtotal:</strong>
+                    <span id="orderSubtotal">₹0</span>
+                </div>
+                <div class="order-detail">
+                    <strong>🎉 Discount:</strong>
+                    <span id="orderDiscount"
+                        style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); color: white; padding: 4px 10px; border-radius: 5px; font-weight: 700;">0%</span>
+                    <span id="discountAmount" style="color: #27ae60; font-weight: 700; margin-left: 8px;">(-₹0)</span>
                 </div>
                 <div class="order-detail">
                     <strong>Delivery Charge:</strong>
@@ -669,22 +684,48 @@
             const orderCode = getParameterByName('orderCode') || 'ABU12345Toys';
             const productName = getParameterByName('productName') || 'Toy Product';
 
+            // ✅ FIX: Quantity & Discount params
+            const quantityParam = getParameterByName('quantity');
+            const quantity = quantityParam !== null ? parseInt(quantityParam) : 1;
+
             // ✅ FIX: Handle 0 values correctly
             const productPriceParam = getParameterByName('productPrice');
             const deliveryChargeParam = getParameterByName('deliveryCharge');
+            const totalPriceParam = getParameterByName('totalPrice');
 
             const productPrice = productPriceParam !== null ? parseFloat(productPriceParam) : 500;
             const deliveryCharge = deliveryChargeParam !== null ? parseFloat(deliveryChargeParam) : 50;
-            const totalAmount = productPrice + deliveryCharge;
 
+            // ✅ CALCULATE DISCOUNT
+            const discountPercent = quantity; // 1 qty = 1%, 10 qty = 10%
+            const subtotal = productPrice * quantity;
+            const discountAmount = Math.round((subtotal * discountPercent) / 100);
+            const afterDiscount = subtotal - discountAmount;
+
+            // ✅ Use totalPrice from URL if available, else calculate
+            const totalAmount = totalPriceParam !== null ? parseFloat(totalPriceParam) : (afterDiscount + deliveryCharge);
+
+            // ✅ UPDATE HTML
             document.getElementById('orderCode').textContent = orderCode;
             document.getElementById('productName').textContent = productName;
             document.getElementById('productPrice').textContent = `₹${productPrice}`;
             document.getElementById('deliveryCharge').textContent = `₹${deliveryCharge}`;
-            document.getElementById('totalAmount').textContent = `₹${totalAmount}`;
-            document.getElementById('displayAmount').textContent = `₹${totalAmount}`;
+            document.getElementById('totalAmount').textContent = `₹${Math.round(totalAmount)}`;
+            document.getElementById('displayAmount').textContent = `₹${Math.round(totalAmount)}`;
 
-            document.getElementById('paymentBtn').dataset.amount = totalAmount;
+            // ✅ UPDATE QUANTITY & DISCOUNT FIELDS (add these IDs in HTML)
+            const qtyElement = document.getElementById('orderQuantity');
+            const discountElement = document.getElementById('orderDiscount');
+            const discountAmtElement = document.getElementById('discountAmount');
+            const subtotalElement = document.getElementById('orderSubtotal');
+
+            if (qtyElement) qtyElement.textContent = quantity;
+            if (discountElement) discountElement.textContent = `${discountPercent}%`;
+            if (discountAmtElement) discountAmtElement.textContent = `₹${discountAmount}`;
+            if (subtotalElement) subtotalElement.textContent = `₹${subtotal}`;
+
+            // ✅ PAYMENT BUTTON DATA
+            document.getElementById('paymentBtn').dataset.amount = Math.round(totalAmount);
             document.getElementById('paymentBtn').dataset.orderCode = orderCode;
             document.getElementById('paymentBtn').dataset.productName = productName;
         }
