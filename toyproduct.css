@@ -966,7 +966,7 @@ body {
     }
 
     .contact-info {
-        text-align: center;
+        align-items: center;
     }
 
     .user-name-display {
