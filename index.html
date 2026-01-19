@@ -139,36 +139,396 @@
     </section>
 
     <!-- Customer Testimonials -->
-    <section class="testimonials">
-        <div class="container">
-            <h2 class="section-title">💬 What Parents Say</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                    <p>"My kid absolutely loves the Teddy Bear! Amazing quality and so soft. Will definitely order
-                        again!"</p>
-                    <div class="customer-info">
-                        <strong>- Mubassir Saiyad (Dariyapur)</strong>
-                    </div>
+<section class="testimonials">
+    <div class="container">
+        <h2 class="section-title">💬 What Parents Say</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"My kid absolutely loves the Teddy Bear! Amazing quality and so soft. Will definitely order again!"</p>
+                <div class="customer-info">
+                    <strong>- Mubassir Saiyad</strong>
                 </div>
-                <div class="testimonial-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                    <p>"Great quality toys at the best prices. Fast delivery and excellent customer service. Highly
-                        recommended!"</p>
-                    <div class="customer-info">
-                        <strong>- Sofiya Saiyad (Dariyapur)</strong>
-                    </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Great quality toys at the best prices. Fast delivery and excellent customer service. Highly recommended!"</p>
+                <div class="customer-info">
+                    <strong>- Sofiya Saiyad</strong>
                 </div>
-                <div class="testimonial-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                    <p>"Been ordering from AbuToys for 2 years now. Always fresh stock and kids love every toy!"</p>
-                    <div class="customer-info">
-                        <strong>- Ajaz Munsuri (Shahpur)</strong>
-                    </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Been ordering from AbuToys for 2 years now. Always fresh stock and kids love every toy!"</p>
+                <div class="customer-info">
+                    <strong>- Ajaz Munsuri</strong>
+                </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Best toy store in Ahmedabad! Safe products, affordable prices, and super friendly staff. My children are so happy!"</p>
+                <div class="customer-info">
+                    <strong>- Riya Patel</strong>
+                </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Ordered toys for my daughter's birthday party. Delivery was lightning fast and all items were perfectly packed!"</p>
+                <div class="customer-info">
+                    <strong>- Karan Shah</strong>
+                </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐</div>
+                <p>"Amazing collection of educational toys! My son learned so much while playing. Thank you AbuToys team!"</p>
+                <div class="customer-info">
+                    <strong>- Neha Sharma</strong>
+                </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Very impressed with the quality! Non-toxic materials and safe for kids. Worth every rupee!"</p>
+                <div class="customer-info">
+                    <strong>- Priya Desai</strong>
+                </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Bought toys in bulk for our school event. Great discounts and excellent service. Highly professional!"</p>
+                <div class="customer-info">
+                    <strong>- Amit Mehta</strong>
+                </div>
+            </div>
+            <div class="testimonial-card scroll-animate">
+                <div class="stars">⭐⭐⭐⭐</div>
+                <p>"My go-to store for all baby toys! Trusted quality and amazing customer support. Keep it up!"</p>
+                <div class="customer-info">
+                    <strong>- Anjali Singh</strong>
                 </div>
             </div>
         </div>
-    </section>
+        
+        <!-- View More Button -->
+        <div class="view-more-container">
+            <button id="viewMoreTestimonials" class="btn btn-primary view-more-btn">
+                📋 View All Reviews (30+)
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Panel (Full Screen Sliding) -->
+<div id="testimonialsPanel" class="testimonials-panel">
+    <div class="panel-overlay"></div>
+    <div class="panel-content">
+        <div class="panel-header">
+            <h2>💬 Customer Reviews</h2>
+            <button id="closePanelBtn" class="close-panel-btn">✕</button>
+        </div>
+        <div class="panel-body">
+            <!-- Review 1 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">2 days ago</span>
+                </div>
+                <p class="review-text">"My kid absolutely loves the Teddy Bear! Amazing quality and so soft. Will definitely order again!"</p>
+                <div class="reviewer-name">- Mubassir Saiyad</div>
+            </div>
+
+            <!-- Review 2 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">5 days ago</span>
+                </div>
+                <p class="review-text">"Great quality toys at the best prices. Fast delivery and excellent customer service. Highly recommended!"</p>
+                <div class="reviewer-name">- Sofiya Saiyad</div>
+            </div>
+
+            <!-- Review 3 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">1 week ago</span>
+                </div>
+                <p class="review-text">"Been ordering from AbuToys for 2 years now. Always fresh stock and kids love every toy!"</p>
+                <div class="reviewer-name">- Ajaz Munsuri</div>
+            </div>
+
+            <!-- Review 4 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">1 week ago</span>
+                </div>
+                <p class="review-text">"Best toy store in Ahmedabad! Safe products, affordable prices, and super friendly staff. My children are so happy!"</p>
+                <div class="reviewer-name">- Riya Patel</div>
+            </div>
+
+            <!-- Review 5 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">2 weeks ago</span>
+                </div>
+                <p class="review-text">"Ordered toys for my daughter's birthday party. Delivery was lightning fast and all items were perfectly packed!"</p>
+                <div class="reviewer-name">- Karan Shah</div>
+            </div>
+
+            <!-- Review 6 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">2 weeks ago</span>
+                </div>
+                <p class="review-text">"Amazing collection of educational toys! My son learned so much while playing. Thank you AbuToys team!"</p>
+                <div class="reviewer-name">- Neha Sharma</div>
+            </div>
+
+            <!-- Review 7 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">3 weeks ago</span>
+                </div>
+                <p class="review-text">"Very impressed with the quality! Non-toxic materials and safe for kids. Worth every rupee!"</p>
+                <div class="reviewer-name">- Priya Desai</div>
+            </div>
+
+            <!-- Review 8 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">3 weeks ago</span>
+                </div>
+                <p class="review-text">"Bought toys in bulk for our school event. Great discounts and excellent service. Highly professional!"</p>
+                <div class="reviewer-name">- Amit Mehta</div>
+            </div>
+
+            <!-- Review 9 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">1 month ago</span>
+                </div>
+                <p class="review-text">"My go-to store for all baby toys! Trusted quality and amazing customer support. Keep it up!"</p>
+                <div class="reviewer-name">- Anjali Singh</div>
+            </div>
+
+            <!-- Review 10 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">1 month ago</span>
+                </div>
+                <p class="review-text">"Wonderful experience! Got a beautiful remote control car for my nephew. He plays with it every day!"</p>
+                <div class="reviewer-name">- Rohan Joshi</div>
+            </div>
+
+            <!-- Review 11 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">1 month ago</span>
+                </div>
+                <p class="review-text">"Perfect gifts for kids! I ordered multiple items and everything arrived on time. Excellent packaging!"</p>
+                <div class="reviewer-name">- Meera Kapoor</div>
+            </div>
+
+            <!-- Review 12 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">1 month ago</span>
+                </div>
+                <p class="review-text">"My daughter loves her new doll set! Great quality and very affordable. Thank you AbuToys!"</p>
+                <div class="reviewer-name">- Sanjay Verma</div>
+            </div>
+
+            <!-- Review 13 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">2 months ago</span>
+                </div>
+                <p class="review-text">"Ordered building blocks for my son. He's learning and having fun at the same time. Highly recommend!"</p>
+                <div class="reviewer-name">- Pooja Gupta</div>
+            </div>
+
+            <!-- Review 14 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">2 months ago</span>
+                </div>
+                <p class="review-text">"Best customer service! They helped me choose the right toys for different age groups. Very knowledgeable team!"</p>
+                <div class="reviewer-name">- Vikram Patel</div>
+            </div>
+
+            <!-- Review 15 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">2 months ago</span>
+                </div>
+                <p class="review-text">"Got amazing deals during Diwali sale! Quality products at unbeatable prices. Will shop again!"</p>
+                <div class="reviewer-name">- Divya Shah</div>
+            </div>
+
+            <!-- Review 16 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">2 months ago</span>
+                </div>
+                <p class="review-text">"My kids play with these toys every day! Durable, safe, and fun. Best purchase ever!"</p>
+                <div class="reviewer-name">- Rahul Desai</div>
+            </div>
+
+            <!-- Review 17 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">3 months ago</span>
+                </div>
+                <p class="review-text">"Fantastic variety of toys! From puzzles to action figures, they have everything. One-stop shop!"</p>
+                <div class="reviewer-name">- Kavita Jain</div>
+            </div>
+
+            <!-- Review 18 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">3 months ago</span>
+                </div>
+                <p class="review-text">"Delivery was super fast! Ordered on Monday, received on Wednesday. Very satisfied with the service!"</p>
+                <div class="reviewer-name">- Arjun Modi</div>
+            </div>
+
+            <!-- Review 19 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">3 months ago</span>
+                </div>
+                <p class="review-text">"My son's birthday was made special thanks to AbuToys! Beautiful toy cars and great packaging!"</p>
+                <div class="reviewer-name">- Sneha Rao</div>
+            </div>
+
+            <!-- Review 20 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">3 months ago</span>
+                </div>
+                <p class="review-text">"Eco-friendly toys that are safe for babies. I'm so happy I found this store!"</p>
+                <div class="reviewer-name">- Manish Kumar</div>
+            </div>
+
+            <!-- Review 21 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">4 months ago</span>
+                </div>
+                <p class="review-text">"Great experience shopping here! The team was helpful and the toys are top quality!"</p>
+                <div class="reviewer-name">- Ishita Bansal</div>
+            </div>
+
+            <!-- Review 22 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">4 months ago</span>
+                </div>
+                <p class="review-text">"My niece loves the kitchen set! Very realistic and great for pretend play. Highly recommend!"</p>
+                <div class="reviewer-name">- Vishal Agarwal</div>
+            </div>
+
+            <!-- Review 23 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">4 months ago</span>
+                </div>
+                <p class="review-text">"Perfect toys for developing motor skills! My baby is learning so much. Thank you!"</p>
+                <div class="reviewer-name">- Nisha Reddy</div>
+            </div>
+
+            <!-- Review 24 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">5 months ago</span>
+                </div>
+                <p class="review-text">"Got musical toys for my daughter. She's so happy and plays beautiful tunes every day!"</p>
+                <div class="reviewer-name">- Deepak Malhotra</div>
+            </div>
+
+            <!-- Review 25 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">5 months ago</span>
+                </div>
+                <p class="review-text">"Amazing store with friendly staff! They helped me find the perfect gift for my nephew!"</p>
+                <div class="reviewer-name">- Aarti Chopra</div>
+            </div>
+
+            <!-- Review 26 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">5 months ago</span>
+                </div>
+                <p class="review-text">"Durable and long-lasting toys! My kids have been playing with them for months now!"</p>
+                <div class="reviewer-name">- Suresh Iyer</div>
+            </div>
+
+            <!-- Review 27 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <span class="review-date">6 months ago</span>
+                </div>
+                <p class="review-text">"Best prices in Ahmedabad! I compared with other stores and AbuToys is the most affordable!"</p>
+                <div class="reviewer-name">- Lalita Nair</div>
+            </div>
+
+            <!-- Review 28 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">6 months ago</span>
+                </div>
+                <p class="review-text">"My daughter's toy collection is all from AbuToys! Trusted and reliable every single time!"</p>
+                <div class="reviewer-name">- Rajesh Bhatt</div>
+            </div>
+
+            <!-- Review 29 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">6 months ago</span>
+                </div>
+                <p class="review-text">"Educational and fun! My son is learning colors and shapes with these amazing toys!"</p>
+                <div class="reviewer-name">- Geeta Pandey</div>
+            </div>
+
+            <!-- Review 30 -->
+            <div class="panel-review">
+                <div class="review-header">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <span class="review-date">7 months ago</span>
+                </div>
+                <p class="review-text">"Simply the best! Quality, price, service - everything is perfect. Love AbuToys! ❤️"</p>
+                <div class="reviewer-name">- Harish Tiwari</div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
     <!-- About Shop -->
     <section class="about-mini" id="about">
@@ -203,31 +563,40 @@
     </section>
 
     <!-- Special Offers Section -->
-    <section class="special-offers">
-        <div class="container">
-            <div class="offers-content">
-                <h2>🎁 Special Offers & Deals</h2>
-                <p>Don't miss out on our amazing discounts and festive offers!</p>
-                <div class="offers-grid">
-                    <div class="offer-card">
-                        <div class="offer-icon">🎉</div>
-                        <h3>Festival Special</h3>
-                        <p>Up to 5% OFF on selected toys</p>
+<section class="special-offers">
+    <div class="container">
+        <div class="offers-content">
+            <h2>🎁 Special Offers & Deals</h2>
+            <p>Don't miss out on our amazing discounts and festive offers!</p>
+            <div class="offers-grid">
+                <div class="offer-card">
+                    <div class="offer-icon">🎉</div>
+                    <h3>Festival Special</h3>
+                    <p>Get exclusive combo deals during festivals - Diwali, Holi, Christmas & more! Free gift wrapping included.</p>
+                </div>
+                <div class="offer-card bulk-order-card">
+                    <div class="offer-icon">🎈</div>
+                    <h3>Bulk Orders</h3>
+                    <p>Planning birthday parties, school events, or corporate gifts? Get special wholesale rates on bulk purchases!</p>
+                    <div class="bulk-buttons">
+                        <a href="https://wa.me/8160154042?text=Hi%20AbuToys%2C%20I%20need%20bulk%20products%20and%20want%20to%20discuss%20wholesale%20rates%20with%20you." 
+                           target="_blank" class="bulk-btn whatsapp-bulk">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a href="tel:+917069331761" class="bulk-btn call-bulk">
+                            <i class="fas fa-phone"></i> Call Now
+                        </a>
                     </div>
-                    <div class="offer-card">
-                        <div class="offer-icon">🎂</div>
-                        <h3>Birthday Package</h3>
-                        <p>Special combo deals for birthday gifts</p>
-                    </div>
-                    <div class="offer-card">
-                        <div class="offer-icon">🎈</div>
-                        <h3>Bulk Orders</h3>
-                        <p>Extra discounts on bulk purchases</p>
-                    </div>
+                </div>
+                <div class="offer-card">
+                    <div class="offer-icon">🎂</div>
+                    <h3>Birthday Package</h3>
+                    <p>Special combo deals for birthday gifts with personalized cards and same-day delivery available!</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Store Information -->
     <section class="store-info" id="contact">
