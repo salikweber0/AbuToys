@@ -687,7 +687,7 @@
     /* Store Information */
     .store-info {
         padding: 80px 0;
-        background: linear-gradient(135deg, #b2f3ef 0%, #fed6e3 100%);
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
     }
 
     .store-grid {
@@ -704,7 +704,7 @@
     }
 
     .store-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(255, 255, 255, 0.9);
         padding: 2rem;
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -726,11 +726,11 @@
         font-size: 1.3rem;
         font-weight: 600;
         margin-bottom: 1rem;
-        color: white;
+        color: #333;
     }
 
     .store-card p {
-        color: white;
+        color: #666;
         line-height: 1.6;
     }
 
