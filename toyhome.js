@@ -1869,8 +1869,105 @@ function enablePopupCloseOnOutsideClick(popup) {
     document.addEventListener("click", outsideClick);
 }
 
+// ========== SCROLL ANIMATIONS ========== 
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Add scroll-animate class to sections
+    document.querySelectorAll('.feature-card, .testimonial-card, .offer-card, .store-card').forEach(el => {
+        el.classList.add('scroll-animate');
+        observer.observe(el);
+    });
+}
+
+// ========== ENHANCED NAVBAR SCROLL ========== 
+function enhancedNavbarScroll() {
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll > 100) {
+            navbar.style.background = 'rgba(255,255,255,0.98)';
+            navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+        } else {
+            navbar.style.background = 'rgba(255,255,255,0.95)';
+            navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+        }
+
+        lastScroll = currentScroll;
+    });
+}
+
+// Call these on page load
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        initScrollAnimations();
+        enhancedNavbarScroll();
+    }, 500);
+});
+
 window.addEventListener("load", () => {
     setTimeout(() => {
         createFloatingLocationButton();   // ⭐ New Floating Button
     }, 1000);
+});
+
+// ========== TESTIMONIALS PANEL FUNCTIONALITY ========== 
+function initTestimonialsPanel() {
+    const viewMoreBtn = document.getElementById('viewMoreTestimonials');
+    const panel = document.getElementById('testimonialsPanel');
+    const closeBtn = document.getElementById('closePanelBtn');
+    const overlay = panel.querySelector('.panel-overlay');
+
+    // Open Panel
+    if (viewMoreBtn) {
+        viewMoreBtn.addEventListener('click', () => {
+            panel.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        });
+    }
+
+    // Close Panel - Close Button
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            panel.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scroll
+        });
+    }
+
+    // Close Panel - Overlay Click
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            panel.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+
+    // Close Panel - ESC Key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && panel.classList.contains('active')) {
+            panel.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+// Call on page load
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        initTestimonialsPanel();
+    }, 500);
 });
