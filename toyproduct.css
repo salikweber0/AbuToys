@@ -403,7 +403,7 @@ body {
     transform: scale(1.05);
 }
 
-/* Image Navigation Buttons */
+/* =================== IMAGE NAVIGATION ARROWS - BETTER VISIBILITY =================== */
 .img-nav {
     position: absolute;
     top: 50%;
@@ -424,12 +424,24 @@ body {
     font-size: 0.9rem;
 }
 
+/* Mobile pe arrows always visible */
+@media (max-width: 767px) {
+    .img-nav {
+        opacity: 1 !important;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+}
+
 .prev-img {
-    left: 10px;
+    left: 8px;
 }
 
 .next-img {
-    right: 10px;
+    right: 8px;
 }
 
 .product-card:hover .img-nav {
@@ -438,7 +450,79 @@ body {
 
 .img-nav:hover {
     background: #FF6B6B;
+    color: white;
     transform: translateY(-50%) scale(1.1);
+}
+
+/* =================== PRODUCT DETAIL MODAL - IMAGE SLIDER =================== */
+.product-detail-modal .product-images {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.product-detail-modal .product-img,
+.product-detail-modal .video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+.product-detail-modal .product-img.active,
+.product-detail-modal .video-container.active {
+    display: block;
+}
+
+/* Order Panel - Image Container */
+#order-product-card .product-images {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#order-product-card .product-img,
+#order-product-card .video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+#order-product-card .product-img.active,
+#order-product-card .video-container.active {
+    display: block;
+}
+
+/* Image dots indicator */
+.image-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    z-index: 5;
+}
+
+.image-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.image-dot.active {
+    background: white;
+    width: 24px;
+    border-radius: 4px;
 }
 
 /* Product Overlay - Wishlist */
@@ -1060,8 +1144,70 @@ body {
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     }
     
-    .product-card:hover {
+    /* Card height ko compact karo */
+    .product-image-container {
+        height: 160px !important; /* Pehle 200px tha */
+    }
+    
+    .product-info {
+        padding: 8px !important;
+    }
+    
+    .product-info h3 {
+        font-size: 0.85rem !important;
+        margin-bottom: 5px !important;
+        line-height: 1.2 !important;
+        -webkit-line-clamp: 2;
+    }
+    
+    /* View Product Button */
+    .view-product-btn {
+        width: 100%;
+        padding: 6px 12px;
+        background: linear-gradient(45deg, #4ECDC4, #6ee7e0);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: all 0.3s ease;
+    }
+    
+    .view-product-btn:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+    }
+}
+
+/* Desktop View Product Button */
+@media (min-width: 768px) {
+    .view-product-btn {
+        width: 100%;
+        padding: 10px 20px;
+        background: linear-gradient(45deg, #4ECDC4, #6ee7e0);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .view-product-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
     }
 }
 
