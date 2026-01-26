@@ -363,7 +363,7 @@ class OrderManager {
     const productPrice = parseFloat(productCard.dataset.originalPrice || 0);
     const deliveryCharge = userDataManager.deliveryCharge;
     
-    // ✅ CALCULATE WITH QUANTITY & DISCOUNT
+    // Calculate with quantity & discount
     const subtotal = productPrice * quantity;
     const discountPercent = quantity;
     const discountAmount = (subtotal * discountPercent) / 100;
@@ -381,7 +381,7 @@ class OrderManager {
     const allImages = productCardClone.querySelectorAll('.product-img');
     const videoContainers = productCardClone.querySelectorAll('.video-container');
     const arrows = productCardClone.querySelectorAll('.img-nav');
-    const buyButton = productCardClone.querySelector('.add-to-cart-btn');
+    const buyButton = productCardClone.querySelector('.add-to-cart-btn, .modal-buy-now-btn');
     const wishlistIcon = productCardClone.querySelector('.wishlist-icon');
     const productOverlay = productCardClone.querySelector('.product-overlay');
 
@@ -397,91 +397,109 @@ class OrderManager {
     productCardClone.style.margin = '0';
     productCardClone.style.transform = 'none';
 
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'order-overlay';
+    overlay.className = 'active';
+    document.body.appendChild(overlay);
+
+    // Create panel
     const panel = document.createElement('div');
     panel.id = 'order-panel';
-    panel.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.95); z-index: 999999;
-        display: flex; align-items: center; justify-content: center;
-        padding: 20px; overflow-y: auto;
-    `;
-
+    
     panel.innerHTML = `
-        <div style="background: white; border-radius: 20px; max-width: 600px; width: 100%; 
-            padding: 30px; position: relative; max-height: 90vh; overflow-y: auto;">
+        <div class="order-panel-inner">
+            <!-- Header -->
+            <div class="order-panel-header">
+                <h2 class="order-panel-title">📦 Order Details</h2>
+                <button class="order-close-btn" onclick="closeOrderPanel()">×</button>
+            </div>
             
-            <button onclick="closeOrderPanel()" style="
-                position: sticky; top: 0; right: 0; float: right;
-                background: #ff6b6b; color: white; border: none; border-radius: 50%; 
-                width: 40px; height: 40px; cursor: pointer; font-size: 20px;
-            ">×</button>
+            <!-- Order Code -->
+            <div class="order-code-display">
+                🎫 ${orderCode}
+            </div>
             
-            <h2 style="text-align: center; color: #FF6B6B; font-size: 1.8rem; 
-                margin-bottom: 20px; font-family: 'Fredoka One', cursive !important; clear: both;">
-                ${orderCode}
-            </h2>
+            <!-- Product Card -->
+            <div id="order-product-card"></div>
             
-            <div id="order-product-card" style="margin-bottom: 20px;"></div>
-            
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                <h3 style="color: #333; margin: 0 0 12px 0; font-size: 1.1rem;">💰 Price Details</h3>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Unit Price:</span>
-                    <span>₹${productPrice}</span>
+            <!-- Price Details -->
+            <div class="price-details-section">
+                <h3 class="price-details-title">
+                    💰 Price Breakdown
+                </h3>
+                
+                <div class="price-row">
+                    <span class="price-label">Unit Price:</span>
+                    <span class="price-value">₹${productPrice.toFixed(0)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Quantity:</span>
-                    <span style="font-weight: 700; color: #4ECDC4;">× ${quantity}</span>
+                
+                <div class="price-row">
+                    <span class="price-label">Quantity:</span>
+                    <span class="price-value highlight">× ${quantity}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Subtotal:</span>
-                    <span>₹${subtotal.toFixed(0)}</span>
+                
+                <div class="price-row">
+                    <span class="price-label">Subtotal:</span>
+                    <span class="price-value">₹${subtotal.toFixed(0)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #27ae60;">
-                    <span>Discount (${discountPercent}%):</span>
-                    <span>-₹${discountAmount.toFixed(0)}</span>
+                
+                <div class="price-row">
+                    <span class="price-label">🎉 Discount (${discountPercent}%):</span>
+                    <span class="price-value discount">-₹${discountAmount.toFixed(0)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Delivery:</span>
-                    <span>₹${deliveryCharge}</span>
+                
+                <div class="price-row">
+                    <span class="price-label">🚚 Delivery Charge:</span>
+                    <span class="price-value">${deliveryCharge > 0 ? '₹' + deliveryCharge : 'FREE'}</span>
                 </div>
-                <div style="border-top: 2px solid #ddd; padding-top: 8px; margin-top: 8px; 
-                    display: flex; justify-content: space-between; font-weight: 700; font-size: 1.2rem;">
-                    <span>Grand Total:</span>
-                    <span style="color: #FF6B6B;">₹${totalPrice.toFixed(0)}</span>
+                
+                <div class="price-row total-price-row">
+                    <span class="total-price-label">Grand Total:</span>
+                    <span class="total-price-value">₹${totalPrice.toFixed(0)}</span>
                 </div>
             </div>
             
-            <form id="order-form" style="display: flex; flex-direction: column; gap: 15px;">
-                <div>
-                    <label style="font-weight: 600; color: #333;">Name:</label>
-                    <input type="text" value="${userName}" readonly style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5;">
+            <!-- Order Form -->
+            <form id="order-form" class="order-form">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> Name:
+                    </label>
+                    <input type="text" value="${userName}" readonly class="form-input">
                 </div>
-                <div>
-                    <label style="font-weight: 600; color: #333;">Product:</label>
-                    <input type="text" value="${productName}" readonly style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5;">
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-box"></i> Product:
+                    </label>
+                    <input type="text" value="${productName}" readonly class="form-input">
                 </div>
-                <div>
-                    <label style="font-weight: 600; color: #333;">Full Address:</label>
-                    <textarea id="order-address" style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; min-height: 80px;">${userAddress}</textarea>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> Full Address:
+                    </label>
+                    <textarea id="order-address" class="form-textarea" placeholder="Enter your complete delivery address" required>${userAddress}</textarea>
                 </div>
-                <div>
-                    <label style="font-weight: 600; color: #333;">Order Code:</label>
-                    <input type="text" value="${orderCode}" readonly style="width: 100%; padding: 12px; 
-                        border: 2px solid #e0e0e0; border-radius: 10px; background: #f5f5f5;">
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-tag"></i> Order Code:
+                    </label>
+                    <input type="text" value="${orderCode}" readonly class="form-input">
                 </div>
-                <div>
-                    <label style="font-weight: 600; color: #333;">Password:</label>
-                    <input type="password" id="order-password" placeholder="Enter your password" 
-                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;" required>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Password:
+                    </label>
+                    <input type="password" id="order-password" placeholder="Enter your password to confirm" class="form-input" required>
                 </div>
-                <button type="submit" style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); 
-                    color: white; border: none; padding: 15px; border-radius: 10px; 
-                    font-size: 1.1rem; font-weight: 600; cursor: pointer;">
-                    Submit Order 🚀
+                
+                <button type="submit" class="order-submit-btn">
+                    <i class="fas fa-rocket"></i>
+                    Submit Order
                 </button>
             </form>
         </div>
@@ -489,11 +507,24 @@ class OrderManager {
 
     document.body.appendChild(panel);
 
+    // Show panel with animation
+    setTimeout(() => panel.classList.add('active'), 10);
+
+    // Close function
     window.closeOrderPanel = function() {
-        panel.remove();
-        document.body.style.overflow = '';
+        panel.classList.remove('active');
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            panel.remove();
+            overlay.remove();
+            document.body.style.overflow = '';
+        }, 400);
     };
 
+    // Overlay click to close
+    overlay.addEventListener('click', closeOrderPanel);
+
+    // Add product card
     const cardContainer = document.getElementById('order-product-card');
     cardContainer.appendChild(productCardClone);
 
@@ -503,6 +534,7 @@ class OrderManager {
         firstImg.classList.add("active");
     }
 
+    // Form submit
     const form = document.getElementById('order-form');
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -515,23 +547,28 @@ class OrderManager {
             return;
         }
 
+        if (!address.trim()) {
+            this.showPopup('❌ Please enter delivery address!', 'error');
+            return;
+        }
+
         this.showLoadingAnimation();
 
-            this.submitOrder({
-                orderCode,
-                userName,
-                productName,
-                productPrice,
-                quantity,  // ✅ YE ALREADY HAI
-                deliveryCharge,
-                totalPrice: totalPrice.toFixed(0), // ✅ DECIMAL HATAYA
-                address,
-                password: enteredPassword
-            });
+        this.submitOrder({
+            orderCode,
+            userName,
+            productName,
+            productPrice,
+            quantity,
+            deliveryCharge,
+            totalPrice: totalPrice.toFixed(0),
+            address,
+            password: enteredPassword
         });
+    });
 
-        document.body.style.overflow = 'hidden';
-    }
+    document.body.style.overflow = 'hidden';
+}
 
     showLoadingAnimation() {
         const loader = document.createElement('div');
@@ -1904,6 +1941,277 @@ function initializeLoadMore() {
     });
 }
 
+// =================== PRODUCT DETAIL MODAL ===================
+function openProductDetailModal(card) {
+    const data = JSON.parse(card.dataset.fullData);
+    
+    // Remove existing modal if any
+    document.getElementById('product-detail-modal')?.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'product-detail-modal';
+    modal.className = 'product-detail-modal';
+    
+    // Generate media HTML
+    let mediaHTML = '';
+    data.mediaItems.forEach((media, idx) => {
+        if (media.type === 'image') {
+            mediaHTML += `
+                <img src="${media.src}" 
+                     alt="${data.name}"
+                     class="product-img ${idx === 0 ? 'active' : ''}"
+                     onerror="this.style.display='none'" 
+                     loading="lazy">
+            `;
+        } else {
+            const isYouTube = media.src.includes('youtube.com/embed');
+            mediaHTML += `
+                <div class="video-container ${idx === 0 ? 'active' : ''}" 
+                     data-video-src="${media.src}" 
+                     data-video-type="${isYouTube ? 'youtube' : 'direct'}">
+                    <div class="video-thumbnail">
+                        <i class="fas fa-play-circle video-play-icon"></i>
+                        <span class="video-label">🎬 Play Video</span>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    // Check if should show price
+    const shouldShowPrice = userDataManager.isLoggedIn() &&
+        userDataManager.isLocationVerified() &&
+        userDataManager.userDistance <= 20;
+    
+    const priceHTML = shouldShowPrice ? `
+        <div class="price-display" style="margin: 12px 0; padding: 15px; background: linear-gradient(135deg, #fff5f5, #ffe8e8); border-radius: 12px; text-align: center; border: 2px solid #ffe0e0;">
+            <div style="font-size: 2rem; font-weight: 800; color: #FF6B6B; margin-bottom: 8px;">
+                ₹${data.price.toFixed(0)}
+            </div>
+            ${data.oldPrice > data.price ? `
+                <div style="font-size: 1rem; color: #999; text-decoration: line-through; margin-bottom: 8px;">
+                    ₹${data.oldPrice.toFixed(0)}
+                </div>
+            ` : ''}
+            ${data.deliveryCharge > 0 ? `
+                <div style="font-size: 0.9rem; color: #666; margin-top: 8px; padding: 8px; background: white; border-radius: 8px;">
+                    🚚 Delivery Charge: ₹${data.deliveryCharge}
+                </div>
+            ` : `
+                <div style="font-size: 0.9rem; color: #27ae60; margin-top: 8px; padding: 8px; background: #d4edda; border-radius: 8px; font-weight: 600;">
+                    🎉 FREE Delivery!
+                </div>
+            `}
+            
+            <div style="margin-top: 12px; padding: 12px; background: white; border-radius: 8px; border: 2px dashed #FF6B6B;">
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">Total Amount:</div>
+                <div style="font-size: 1.4rem; font-weight: 800; color: #FF6B6B;">
+                    ₹${data.totalPrice.toFixed(0)}
+                </div>
+            </div>
+        </div>
+    ` : `
+        <div style="padding: 20px; background: linear-gradient(135deg, #fff3cd, #ffe8a1); border-radius: 12px; text-align: center; margin: 12px 0; border: 2px solid #ffd700;">
+            <div style="font-size: 2rem; margin-bottom: 10px;">🔒</div>
+            <p style="color: #856404; margin: 0; font-weight: 700; font-size: 1.1rem;">Login & Verify Location</p>
+            <p style="color: #856404; margin: 8px 0 0 0; font-size: 0.9rem;">to see prices and buy products</p>
+        </div>
+    `;
+    
+    const buttonsHTML = shouldShowPrice ? `
+        <button class="btn modal-buy-now-btn" style="
+            background: linear-gradient(45deg, #FF6B6B, #ff8787); 
+            padding: 14px 30px; 
+            border: none; 
+            border-radius: 30px; 
+            color: white; 
+            font-weight: 700; 
+            cursor: pointer; 
+            width: 100%; 
+            text-align: center; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        ">
+            <i class="fas fa-shopping-cart"></i>
+            Buy Now
+        </button>
+    ` : `
+        <button onclick="window.location.href='index.html'" style="
+            background: linear-gradient(45deg, #4ECDC4, #6ee7e0); 
+            padding: 14px 30px; 
+            border: none; 
+            border-radius: 30px; 
+            color: white; 
+            font-weight: 700; 
+            cursor: pointer; 
+            width: 100%; 
+            text-align: center; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        ">
+            <i class="fas fa-sign-in-alt"></i>
+            Login to Buy
+        </button>
+    `;
+    
+    modal.innerHTML = `
+        <div class="product-detail-content" style="animation: slideInUp 0.4s ease;">
+            <button class="product-detail-close">×</button>
+            
+            <div class="product-image-container" style="height: 350px; margin-bottom: 0;">
+                <div class="product-images">
+                    ${mediaHTML}
+                </div>
+                <button class="img-nav prev-img">◀</button>
+                <button class="img-nav next-img">▶</button>
+                <div class="product-overlay">
+                    <i class="fa-solid fa-heart wishlist-icon" title="Add to Wishlist"></i>
+                </div>
+            </div>
+            
+            <div class="product-info" style="padding: 25px;">
+                <h3 style="font-size: 1.6rem; margin-bottom: 12px; color: #333; font-weight: 700; line-height: 1.3;">
+                    ${data.name}
+                </h3>
+                
+                ${data.description ? `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #4ECDC4;">
+                        <p class="product-description" style="font-size: 0.95rem; color: #555; margin: 0; line-height: 1.6;">
+                            📝 ${data.description}
+                        </p>
+                    </div>
+                ` : ''}
+                
+                ${priceHTML}
+                
+                <div style="margin-top: 20px;">
+                    ${buttonsHTML}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Show modal with animation
+    setTimeout(() => modal.classList.add('active'), 10);
+    
+    // Close button handler
+    modal.querySelector('.product-detail-close').addEventListener('click', () => {
+        closeModalWithAnimation();
+    });
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModalWithAnimation();
+        }
+    });
+    
+    // ESC key to close
+    const escHandler = (e) => {
+        if (e.key === 'Escape') {
+            closeModalWithAnimation();
+            document.removeEventListener('keydown', escHandler);
+        }
+    };
+    document.addEventListener('keydown', escHandler);
+    
+    // Close modal function
+    function closeModalWithAnimation() {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.remove();
+            document.body.style.overflow = '';
+        }, 300);
+    }
+    
+    // ✅ BUY NOW BUTTON - PROPER CARD CREATION
+    const buyNowBtn = modal.querySelector('.modal-buy-now-btn');
+    if (buyNowBtn) {
+        const handleBuyClick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (!userDataManager.isLocationVerified() || !userDataManager.isLoggedIn()) {
+                userDataManager.showMessage("Please login and verify location first!", "error");
+                return;
+            }
+            
+            // Close modal
+            closeModalWithAnimation();
+            
+            // ✅ CREATE PROPER PRODUCT CARD - WITH ALL REQUIRED DATA
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.dataset.originalPrice = data.price.toString();
+            productCard.dataset.category = data.category;
+            
+            // ✅ CREATE COMPLETE CARD STRUCTURE
+            let cardMediaHTML = '';
+            if (data.mediaItems && data.mediaItems.length > 0) {
+                data.mediaItems.forEach((media, idx) => {
+                    if (media.type === 'image') {
+                        cardMediaHTML += `
+                            <img src="${media.src}" 
+                                 alt="${data.name}"
+                                 class="product-img ${idx === 0 ? 'active' : ''}"
+                                 loading="lazy">
+                        `;
+                    }
+                });
+            }
+            
+            productCard.innerHTML = `
+                <div class="product-image-container">
+                    <div class="product-images">
+                        ${cardMediaHTML || '<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;">No Image</div>'}
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>${data.name}</h3>
+                    <p class="product-description">${data.description || ''}</p>
+                    <div class="product-price">₹${data.price.toFixed(0)}</div>
+                </div>
+            `;
+            
+            // ✅ OPEN QUANTITY PANEL WITH PROPER CARD
+            setTimeout(() => {
+                openQuantityPanel(productCard);
+            }, 100);
+        };
+        
+        // Click event
+        buyNowBtn.addEventListener('click', handleBuyClick);
+        
+        // Touch event for mobile
+        buyNowBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            handleBuyClick(e);
+        });
+    }
+    
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    // Initialize modal features
+    setTimeout(() => {
+        initializeProductImageSliders();
+        initializeWishlistFunctionality();
+    }, 150);
+}
+
 // =================== GOOGLE SHEETS PRODUCT LOADING ===================
 // ✅ REPLACE YOUR OLD loadProductsFromSheet FUNCTION WITH THIS
 
@@ -2076,28 +2384,50 @@ async function loadProductsFromSheet() {
     </button>
 `;
 
-            card.innerHTML = `
-                <div class="product-image-container">
-                    <div class="product-images">
-                        ${mediaHTML}
-                    </div>
-                    <button class="img-nav prev-img">◀</button>
-                    <button class="img-nav next-img">▶</button>
-                    <div class="product-overlay">
-                        <i class="fa-solid fa-heart wishlist-icon" title="Add to Wishlist"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3>${item.Name || "Product"}</h3>
-                    <p class="product-description">${item.Desc || ""}</p>
-                    ${priceHTML}
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        ${buttonsHTML}
-                    </div>
-                </div>
-            `;
+            // ✅ COMPACT CARD HTML - Grid View
+const compactCardHTML = `
+    <div class="product-image-container">
+        <div class="product-images">
+            ${mediaHTML}
+        </div>
+        <button class="img-nav prev-img">◀</button>
+        <button class="img-nav next-img">▶</button>
+        <div class="product-overlay">
+            <i class="fa-solid fa-heart wishlist-icon" title="Add to Wishlist"></i>
+        </div>
+    </div>
+    <div class="product-info">
+        <h3>${item.Name || "Product"}</h3>
+    </div>
+`;
 
-            grid.appendChild(card);
+card.innerHTML = compactCardHTML;
+
+// ✅ STORE FULL DATA IN DATASET
+card.dataset.fullData = JSON.stringify({
+    name: item.Name || "Product",
+    description: item.Desc || "",
+    price: originalPrice,
+    oldPrice: oldPriceValue,
+    deliveryCharge: deliveryCharge,
+    totalPrice: totalPrice,
+    mediaItems: mediaItems,
+    category: category
+});
+
+// ✅ CARD CLICK -> OPEN DETAIL MODAL
+card.addEventListener('click', function(e) {
+    // Ignore clicks on wishlist/nav buttons
+    if (e.target.closest('.wishlist-icon') || 
+        e.target.closest('.img-nav') ||
+        e.target.closest('.product-img')) {
+        return;
+    }
+    
+    openProductDetailModal(this);
+});
+
+grid.appendChild(card);
         });
 
         console.log(`Loaded ${activeProducts.length} products successfully!`);
