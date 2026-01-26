@@ -1455,7 +1455,7 @@ function showFilterResults(category, count) {
     userDataManager.showMessage(message, "info");
 }
 
-// =================== PRODUCT IMAGES AUTO-SLIDER ===================
+// =================== ENHANCED IMAGE SLIDER WITH SWIPE =================== 
 function initializeProductImageSliders() {
     document.querySelectorAll('.product-card').forEach(card => {
         const mediaContainer = card.querySelector('.product-images');
@@ -1464,10 +1464,33 @@ function initializeProductImageSliders() {
 
         if (!mediaContainer || !prevBtn || !nextBtn) return;
 
-        const mediaElements = Array.from(mediaContainer.children);
+        const mediaElements = Array.from(mediaContainer.children).filter(child => 
+            !child.classList.contains('img-nav') && 
+            !child.classList.contains('product-overlay') &&
+            !child.classList.contains('image-dots')
+        );
+        
         let currentIndex = 0;
         let autoSlideInterval;
         let isVideoPlaying = false;
+        
+        // Add dots indicator
+        if (mediaElements.length > 1) {
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'image-dots';
+            mediaElements.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = `image-dot ${i === 0 ? 'active' : ''}`;
+                dot.addEventListener('click', () => {
+                    stopAutoSlide();
+                    currentIndex = i;
+                    showMedia(currentIndex);
+                    if (!isVideoPlaying) startAutoSlide();
+                });
+                dotsContainer.appendChild(dot);
+            });
+            mediaContainer.appendChild(dotsContainer);
+        }
 
         const validMedia = mediaElements.filter(media => {
             if (media.tagName === 'IMG') {
@@ -1486,19 +1509,26 @@ function initializeProductImageSliders() {
 
         function showMedia(index) {
             validMedia.forEach((media, i) => {
-                if (i === index) {
-                    media.style.display = 'block';
-                    media.classList.add('active');
-                } else {
-                    media.style.display = 'none';
-                    media.classList.remove('active');
-                }
+                media.classList.toggle('active', i === index);
+                media.style.display = i === index ? 'block' : 'none';
+            });
+            
+            // Update dots
+            const dots = card.querySelectorAll('.image-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
             });
         }
 
         function nextSlide() {
             if (isVideoPlaying) return;
             currentIndex = (currentIndex + 1) % validMedia.length;
+            showMedia(currentIndex);
+        }
+
+        function prevSlide() {
+            if (isVideoPlaying) return;
+            currentIndex = (currentIndex - 1 + validMedia.length) % validMedia.length;
             showMedia(currentIndex);
         }
 
@@ -1522,41 +1552,65 @@ function initializeProductImageSliders() {
         prevBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             stopAutoSlide();
-            currentIndex = (currentIndex - 1 + validMedia.length) % validMedia.length;
-            showMedia(currentIndex);
+            prevSlide();
             if (!isVideoPlaying) startAutoSlide();
         });
 
         nextBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             stopAutoSlide();
-            currentIndex = (currentIndex + 1) % validMedia.length;
-            showMedia(currentIndex);
+            nextSlide();
             if (!isVideoPlaying) startAutoSlide();
         });
 
+        // ✅ SWIPE FUNCTIONALITY
         let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        
         mediaContainer.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
             stopAutoSlide();
-        });
+        }, { passive: true });
+
+        mediaContainer.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = startX - currentX;
+            const diffY = startY - currentY;
+            
+            // Only prevent scroll if horizontal swipe is dominant
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
         mediaContainer.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            
             const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = startX - endX;
+            const diffY = startY - endY;
 
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    currentIndex = (currentIndex + 1) % validMedia.length;
+            // Check if horizontal swipe is dominant
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    nextSlide();
                 } else {
-                    currentIndex = (currentIndex - 1 + validMedia.length) % validMedia.length;
+                    prevSlide();
                 }
-                showMedia(currentIndex);
             }
+            
+            isDragging = false;
             if (!isVideoPlaying) startAutoSlide();
-        });
+        }, { passive: true });
 
-        // Listen for video modal events
+        // Video modal events
         document.addEventListener('video-modal-opened', () => {
             isVideoPlaying = true;
             stopAutoSlide();
@@ -2398,10 +2452,34 @@ const compactCardHTML = `
     </div>
     <div class="product-info">
         <h3>${item.Name || "Product"}</h3>
+        <button class="view-product-btn">
+            <i class="fas fa-eye"></i>
+            View Product
+        </button>
     </div>
 `;
-
 card.innerHTML = compactCardHTML;
+
+// Handle View Product button click
+const viewBtn = card.querySelector('.view-product-btn');
+if (viewBtn) {
+    viewBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openProductDetailModal(card);
+    });
+}
+
+// Remove old card click handler and replace with this:
+// (Keep wishlist and nav button exceptions)
+card.addEventListener('click', function(e) {
+    if (e.target.closest('.wishlist-icon') || 
+        e.target.closest('.img-nav') ||
+        e.target.closest('.view-product-btn')) {
+        return;
+    }
+    // Do nothing - only View Product button opens modal
+});
 
 // ✅ STORE FULL DATA IN DATASET
 card.dataset.fullData = JSON.stringify({
